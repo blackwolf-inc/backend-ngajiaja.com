@@ -1,0 +1,9 @@
+{
+  "name": "ngajiaja-tanam-kebaikan",
+  "version": "1.0.0",
+  "description": "semoga berkah",
+  "main": "app.js",
+  "repository": "https://github.com/blackwolf-inc/backend-ngajiaja.com.git",
+  "author": "team backend",
+  "license": "MIT"
+}
