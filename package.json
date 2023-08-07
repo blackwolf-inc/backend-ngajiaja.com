@@ -3,10 +3,18 @@
   "version": "1.0.0",
   "description": "semoga berkah",
   "main": "app.js",
+  "scripts": {
+    "dev": "nodemon ./src/app.js",
+    "start": "node ./src/app.js",
+    "migrate:up": "npx sequelize-cli db:migrate",
+    "migrate:down": "npx sequelize-cli db:migrate:undo:all",
+    "migrate:status": "npx sequelize-cli db:migrate:status"
+  },
   "repository": "https://github.com/blackwolf-inc/backend-ngajiaja.com.git",
   "author": "team backend",
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^1.20.2",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
