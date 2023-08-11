@@ -1,0 +1,16 @@
+post http://localhost:5051/api/v1/registration/student
+Content-Type: application/json
+
+{
+    user_id int [ref: - user.id]
+  profesi string
+  bisa_baca_ayat string [note: "BELUM | TERBATA-BATA | LANCAR"]
+  menguasai_ilmu_tajwid int [note: "0 | 1"]
+  jadwal_bimbingan timestamp
+  paham_aplikasi_meet int [note: "0 | 1"]
+  siap_komitmen_mengaji int [note: "0 | 1"]
+  siap_komitmen_infak int [note: "0 | 1"]
+  bersedia_bayar_20K int [note: "0 | 1"]
+  created_at timestamp
+  updated_at timestamp
+}
