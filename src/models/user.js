@@ -8,7 +8,11 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      // Relation to teacher
+      User.hasOne(models.Pengajar, {
+        foreignKey: 'user_id',
+        as: 'pengajar',
+      });
     }
   }
   User.init(
