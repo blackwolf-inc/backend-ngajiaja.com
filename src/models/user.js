@@ -12,6 +12,12 @@ module.exports = (sequelize, DataTypes) => {
       User.hasOne(models.Pengajar, {
         foreignKey: 'user_id',
         as: 'pengajar',
+        
+      // define association here
+      User.hasOne(models.Student, {
+        foreignKey: 'user_id',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       });
     }
   }

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mengaji - Notifikasi</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      width: 500px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden; /* Memastikan elemen card tidak terlihat keluar dari bentuknya */
+    }
+
+    .header {
+      padding: 20px;
+      background-color: #007bff;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    .content {
+      padding: 30px;
+      color: #333333;
+      line-height: 1.6;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+    .button:hover {
+      background-color: #0056b3;
+    }
+
+    .footer {
+      background-color: white;
+      padding: 20px;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+      color: #007bff;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h2>Hello <%= user.name %>,</h2>
+    </div>
+    <div class="content">
+      <h1 style="text-align: center; background-color: #ffffff; padding: 10px;"><%= user.subject %></h1>
+      <p><%= user.description %></p>
+      <br><br>
+      <p>If you have any questions, please feel free to contact us.</p>
+      <p>Thank you for choosing Mengaji!</p>
+    </div>
+    <div class="button-container">
+      <button class="button">Visit Mengaji</button>
+    </div>
+    <div class="footer">
+      <p>Regards,<br>The Mengaji Team</p>
+    </div>
+  </div>
+</body>
+</html>
