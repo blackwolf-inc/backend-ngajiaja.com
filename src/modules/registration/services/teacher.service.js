@@ -17,15 +17,14 @@ class TeacherService extends BaseService {
 
   async inputValidation(req) {
     const schema = {
-      user_id: { type: 'integer' },
-      user_id: { type: 'integer' },
+      user_id: { type: 'number' },
       pendidikan_terakhir: { type: 'string', optional: false },
       punya_sertifikasi_guru_quran: { type: 'number', enum: [0, 1] },
       background_pendidikan_quran: { type: 'string', optional: false },
       pengalaman_mengajar: { type: 'string', optional: false },
       pernah_mengajar_online: { type: 'number', enum: [0, 1] },
       paham_aplikasi_meet: { type: 'number', enum: [0, 1] },
-      hafalan_quran: { type: 'string', optional: false },
+      hafalan_quran: { type: 'string', optional: z },
       siap_komitmen: { type: 'number', enum: [0, 1] },
       jam_mengajar: { type: 'string', optional: false },
       mengajar_hari_libur: { type: 'number', enum: [0, 1] },
