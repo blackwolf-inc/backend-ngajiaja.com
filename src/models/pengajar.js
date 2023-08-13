@@ -17,19 +17,80 @@ module.exports = (sequelize, DataTypes) => {
   }
   Pengajar.init(
     {
-      user_id: DataTypes.INTEGER,
-      pendidikan_terakhir: DataTypes.STRING,
-      punya_sertifikasi_guru_quran: DataTypes.INTEGER,
-      background_pendidikan_quran: DataTypes.STRING,
-      pengalaman_mengajar: DataTypes.STRING,
-      pernah_mengajar_online: DataTypes.INTEGER,
-      paham_aplikasi_meet: DataTypes.INTEGER,
-      hafalan_quran: DataTypes.STRING,
-      siap_komitmen: DataTypes.INTEGER,
-      jam_mengajar: DataTypes.STRING,
-      mengajar_hari_libur: DataTypes.INTEGER,
-      bagi_hasil_50persen: DataTypes.INTEGER,
-      isVerifiedByAdmin: DataTypes.INTEGER,
+      user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        unique: true,
+      },
+      pendidikan_terakhir: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      punya_sertifikasi_guru_quran: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          isIn: [[0, 1]],
+        },
+      },
+      background_pendidikan_quran: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      pengalaman_mengajar: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      pernah_mengajar_online: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          isIn: [[0, 1]],
+        },
+      },
+      paham_aplikasi_meet: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          isIn: [[0, 1]],
+        },
+      },
+      hafalan_quran: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      siap_komitmen: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          isIn: [[0, 1]],
+        },
+      },
+      jam_mengajar: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      mengajar_hari_libur: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          isIn: [[0, 1]],
+        },
+      },
+      bagi_hasil_50persen: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          isIn: [[0, 1]],
+        },
+      },
+      isVerifiedByAdmin: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          isIn: [[0, 1]],
+        },
+      },
     },
     {
       sequelize,
