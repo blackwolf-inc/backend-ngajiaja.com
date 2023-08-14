@@ -87,6 +87,7 @@ module.exports = (sequelize, DataTypes) => {
       isVerifiedByAdmin: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        defaultValue: 0,
         validate: {
           isIn: [[0, 1]],
         },
