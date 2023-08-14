@@ -1,11 +1,11 @@
 const StudentService = require('../services/student.service');
 const responseHandler = require('./../../../helpers/responseHandler');
 const db = require('./../../../models/index');
-const { Student, sequelize } = db;
+const { Peserta, sequelize } = db;
 
 class StudentController {
   static async getOne(req, res, next) {
-    const service = new StudentService(req, Student);
+    const service = new StudentService(req, Peserta);
     try {
       const result = await service.getOneById(req.params.id);
       return responseHandler.succes(res, `Success get ${service.db.name}`, result);
@@ -15,7 +15,7 @@ class StudentController {
   }
 
   static async getAll(req, res, next) {
-    const service = new StudentService(req, Student);
+    const service = new StudentService(req, Peserta);
     try {
       const result = await service.getAll();
       return responseHandler.succes(res, `Success get all ${service.db.name}s`, result);
@@ -25,7 +25,7 @@ class StudentController {
   }
 
   static async create(req, res, next) {
-    const service = new StudentService(req, Student);
+    const service = new StudentService(req, Peserta);
     try {
       await service.checkUserId(req);
       const result = await service.createData(req.body);
@@ -36,7 +36,7 @@ class StudentController {
   }
 
   static async update(req, res, next) {
-    const service = new StudentService(req, Student);
+    const service = new StudentService(req, Peserta);
     try {
       const result = await service.updateData(req.body, { id: req.params.id });
       return responseHandler.succes(res, `Success update ${service.db.name}`, result);
@@ -46,7 +46,7 @@ class StudentController {
   }
 
   static async delete(req, res, next) {
-    const service = new StudentService(req, Student);
+    const service = new StudentService(req, Peserta);
     try {
       await service.deleteData(req.params.id);
       return responseHandler.succes(res, `Success delete ${service.db.name}`);
