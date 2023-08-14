@@ -24,7 +24,7 @@ class TeacherService extends BaseService {
       user_id: { type: 'number' },
       pendidikan_terakhir: { type: 'string', optional: false },
       punya_sertifikasi_guru_quran: { type: 'enum', values: [0, 1] },
-      background_pendidikan_quran: { type: 'string', optional: false },
+      lembaga_pendidikan_terakhir: { type: 'string', optional: false },
       pengalaman_mengajar: { type: 'string', optional: false },
       pernah_mengajar_online: { type: 'enum', values: [0, 1] },
       paham_aplikasi_meet: { type: 'enum', values: [0, 1] },
