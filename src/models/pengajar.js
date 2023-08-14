@@ -17,25 +17,16 @@ module.exports = (sequelize, DataTypes) => {
   }
   Pengajar.init(
     {
-      user_id: {
-        type: DataTypes.INTEGER,
-        unique: true,
-      },
-      pendidikan_terakhir: {
-        type: DataTypes.STRING,
-      },
-      lembaga_pendidikan_terakhir: {
-        type: DataTypes.STRING,
-      },
+      user_id: DataTypes.INTEGER,
+      pendidikan_terakhir: DataTypes.STRING,
+      lembaga_pendidikan_terakhir: DataTypes.STRING,
       punya_sertifikasi_guru_quran: {
         type: DataTypes.INTEGER,
         validate: {
           isIn: [[0, 1]],
         },
       },
-      pengalaman_mengajar: {
-        type: DataTypes.STRING,
-      },
+      pengalaman_mengajar: DataTypes.STRING,
       pernah_mengajar_online: {
         type: DataTypes.INTEGER,
         validate: {
@@ -48,18 +39,14 @@ module.exports = (sequelize, DataTypes) => {
           isIn: [[0, 1]],
         },
       },
-      hafalan_quran: {
-        type: DataTypes.STRING,
-      },
+      hafalan_quran: DataTypes.STRING,
       siap_komitmen: {
         type: DataTypes.INTEGER,
         validate: {
           isIn: [[0, 1]],
         },
       },
-      jam_mengajar: {
-        type: DataTypes.STRING,
-      },
+      jam_mengajar: DataTypes.STRING,
       mengajar_hari_libur: {
         type: DataTypes.INTEGER,
         validate: {
