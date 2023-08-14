@@ -26,11 +26,15 @@ class TeacherController {
 
   static async create(req, res, next) {
     const service = new TeacherService(req, Pengajar);
+    const validation = await service.inputValidation(req);
+
+    if (!validation) return responseHandler.error(res, 'Validation failed', validation);
+
     try {
-      const checkUser = await service.checkUser(req.body.user_id);
+      const userExist = await service.checkUser(req.body.user_id);
       await service.checkTeacherDuplicate(req.body.user_id);
 
-      await service.sendNotificationEmail(checkUser.email, checkUser.nama);
+      // await service.sendNotificationEmail(userExist.email, userExist.nama); //Belum setup cpanel
 
       const result = await service.createData(req.body);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);

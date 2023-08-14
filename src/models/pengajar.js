@@ -19,17 +19,53 @@ module.exports = (sequelize, DataTypes) => {
     {
       user_id: DataTypes.INTEGER,
       pendidikan_terakhir: DataTypes.STRING,
-      punya_sertifikasi_guru_quran: DataTypes.INTEGER,
-      background_pendidikan_quran: DataTypes.STRING,
+      lembaga_pendidikan_terakhir: DataTypes.STRING,
+      punya_sertifikasi_guru_quran: {
+        type: DataTypes.INTEGER,
+        validate: {
+          isIn: [[0, 1]],
+        },
+      },
       pengalaman_mengajar: DataTypes.STRING,
-      pernah_mengajar_online: DataTypes.INTEGER,
-      paham_aplikasi_meet: DataTypes.INTEGER,
+      pernah_mengajar_online: {
+        type: DataTypes.INTEGER,
+        validate: {
+          isIn: [[0, 1]],
+        },
+      },
+      paham_aplikasi_meet: {
+        type: DataTypes.INTEGER,
+        validate: {
+          isIn: [[0, 1]],
+        },
+      },
       hafalan_quran: DataTypes.STRING,
-      siap_komitmen: DataTypes.INTEGER,
+      siap_komitmen: {
+        type: DataTypes.INTEGER,
+        validate: {
+          isIn: [[0, 1]],
+        },
+      },
       jam_mengajar: DataTypes.STRING,
-      mengajar_hari_libur: DataTypes.INTEGER,
-      bagi_hasil_50persen: DataTypes.INTEGER,
-      isVerifiedByAdmin: DataTypes.INTEGER,
+      mengajar_hari_libur: {
+        type: DataTypes.INTEGER,
+        validate: {
+          isIn: [[0, 1]],
+        },
+      },
+      bagi_hasil_50persen: {
+        type: DataTypes.INTEGER,
+        validate: {
+          isIn: [[0, 1]],
+        },
+      },
+      isVerifiedByAdmin: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        validate: {
+          isIn: [[0, 1]],
+        },
+      },
     },
     {
       sequelize,
