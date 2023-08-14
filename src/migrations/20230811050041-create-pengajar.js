@@ -16,12 +16,12 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      punya_sertifikasi_guru_quran: {
-        type: Sequelize.INTEGER,
+      lembaga_pendidikan_terakhir: {
+        type: Sequelize.STRING,
         allowNull: false,
       },
-      background_pendidikan_quran: {
-        type: Sequelize.STRING,
+      punya_sertifikasi_guru_quran: {
+        type: Sequelize.INTEGER,
         allowNull: false,
       },
       pengalaman_mengajar: {

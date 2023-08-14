@@ -26,16 +26,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      lembaga_pendidikan_terakhir: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       punya_sertifikasi_guru_quran: {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
           isIn: [[0, 1]],
         },
-      },
-      background_pendidikan_quran: {
-        type: DataTypes.STRING,
-        allowNull: false,
       },
       pengalaman_mengajar: {
         type: DataTypes.STRING,
