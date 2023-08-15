@@ -3,6 +3,8 @@ const UserController = require('./controllers/user.controller');
 const PengajarController = require('./controllers/teacher.controller');
 const StudentController = require('./controllers/student.controller');
 const router = Router();
+const validate = require('./../../utils/validatorIndex');
+const { createUserValidator, updateUserValidator } = require('./validators/user.validator');
 
 router.get('/test', (req, res) => {
   res.send('test registration');
@@ -11,10 +13,9 @@ router.get('/test', (req, res) => {
 // users route
 router.get('/user', UserController.getAll);
 router.get('/user/:id', UserController.getOne);
-router.post('/user', UserController.create);
-router.patch('/user/:id', UserController.update);
+router.post('/user', validate(createUserValidator), UserController.create);
+router.patch('/user/:id', validate(updateUserValidator), UserController.update);
 router.delete('/user/:id', UserController.delete);
-
 
 // Teacher Route
 router.get('/pengajar', PengajarController.getAll);
