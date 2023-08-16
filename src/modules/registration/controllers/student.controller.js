@@ -28,6 +28,8 @@ class StudentController {
     const service = new StudentService(req, Peserta);
     try {
       await service.checkUserId(req);
+      const { menguasai_ilmu_tajwid } = req.body;
+      console.log(typeof menguasai_ilmu_tajwid);
       const result = await service.createData(req.body);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {

@@ -18,9 +18,6 @@ module.exports = {
           key: 'id',
         },
       },
-      jadwal_bimbingan_id: {
-        type: Sequelize.INTEGER,
-      },
       profesi: {
         type: Sequelize.STRING,
       },
