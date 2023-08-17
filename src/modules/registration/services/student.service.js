@@ -1,3 +1,4 @@
+const { validationResult } = require('express-validator');
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
 const { User } = require('../../../models');
