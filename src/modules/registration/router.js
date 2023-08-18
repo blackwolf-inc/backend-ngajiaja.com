@@ -9,15 +9,21 @@ const {
   createStudentValidator,
   updateStudentValidator,
 } = require('./validators/student.validator');
+const isAuthenticate = require('./../../middlewares/authentication');
 
 router.get('/test', (req, res) => {
   res.send('test registration');
 });
 
+// create user without auth
+router.post('/user', validate(createUserValidator), UserController.create);
+
+// after login everything need to check auth
+router.use(isAuthenticate);
+
 // users route
 router.get('/user', UserController.getAll);
 router.get('/user/:id', UserController.getOne);
-router.post('/user', validate(createUserValidator), UserController.create);
 router.patch('/user/:id', validate(updateUserValidator), UserController.update);
 router.delete('/user/:id', UserController.delete);
 

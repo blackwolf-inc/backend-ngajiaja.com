@@ -10,6 +10,12 @@ class UserService extends BaseService {
 
     return data;
   }
+
+  async roleCreationUser() {
+    if (this.req.user && this.req.user.role !== 'ADMIN' && this.req.body.role === 'ADMIN') {
+      throw ApiError.badRequest('You can not create ADMIN role');
+    }
+  }
 }
 
 module.exports = UserService;

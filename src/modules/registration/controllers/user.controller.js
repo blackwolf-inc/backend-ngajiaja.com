@@ -9,6 +9,8 @@ class UserController {
     const service = new UserService(req, User);
     try {
       const result = await service.getOneById(req.params.id);
+      delete result.password;
+      delete result.token;
       return responseHandler.succes(res, `Success get ${service.db.name}`, result);
     } catch (error) {
       next(error);
@@ -19,6 +21,10 @@ class UserController {
     const service = new UserService(req, User);
     try {
       const result = await service.getAll();
+      for (const data of result.datas) {
+        delete data.password;
+        delete data.token;
+      }
       return responseHandler.succes(res, `Success get all ${service.db.name}s`, result);
     } catch (error) {
       next(error);
