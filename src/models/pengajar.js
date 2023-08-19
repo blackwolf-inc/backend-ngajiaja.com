@@ -26,7 +26,12 @@ module.exports = (sequelize, DataTypes) => {
           isIn: [[0, 1]],
         },
       },
-      pengalaman_mengajar: DataTypes.STRING,
+      pengalaman_mengajar: {
+        type: DataTypes.STRING,
+        validate: {
+          isIn: [['BELUM PERNAH', '< 6 BULAN', '> 6 BULAN']],
+        },
+      },
       pernah_mengajar_online: {
         type: DataTypes.INTEGER,
         validate: {
@@ -39,14 +44,12 @@ module.exports = (sequelize, DataTypes) => {
           isIn: [[0, 1]],
         },
       },
-      hafalan_quran: DataTypes.STRING,
       siap_komitmen: {
         type: DataTypes.INTEGER,
         validate: {
           isIn: [[0, 1]],
         },
       },
-      jam_mengajar: DataTypes.STRING,
       mengajar_hari_libur: {
         type: DataTypes.INTEGER,
         validate: {
