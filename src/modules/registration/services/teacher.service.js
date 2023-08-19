@@ -21,16 +21,14 @@ class TeacherService extends BaseService {
 
   async inputValidation(req) {
     const schema = {
-      user_id: { type: 'number' },
+      user_id: { type: 'number', optional: false },
       pendidikan_terakhir: { type: 'string', optional: false },
       punya_sertifikasi_guru_quran: { type: 'enum', values: [0, 1] },
       lembaga_pendidikan_terakhir: { type: 'string', optional: false },
-      pengalaman_mengajar: { type: 'string', optional: false },
+      pengalaman_mengajar: { type: 'enum', values: ['BELUM PERNAH', '< 6 BULAN', '> 6 BULAN'] },
       pernah_mengajar_online: { type: 'enum', values: [0, 1] },
       paham_aplikasi_meet: { type: 'enum', values: [0, 1] },
-      hafalan_quran: { type: 'string', optional: false },
       siap_komitmen: { type: 'enum', values: [0, 1] },
-      jam_mengajar: { type: 'string', optional: false },
       mengajar_hari_libur: { type: 'enum', values: [0, 1] },
       bagi_hasil_50persen: { type: 'enum', values: [0, 1] },
     };
@@ -39,8 +37,6 @@ class TeacherService extends BaseService {
     const validation = v.compile(schema);
 
     const validationResult = validation(req.body);
-    console.log('debbug');
-    console.log(validationResult);
 
     if (validationResult !== true) {
       return false;
