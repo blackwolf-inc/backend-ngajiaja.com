@@ -26,11 +26,6 @@ class TeacherController {
 
   static async create(req, res, next) {
     const service = new TeacherService(req, Pengajar);
-    const validation = await service.inputValidation(req);
-
-    if (!validation)
-      return responseHandler.error(res, 'Input data tidak valid / kosong', validation);
-
     try {
       await service.checkUser(req.body.user_id);
       await service.checkTeacherDuplicate(req.body.user_id);
