@@ -6,6 +6,10 @@ const router = Router();
 const validate = require('./../../utils/validatorIndex');
 const { createUserValidator, updateUserValidator } = require('./validators/user.validator');
 const {
+  createTeacherValidator,
+  updateTeacherValidator,
+} = require('./validators/teacher.validator');
+const {
   createStudentValidator,
   updateStudentValidator,
 } = require('./validators/student.validator');
@@ -24,8 +28,8 @@ router.delete('/user/:id', UserController.delete);
 // Teacher Route
 router.get('/pengajar', PengajarController.getAll);
 router.get('/pengajar/:id', PengajarController.getOne);
-router.post('/pengajar', PengajarController.create);
-router.patch('/pengajar/:id', PengajarController.update);
+router.post('/pengajar', validate(createTeacherValidator), PengajarController.create);
+router.patch('/pengajar/:id', validate(updateTeacherValidator), PengajarController.update);
 router.delete('/pengajar', PengajarController.delete);
 
 // students route
