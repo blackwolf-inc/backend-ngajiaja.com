@@ -19,6 +19,9 @@ router.get('/test', (req, res) => {
   res.send('test registration');
 });
 
+// test send email that need to be deploy first in Cpannel
+router.post('/user/send/email', UserController.testSendEmail);
+
 // create user without auth
 router.post('/user', validate(createUserValidator), UserController.create);
 

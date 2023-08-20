@@ -3,6 +3,7 @@ const UserService = require('../services/user.service');
 const responseHandler = require('./../../../helpers/responseHandler');
 const db = require('./../../../models/index');
 const { User, sequelize } = db;
+const nodemailer = require('nodemailer');
 
 class UserController {
   static async getOne(req, res, next) {
@@ -63,6 +64,46 @@ class UserController {
     try {
       await service.deleteData(req.params.id);
       return responseHandler.succes(res, `Success delete ${service.db.name}`);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async testSendEmail(req, res, next) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: 'mail.ngajiaja.com',
+        port: 465,
+        secure: true,
+        auth: {
+          user: 'no-reply@ngajiaja.com',
+          pass: '.38r@XK0_Wqu',
+        },
+      });
+
+      const mailOption = {
+        from: 'no-reply@ngajiaja.com',
+        to: 'najib.ngajiaja@yopmail.com',
+        subject: 'Pendaftaran',
+        html: `
+              <h3>Halo Najib!</h3>
+              <p>
+              Kami telah menerima pendaftaran anda.
+              <br />
+            `,
+      };
+
+      transporter.sendMail(mailOption, function (error, response) {
+        if (error) {
+          console.log(error);
+          return res.status(500).send(error);
+        } else {
+          return res.status(200).json({
+            message: 'Email has been sent',
+          });
+        }
+      });
+      transporter.close();
     } catch (error) {
       next(error);
     }

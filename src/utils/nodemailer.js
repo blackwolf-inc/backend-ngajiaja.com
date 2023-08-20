@@ -27,7 +27,7 @@ class Nodemailer {
 
   static getHtml = (fileName, data) => {
     return new Promise((resolve, reject) => {
-      const path = `${process.cwd()}/src/views/${fileName}`;
+      const path = `${process.cwd()}/src/views/email/${fileName}`;
 
       ejs.renderFile(path, data, (err, data) => {
         if (err) {
