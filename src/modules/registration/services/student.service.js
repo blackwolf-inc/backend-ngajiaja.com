@@ -14,7 +14,7 @@ class StudentService extends BaseService {
   async checkDuplicateUserId(req) {
     const data = await this.__findOne({ where: { user_id: req.body.user_id } });
     if (data) {
-      throw ApiError.badRequest(`Peserta/Pengajar for user_id ${data.user_id} already exist`);
+      throw ApiError.badRequest(`Peserta for user_id ${data.user_id} already exist`);
     }
   }
 }
