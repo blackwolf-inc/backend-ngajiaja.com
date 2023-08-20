@@ -10,6 +10,13 @@ class StudentService extends BaseService {
       throw ApiError.badRequest(`user not found`);
     }
   }
+
+  async checkDuplicateUserId(req) {
+    const data = await this.__findOne({ where: { user_id: req.body.user_id } });
+    if (data) {
+      throw ApiError.badRequest(`Peserta/Pengajar for user_id ${data.user_id} already exist`);
+    }
+  }
 }
 
 module.exports = StudentService;

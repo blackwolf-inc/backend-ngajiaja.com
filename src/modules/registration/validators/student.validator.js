@@ -29,15 +29,8 @@ const createStudentValidator = [
     .isString()
     .withMessage('Must be string')
     .bail()
-    .isIn([
-      'Belum bisa membaca Quran',
-      'Bisa membaca Quran tapi terbata-bata',
-      'Bisa membaca Quran dengan lancar',
-      'Bisa membaca dan sedang menghafal Quran',
-    ])
-    .withMessage(
-      'bisa_baca_ayat must be Belum bisa membaca Quran / Bisa membaca Quran tapi terbata-bata / Bisa membaca Quran dengan lancar / Bisa membaca dan sedang menghafal Quran'
-    ),
+    .isIn(['BELUM BISA', 'TERBATA-BATA', 'BISA', 'BISA DAN HAFAL'])
+    .withMessage('bisa_baca_ayat must be BELUM BISA / TERBATA-BATA / BISA / BISA DAN HAFAL'),
   check('menguasai_ilmu_tajwid')
     .exists()
     .withMessage('Must have menguasai_ilmu_tajwid')
@@ -120,18 +113,13 @@ const updateStudentValidator = [
     .isString()
     .withMessage('Must be string')
     .bail()
-    .isIn([
-      'Belum bisa membaca Quran',
-      'Bisa membaca Quran tapi terbata-bata',
-      'Bisa membaca Quran dengan lancar',
-      'Bisa membaca dan sedang menghafal Quran',
-    ])
+    .isIn(['BELUM BISA', 'TERBATA-BATA', 'BISA', 'BISA DAN HAFAL'])
     .withMessage(
       `bisa_baca_ayat must be :
-      1. Belum bisa membaca Quran 
-      2. Bisa membaca Quran tapi terbata-bata 
-      3. Bisa membaca Quran dengan lancar 
-      4. Bisa membaca dan sedang menghafal Quran`
+      1. BELUM BISA 
+      2. TERBATA-BATA 
+      3. BISA 
+      4. BISA DAN HAFAL`
     ),
   check('menguasai_ilmu_tajwid')
     .if(body('menguasai_ilmu_tajwid').exists())
