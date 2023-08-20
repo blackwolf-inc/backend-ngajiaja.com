@@ -26,7 +26,7 @@ router.post('/user/send/email', UserController.testSendEmail);
 router.post('/user', validate(createUserValidator), UserController.create);
 
 // after login everything need to check auth
-router.use(isAuthenticate);
+// router.use(isAuthenticate);
 
 // users route
 router.get('/user', UserController.getAll);
