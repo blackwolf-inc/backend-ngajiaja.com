@@ -29,14 +29,8 @@ module.exports = {
       paham_aplikasi_meet: {
         type: Sequelize.INTEGER,
       },
-      hafalan_quran: {
-        type: Sequelize.STRING,
-      },
       siap_komitmen: {
         type: Sequelize.INTEGER,
-      },
-      jam_mengajar: {
-        type: Sequelize.STRING,
       },
       mengajar_hari_libur: {
         type: Sequelize.INTEGER,
