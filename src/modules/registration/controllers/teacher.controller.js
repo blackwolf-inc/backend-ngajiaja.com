@@ -27,10 +27,10 @@ class TeacherController {
   static async create(req, res, next) {
     const service = new TeacherService(req, Pengajar);
     try {
-      await service.checkUser(req.body.user_id);
+      const userExist = await service.checkUser(req.body.user_id);
       await service.checkTeacherDuplicate(req.body.user_id);
 
-      // await service.sendNotificationEmail(userExist.email, userExist.nama); //Belum setup cpanel
+      await service.sendNotificationEmail(userExist.email, userExist.nama);
 
       const result = await service.createData(req.body);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
