@@ -67,5 +67,3 @@ class Application {
 }
 
 new Application();
-
-// test push main
