@@ -2,7 +2,10 @@ const { Router } = require('express');
 const AuthController = require('./controllers/auth.controller');
 const isAuthenticate = require('./../../middlewares/authentication');
 const validate = require('./../../utils/validatorIndex');
-const { reqResetPasswordValidator, resetPasswordValidator } = require('./validators/auth.validator');
+const {
+  reqResetPasswordValidator,
+  resetPasswordValidator,
+} = require('./validators/auth.validator');
 
 const router = Router();
 
@@ -12,7 +15,16 @@ router.get('/test', (req, res) => {
 
 router.post('/login', AuthController.login);
 router.post('/logout', isAuthenticate, AuthController.logout);
-router.post("/request-reset-password", validate(reqResetPasswordValidator), AuthController.requestResetPassword);
-router.post("/reset-password", validate(resetPasswordValidator), AuthController.resetPassword);
+router.post(
+  '/request-reset-password',
+  validate(reqResetPasswordValidator),
+  AuthController.requestResetPassword
+);
+router.post('/reset-password', validate(resetPasswordValidator), AuthController.resetPassword);
+router.get('/route/baru/test', (req, res) => {
+  return res.status(200).json({
+    message: 'ini untuk test route baru ketika deploy!',
+  });
+});
 
 module.exports = router;
