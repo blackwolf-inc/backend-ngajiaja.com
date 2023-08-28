@@ -15,9 +15,6 @@ module.exports = {
       reset_token: {
         type: Sequelize.STRING
       },
-      expired_date: {
-        type: Sequelize.DATE
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

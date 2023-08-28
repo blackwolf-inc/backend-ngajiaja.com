@@ -58,7 +58,8 @@ class AuthController {
       const user = await userService.getUserByEmail(req.body.email);
       req.body.user = user;
       const result = await service.generateResetPasswordToken(req);
-      return responseHandler.succes(res, `Success`, result);
+      service.sendNotificationEmail(user, result.reset_token)      
+      return responseHandler.succes(res, `Success`, result); 
     } catch (err) {
       next(err);
     }
