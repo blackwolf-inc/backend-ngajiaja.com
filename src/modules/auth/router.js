@@ -21,10 +21,5 @@ router.post(
   AuthController.requestResetPassword
 );
 router.post('/reset-password', validate(resetPasswordValidator), AuthController.resetPassword);
-router.get('/route/baru/test', (req, res) => {
-  return res.status(200).json({
-    message: 'ini untuk test route baru ketika deploy!',
-  });
-});
 
 module.exports = router;
