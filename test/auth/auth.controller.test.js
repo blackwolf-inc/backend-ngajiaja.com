@@ -3,10 +3,11 @@ process.env.NODE_ENV='test';
 const expect = require('chai').expect;
 const axios = require('axios');
 require('dotenv').config();
-const BASE_URL = process.env.BASE_URL;
+const BASE_URL = process.env.BASE_URL_TEST;
 const db = require('../../src/models/index');
 const { User, UserResetPassword, sequelize } = db;
-const { checkHash, getHash } = require('../../src/helpers/passwordHash');
+const { checkHash } = require('../../src/helpers/passwordHash');
+const TEST_EMAIL = 'test@test.com';
 
 describe("User request reset password", () => {
     before(async function() {
@@ -15,7 +16,7 @@ describe("User request reset password", () => {
         let payload = {
             "role": "PENGAJAR",
             "nama": "testing",
-            "email": "test@test.com",
+            "email": TEST_EMAIL,
             "telp_wa": "081234567890",
             "jenis_kelamin": "L",
             "alamat": "Indonesia",
@@ -27,19 +28,20 @@ describe("User request reset password", () => {
     });
         
     it('request reset password and then send reset password', async () => {
-        const response = await axios.post(BASE_URL + '/auth/request-reset-password', {email: "test@test.com"});
+        const response = await axios.post(BASE_URL + '/auth/request-reset-password', {email: TEST_EMAIL});
         expect(response.status).to.be.equal(200);
-        const user = await User.findOne({where: {email: 'test@test.com'}});
+        const user = await User.findOne({where: {email: TEST_EMAIL}});
         const userResetPassword = await UserResetPassword.findOne({where: {user_id: user.id}});
         expect(userResetPassword.user_id).to.equal(user.id);      
     });
 
     it('change password and remove previous token', async () => {
-        const user = await User.findOne({where: {email: "test@test.com"}});
+        await axios.post(BASE_URL + '/auth/request-reset-password', {email: TEST_EMAIL});
+        const user = await User.findOne({where: {email: TEST_EMAIL}});
         const token = await UserResetPassword.findOne({where: {user_id: user.id}});
         const response = await axios.post(BASE_URL + '/auth/reset-password', {password: "Test12345", token: token.reset_token});
         expect(response.status).to.be.equal(200);
-        const updatedUser = await User.findOne({where: {email: "test@test.com"}});
+        const updatedUser = await User.findOne({where: {email: TEST_EMAIL}});
         expect(checkHash("Test12345", updatedUser.password)).to.equal(true);  
     });
 

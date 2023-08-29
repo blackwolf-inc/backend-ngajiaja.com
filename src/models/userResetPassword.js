@@ -1,7 +1,5 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class UserResetPassword extends Model {
     /**
@@ -21,7 +19,6 @@ module.exports = (sequelize, DataTypes) => {
   UserResetPassword.init({
     user_id: DataTypes.INTEGER,
     reset_token: DataTypes.STRING,
-    expired_date: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'UserResetPassword',
