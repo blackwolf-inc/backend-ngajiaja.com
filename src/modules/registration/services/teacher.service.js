@@ -1,9 +1,50 @@
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
 const SendEmailNotification = require('../../../utils/nodemailer');
+const moment = require('moment');
 const { User, Pengajar } = require('../../../models');
 
 class TeacherService extends BaseService {
+  async createTeacher(payload) {
+    const dateString = payload.tanggal_wawancara;
+    const dateObject = moment(dateString, 'DD-MM-YYY').toDate();
+    const formattedDate = moment(dateObject).format('DD-MM-YYYY');
+
+    const timeString = payload.jam_wawancara;
+    const timeObject = moment(timeString, 'HH:mm').format('HH:mm:ss');
+
+    payload.tanggal_wawancara = formattedDate;
+    payload.jam_wawancara = timeObject;
+
+    const createdTeacher = await this.createData(payload);
+
+    return createdTeacher;
+  }
+
+  async updateTeacher(payload, id) {
+    if (!payload.jam_wawancara || !payload.tanggal_wawancara) {
+      const updatedTeacher = await this.updateData(payload, { id });
+      return updatedTeacher;
+    }
+
+    if (payload.tanggal_wawancara) {
+      const dateString = payload.tanggal_wawancara;
+      const dateObject = moment(dateString, 'DD-MM-YYYY').toDate();
+      const formattedDate = moment(dateObject).format('DD-MM-YYYY');
+      payload.tanggal_wawancara = formattedDate;
+    }
+
+    if (payload.jam_wawancara) {
+      const timeString = payload.jam_wawancara;
+      const timeObject = moment(timeString, 'HH:mm').format('HH:mm:ss');
+      payload.jam_wawancara = timeObject;
+    }
+
+    const createdTeacher = await this.updateData(payload, { id });
+
+    return createdTeacher;
+  }
+
   async checkUser(id) {
     const result = await User.findOne({ where: { id } });
     if (!result) throw ApiError.notFound(`User with id ${id} not found`);
