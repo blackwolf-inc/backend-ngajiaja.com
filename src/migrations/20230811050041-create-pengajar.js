@@ -11,10 +11,10 @@ module.exports = {
       user_id: {
         type: Sequelize.INTEGER,
       },
-      pendidikan_terakhir: {
+      level: {
         type: Sequelize.STRING,
       },
-      lembaga_pendidikan_terakhir: {
+      pendidikan_terakhir: {
         type: Sequelize.STRING,
       },
       punya_sertifikasi_guru_quran: {
@@ -41,6 +41,18 @@ module.exports = {
       isVerifiedByAdmin: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
+      },
+      link_video_membaca_quran: {
+        type: Sequelize.STRING,
+      },
+      link_video_simulasi_mengajar: {
+        type: Sequelize.STRING,
+      },
+      tanggal_wawancara: {
+        type: Sequelize.DATEONLY,
+      },
+      jam_wawancara: {
+        type: Sequelize.TIME,
       },
       createdAt: {
         allowNull: false,

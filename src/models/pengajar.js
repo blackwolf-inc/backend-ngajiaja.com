@@ -18,8 +18,13 @@ module.exports = (sequelize, DataTypes) => {
   Pengajar.init(
     {
       user_id: DataTypes.INTEGER,
+      level: {
+        type: DataTypes.STRING,
+        validate: {
+          isIn: [['MUBTADI', 'YUKHTABAR', 'BARIE']],
+        },
+      },
       pendidikan_terakhir: DataTypes.STRING,
-      lembaga_pendidikan_terakhir: DataTypes.STRING,
       punya_sertifikasi_guru_quran: {
         type: DataTypes.INTEGER,
         validate: {
@@ -69,6 +74,10 @@ module.exports = (sequelize, DataTypes) => {
           isIn: [[0, 1]],
         },
       },
+      link_video_membaca_quran: DataTypes.STRING,
+      link_video_simulasi_mengajar: DataTypes.STRING,
+      tanggal_wawancara: DataTypes.DATEONLY,
+      jam_wawancara: DataTypes.TIME,
     },
     {
       sequelize,
