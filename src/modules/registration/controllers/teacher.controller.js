@@ -32,7 +32,7 @@ class TeacherController {
 
       await service.sendNotificationEmail(userExist.email, userExist.nama);
 
-      const result = await service.createData(req.body);
+      const result = await service.createTeacher(req.body);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {
       next(error);
@@ -43,7 +43,7 @@ class TeacherController {
     const service = new TeacherService(req, Pengajar);
     try {
       await service.getOneById(req.params.id);
-      const result = await service.updateData(req.body, { id: req.params.id });
+      const result = await service.updateTeacher(req.body, req.params.id);
       return responseHandler.succes(res, `Success update ${service.db.name}`, result);
     } catch (error) {
       next(error);
