@@ -167,7 +167,51 @@ const updateStudentValidator = [
     .withMessage('bersedia_bayar_20K must be 0 / 1'),
 ];
 
+const createJadwalValidator = [
+  check('peserta_id')
+    .exists()
+    .withMessage('Must have peserta_id')
+    .bail()
+    .isNumeric()
+    .withMessage('Must be an integer'),
+  check('hari_bimbingan_1')
+    .exists()
+    .withMessage('Must have hari_bimbingan_1')
+    .bail()
+    .isString()
+    .withMessage('Must be a string')
+    .bail()
+    .isIn(['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'])
+    .withMessage(
+      'hari_bimbingan_1 must be one of: SENIN, SELASA, RABU, KAMIS, JUMAT, SABTU, MINGGU'
+    ),
+  check('jam_bimbingan_1')
+    .exists()
+    .withMessage('Must have jam_bimbingan_1')
+    .bail()
+    .isString()
+    .withMessage('Must be a string')
+    .bail()
+    .matches(/^([01]?[0-9]|2[0-3]):[0-5][0-9] - ([01]?[0-9]|2[0-3]):[0-5][0-9]$/)
+    .withMessage('jam_bimbingan_1 must be in the format HH:mm - HH:mm'),
+  check('hari_bimbingan_2')
+    .optional()
+    .isString()
+    .withMessage('Must be a string')
+    .isIn(['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'])
+    .withMessage(
+      'hari_bimbingan_2 must be one of: SENIN, SELASA, RABU, KAMIS, JUMAT, SABTU, MINGGU'
+    ),
+  check('jam_bimbingan_2')
+    .optional()
+    .isString()
+    .withMessage('Must be a string')
+    .matches(/^([01]?[0-9]|2[0-3]):[0-5][0-9] - ([01]?[0-9]|2[0-3]):[0-5][0-9]$/)
+    .withMessage('jam_bimbingan_2 must be in the format HH:mm - HH:mm'),
+];
+
 module.exports = {
   createStudentValidator,
   updateStudentValidator,
+  createJadwalValidator,
 };
