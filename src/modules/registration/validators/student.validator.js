@@ -29,7 +29,7 @@ const createStudentValidator = [
     .isString()
     .withMessage('Must be string')
     .bail()
-    .isIn(['BEGINNER, ELEMENTARY, INTERMEDIATE, ADVANCE'])
+    .isIn(['BEGINNER', 'ELEMENTARY', 'INTERMEDIATE', 'ADVANCE'])
     .withMessage('level must be BEGINNER / ELEMENTARY / INTERMEDIATE / ADVANCE'),
   check('menguasai_ilmu_tajwid')
     .exists()
@@ -113,7 +113,7 @@ const updateStudentValidator = [
     .isString()
     .withMessage('Must be string')
     .bail()
-    .isIn(['BEGINNER, ELEMENTARY, INTERMEDIATE, ADVANCE'])
+    .isIn(['BEGINNER', 'ELEMENTARY', 'INTERMEDIATE', 'ADVANCE'])
     .withMessage(`level must be BEGINNER / ELEMENTARY / INTERMEDIATE / ADVANCE`),
   check('menguasai_ilmu_tajwid')
     .if(body('menguasai_ilmu_tajwid').exists())
@@ -195,7 +195,9 @@ const createJadwalValidator = [
     .matches(/^([01]?[0-9]|2[0-3]):[0-5][0-9] - ([01]?[0-9]|2[0-3]):[0-5][0-9]$/)
     .withMessage('jam_bimbingan_1 must be in the format HH:mm - HH:mm'),
   check('hari_bimbingan_2')
-    .optional()
+    .exists()
+    .withMessage('Must have jam_bimbingan_2')
+    .bail()
     .isString()
     .withMessage('Must be a string')
     .isIn(['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'])
@@ -203,7 +205,9 @@ const createJadwalValidator = [
       'hari_bimbingan_2 must be one of: SENIN, SELASA, RABU, KAMIS, JUMAT, SABTU, MINGGU'
     ),
   check('jam_bimbingan_2')
-    .optional()
+    .exists()
+    .withMessage('Must have jam_bimbingan_2')
+    .bail()
     .isString()
     .withMessage('Must be a string')
     .matches(/^([01]?[0-9]|2[0-3]):[0-5][0-9] - ([01]?[0-9]|2[0-3]):[0-5][0-9]$/)
