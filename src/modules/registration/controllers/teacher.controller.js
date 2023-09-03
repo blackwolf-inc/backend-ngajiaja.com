@@ -2,7 +2,8 @@ const TeacherService = require('../services/teacher.service');
 const responseHandler = require('./../../../helpers/responseHandler');
 const db = require('./../../../models/index');
 const { Pengajar, sequelize } = db;
-
+const { USER_ROLE } = require('./../../../helpers/constanta');
+const ApiError = require('../../../helpers/errorHandler');
 class TeacherController {
   static async getOne(req, res, next) {
     const service = new TeacherService(req, Pengajar);
@@ -27,12 +28,16 @@ class TeacherController {
   static async create(req, res, next) {
     const service = new TeacherService(req, Pengajar);
     try {
-      const userExist = await service.checkUser(req.body.user_id);
-      await service.checkTeacherDuplicate(req.body.user_id);
-
-      await service.sendNotificationEmail(userExist.email, userExist.nama);
+      const [userExist, _] = await Promise.all([
+        service.checkUser(req.body.user_id),
+        service.checkTeacherDuplicate(req.body.user_id),
+      ]);
+      if (userExist.dataValues.role !== USER_ROLE.PENGAJAR) {
+        throw ApiError.badRequest(`User's role is not PENGAJAR`);
+      }
 
       const result = await service.createTeacher(req.body);
+      service.sendNotificationEmail(userExist.email, userExist.nama);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {
       next(error);

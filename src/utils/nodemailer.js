@@ -15,7 +15,7 @@ class Nodemailer {
 
     try {
       await transporter.sendMail({
-        from: `Quicktix <${process.env.EMAIL_ACCOUNT}>`,
+        from: `Admin <${process.env.EMAIL_ACCOUNT}>`,
         to,
         subject,
         html,
