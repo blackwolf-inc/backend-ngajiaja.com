@@ -14,6 +14,8 @@ const {
   updateStudentValidator,
 } = require('./validators/student.validator');
 const isAuthenticate = require('./../../middlewares/authentication');
+const { hasRole } = require('../../middlewares/roleAuth');
+const { USER_ROLE } = require('../../helpers/constanta');
 
 router.get('/test', (req, res) => {
   res.send('test registration');
@@ -29,7 +31,11 @@ router.use(isAuthenticate);
 router.get('/user', UserController.getAll);
 router.get('/user/:id', UserController.getOne);
 router.patch('/user/:id', validate(updateUserValidator), UserController.update);
-router.delete('/user/:id', UserController.delete);
+router.delete(
+  '/user/:id',
+  hasRole([USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN]),
+  UserController.delete
+);
 
 // Teacher Route
 router.get('/pengajar', PengajarController.getAll);

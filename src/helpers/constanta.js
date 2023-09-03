@@ -1,4 +1,4 @@
-const roleUser = {
+const USER_ROLE = {
   SUPER_ADMIN: 'SUPER_ADMIN',
   ADMIN: 'ADMIN',
   PENGAJAR: 'PENGAJAR',
@@ -6,5 +6,5 @@ const roleUser = {
 };
 
 module.exports = {
-  roleUser,
+  USER_ROLE,
 };

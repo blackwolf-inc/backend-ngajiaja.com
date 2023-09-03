@@ -1,12 +1,12 @@
 const { getHash } = require('../helpers/passwordHash');
-const { roleUser } = require('../helpers/constanta');
+const { USER_ROLE } = require('../helpers/constanta');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert('Users', [
       {
-        role: roleUser.SUPER_ADMIN,
+        role: USER_ROLE.SUPER_ADMIN,
         nama: 'superadmin',
         email: 'superadmin.ngajiaja@yopmail.com',
         telp_wa: '08123456789',
@@ -19,7 +19,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        role: roleUser.ADMIN,
+        role: USER_ROLE.ADMIN,
         nama: 'admin1',
         email: 'admin1.ngajiaja@yopmail.com',
         telp_wa: '08123456789',
