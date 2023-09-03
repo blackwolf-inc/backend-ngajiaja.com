@@ -19,9 +19,9 @@ const createStudentValidator = [
     .bail()
     .isString()
     .withMessage('Must be string'),
-  check('bisa_baca_ayat')
+  check('level')
     .exists()
-    .withMessage('Must have bisa_baca_ayat')
+    .withMessage('Must have level')
     .bail()
     .notEmpty()
     .withMessage('Can not be empty')
@@ -29,8 +29,8 @@ const createStudentValidator = [
     .isString()
     .withMessage('Must be string')
     .bail()
-    .isIn(['BELUM BISA', 'TERBATA-BATA', 'BISA', 'BISA DAN HAFAL'])
-    .withMessage('bisa_baca_ayat must be BELUM BISA / TERBATA-BATA / BISA / BISA DAN HAFAL'),
+    .isIn(['BEGINNER, ELEMENTARY, INTERMEDIATE, ADVANCE'])
+    .withMessage('level must be BEGINNER / ELEMENTARY / INTERMEDIATE / ADVANCE'),
   check('menguasai_ilmu_tajwid')
     .exists()
     .withMessage('Must have menguasai_ilmu_tajwid')
@@ -105,22 +105,16 @@ const updateStudentValidator = [
     .bail()
     .isString()
     .withMessage('Must be string'),
-  check('bisa_baca_ayat')
-    .if(body('bisa_baca_ayat').exists())
+  check('level')
+    .if(body('level').exists())
     .notEmpty()
     .withMessage('Can not be empty')
     .bail()
     .isString()
     .withMessage('Must be string')
     .bail()
-    .isIn(['BELUM BISA', 'TERBATA-BATA', 'BISA', 'BISA DAN HAFAL'])
-    .withMessage(
-      `bisa_baca_ayat must be :
-      1. BELUM BISA 
-      2. TERBATA-BATA 
-      3. BISA 
-      4. BISA DAN HAFAL`
-    ),
+    .isIn(['BEGINNER, ELEMENTARY, INTERMEDIATE, ADVANCE'])
+    .withMessage(`level must be BEGINNER / ELEMENTARY / INTERMEDIATE / ADVANCE`),
   check('menguasai_ilmu_tajwid')
     .if(body('menguasai_ilmu_tajwid').exists())
     .notEmpty()
