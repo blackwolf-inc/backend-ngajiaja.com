@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       user_id: DataTypes.INTEGER,
       profesi: DataTypes.STRING,
-      bisa_baca_ayat: {
+      level: {
         type: DataTypes.STRING,
       },
       menguasai_ilmu_tajwid: {

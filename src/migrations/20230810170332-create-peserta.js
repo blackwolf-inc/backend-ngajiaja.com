@@ -21,7 +21,7 @@ module.exports = {
       profesi: {
         type: Sequelize.STRING,
       },
-      bisa_baca_ayat: {
+      level: {
         type: Sequelize.STRING,
       },
       menguasai_ilmu_tajwid: {
