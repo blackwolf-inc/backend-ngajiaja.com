@@ -9,10 +9,7 @@ const {
   createTeacherValidator,
   updateTeacherValidator,
 } = require('./validators/teacher.validator');
-const {
-  createStudentValidator,
-  updateStudentValidator,
-} = require('./validators/student.validator');
+const students = require('./validators/student.validator');
 const isAuthenticate = require('./../../middlewares/authentication');
 const { hasRole } = require('../../middlewares/roleAuth');
 const { USER_ROLE } = require('../../helpers/constanta');
@@ -47,8 +44,15 @@ router.delete('/pengajar', PengajarController.delete);
 // students route
 router.get('/student', StudentController.getAll);
 router.get('/student/:id', StudentController.getOne);
-router.post('/student', validate(createStudentValidator), StudentController.create);
-router.patch('/student/:id', validate(updateStudentValidator), StudentController.update);
+router.post('/student', validate(students.createStudentValidator), StudentController.create);
+router.patch('/student/:id', validate(students.updateStudentValidator), StudentController.update);
 router.delete('/student/:id', StudentController.delete);
+
+// students route jadwal_bimbingan_peserta
+router.post(
+  '/student/jadwal',
+  validate(students.createJadwalValidator),
+  StudentController.createJadwalBimbingan
+);
 
 module.exports = router;

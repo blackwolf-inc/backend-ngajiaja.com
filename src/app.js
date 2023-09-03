@@ -28,6 +28,7 @@ class Application {
     this.app.set('view engine', 'ejs');
     this.app.use(morgan('dev'));
     this.app.use(compression());
+    this.app.use('/images', express.static('../images'));
   }
 
   async routers() {

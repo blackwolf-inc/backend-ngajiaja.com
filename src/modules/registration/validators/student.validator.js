@@ -19,9 +19,9 @@ const createStudentValidator = [
     .bail()
     .isString()
     .withMessage('Must be string'),
-  check('bisa_baca_ayat')
+  check('level')
     .exists()
-    .withMessage('Must have bisa_baca_ayat')
+    .withMessage('Must have level')
     .bail()
     .notEmpty()
     .withMessage('Can not be empty')
@@ -29,8 +29,8 @@ const createStudentValidator = [
     .isString()
     .withMessage('Must be string')
     .bail()
-    .isIn(['BELUM BISA', 'TERBATA-BATA', 'BISA', 'BISA DAN HAFAL'])
-    .withMessage('bisa_baca_ayat must be BELUM BISA / TERBATA-BATA / BISA / BISA DAN HAFAL'),
+    .isIn(['BEGINNER', 'ELEMENTARY', 'INTERMEDIATE', 'ADVANCE'])
+    .withMessage('level must be BEGINNER / ELEMENTARY / INTERMEDIATE / ADVANCE'),
   check('menguasai_ilmu_tajwid')
     .exists()
     .withMessage('Must have menguasai_ilmu_tajwid')
@@ -105,22 +105,16 @@ const updateStudentValidator = [
     .bail()
     .isString()
     .withMessage('Must be string'),
-  check('bisa_baca_ayat')
-    .if(body('bisa_baca_ayat').exists())
+  check('level')
+    .if(body('level').exists())
     .notEmpty()
     .withMessage('Can not be empty')
     .bail()
     .isString()
     .withMessage('Must be string')
     .bail()
-    .isIn(['BELUM BISA', 'TERBATA-BATA', 'BISA', 'BISA DAN HAFAL'])
-    .withMessage(
-      `bisa_baca_ayat must be :
-      1. BELUM BISA 
-      2. TERBATA-BATA 
-      3. BISA 
-      4. BISA DAN HAFAL`
-    ),
+    .isIn(['BEGINNER', 'ELEMENTARY', 'INTERMEDIATE', 'ADVANCE'])
+    .withMessage(`level must be BEGINNER / ELEMENTARY / INTERMEDIATE / ADVANCE`),
   check('menguasai_ilmu_tajwid')
     .if(body('menguasai_ilmu_tajwid').exists())
     .notEmpty()
@@ -173,7 +167,55 @@ const updateStudentValidator = [
     .withMessage('bersedia_bayar_20K must be 0 / 1'),
 ];
 
+const createJadwalValidator = [
+  check('peserta_id')
+    .exists()
+    .withMessage('Must have peserta_id')
+    .bail()
+    .isNumeric()
+    .withMessage('Must be an integer'),
+  check('hari_bimbingan_1')
+    .exists()
+    .withMessage('Must have hari_bimbingan_1')
+    .bail()
+    .isString()
+    .withMessage('Must be a string')
+    .bail()
+    .isIn(['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'])
+    .withMessage(
+      'hari_bimbingan_1 must be one of: SENIN, SELASA, RABU, KAMIS, JUMAT, SABTU, MINGGU'
+    ),
+  check('jam_bimbingan_1')
+    .exists()
+    .withMessage('Must have jam_bimbingan_1')
+    .bail()
+    .isString()
+    .withMessage('Must be a string')
+    .bail()
+    .matches(/^([01]?[0-9]|2[0-3]):[0-5][0-9] - ([01]?[0-9]|2[0-3]):[0-5][0-9]$/)
+    .withMessage('jam_bimbingan_1 must be in the format HH:mm - HH:mm'),
+  check('hari_bimbingan_2')
+    .exists()
+    .withMessage('Must have jam_bimbingan_2')
+    .bail()
+    .isString()
+    .withMessage('Must be a string')
+    .isIn(['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'])
+    .withMessage(
+      'hari_bimbingan_2 must be one of: SENIN, SELASA, RABU, KAMIS, JUMAT, SABTU, MINGGU'
+    ),
+  check('jam_bimbingan_2')
+    .exists()
+    .withMessage('Must have jam_bimbingan_2')
+    .bail()
+    .isString()
+    .withMessage('Must be a string')
+    .matches(/^([01]?[0-9]|2[0-3]):[0-5][0-9] - ([01]?[0-9]|2[0-3]):[0-5][0-9]$/)
+    .withMessage('jam_bimbingan_2 must be in the format HH:mm - HH:mm'),
+];
+
 module.exports = {
   createStudentValidator,
   updateStudentValidator,
+  createJadwalValidator,
 };

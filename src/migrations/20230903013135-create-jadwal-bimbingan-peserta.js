@@ -2,42 +2,32 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Pesertas', {
+    await queryInterface.createTable('JadwalBimbinganPeserta', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      user_id: {
+      peserta_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        unique: true,
         references: {
-          model: 'Users',
+          model: 'Pesertas',
           key: 'id',
         },
       },
-      profesi: {
+      hari_bimbingan_1: {
         type: Sequelize.STRING,
       },
-      level: {
+      jam_bimbingan_1: {
         type: Sequelize.STRING,
       },
-      menguasai_ilmu_tajwid: {
-        type: Sequelize.INTEGER,
+      hari_bimbingan_2: {
+        type: Sequelize.STRING,
       },
-      paham_aplikasi_meet: {
-        type: Sequelize.INTEGER,
-      },
-      siap_komitmen_mengaji: {
-        type: Sequelize.INTEGER,
-      },
-      siap_komitmen_infak: {
-        type: Sequelize.INTEGER,
-      },
-      bersedia_bayar_20K: {
-        type: Sequelize.INTEGER,
+      jam_bimbingan_2: {
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
@@ -50,6 +40,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Pesertas');
+    await queryInterface.dropTable('JadwalBimbinganPeserta');
   },
 };

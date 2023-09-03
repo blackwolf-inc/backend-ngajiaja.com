@@ -1,13 +1,19 @@
-const { validationResult } = require('express-validator');
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
-const { User } = require('../../../models');
+const { User, Peserta } = require('../../../models');
 
 class StudentService extends BaseService {
   async checkUserId(req) {
     const data = await User.findOne({ where: { id: req.body.user_id } });
     if (!data) {
       throw ApiError.badRequest(`user not found`);
+    }
+  }
+
+  async checkPesertaId(req) {
+    const data = await Peserta.findOne({ where: { id: req.body.peserta_id } });
+    if (!data) {
+      throw ApiError.badRequest(`Peserta not found`);
     }
   }
 

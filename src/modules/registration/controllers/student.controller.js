@@ -1,7 +1,7 @@
 const StudentService = require('../services/student.service');
 const responseHandler = require('./../../../helpers/responseHandler');
 const db = require('./../../../models/index');
-const { Peserta, sequelize } = db;
+const { Peserta, sequelize, JadwalBimbinganPeserta } = db;
 
 class StudentController {
   static async getOne(req, res, next) {
@@ -31,6 +31,17 @@ class StudentController {
       await service.checkDuplicateUserId(req);
       const result = await service.createData(req.body);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async createJadwalBimbingan(req, res, next) {
+    const service = new StudentService(req, JadwalBimbinganPeserta);
+    try {
+      await service.checkPesertaId(req);
+      const result = await service.createData(req.body);
+      return responseHandler.succes(res, `Success create Jadwal_Bimbingan_Peserta`, result);
     } catch (error) {
       next(error);
     }
