@@ -10,6 +10,7 @@
     "migrate:up": "npx sequelize-cli db:migrate",
     "migrate:down": "npx sequelize-cli db:migrate:undo:all",
     "migrate:status": "npx sequelize-cli db:migrate:status",
+    "seed:all": "npx sequelize-cli db:seed:all",
     "test": "mocha --recursive"
   },
   "repository": "https://github.com/blackwolf-inc/backend-ngajiaja.com.git",
