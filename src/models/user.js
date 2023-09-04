@@ -15,8 +15,14 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
-      // define association here
+      // Relation to student
       User.hasOne(models.Peserta, {
+        foreignKey: 'user_id',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
+      // Relation to Biaya administrasi
+      User.hasOne(models.BiayaAdministrasi, {
         foreignKey: 'user_id',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
