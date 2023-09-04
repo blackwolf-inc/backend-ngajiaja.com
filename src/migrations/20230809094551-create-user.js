@@ -30,6 +30,9 @@ module.exports = {
       usia: {
         type: Sequelize.INTEGER,
       },
+      status: {
+        type: Sequelize.STRING,
+      },
       password: {
         type: Sequelize.STRING,
       },
