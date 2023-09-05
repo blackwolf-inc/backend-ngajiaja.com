@@ -36,9 +36,9 @@ class UserController {
     const service = new UserService(req, User);
     try {
       req.body.password = getHash(req.body.password);
-      // const result = await service.createData(req.body);
-      // delete result.password;
-      return responseHandler.succes(res, `Success create ${service.db.name}`, 'result');
+      const result = await service.createData(req.body);
+      delete result.password;
+      return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {
       next(error);
     }
