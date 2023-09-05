@@ -1,4 +1,5 @@
 const { check, body } = require('express-validator');
+const { USER_ROLE } = require('../../../helpers/constanta');
 
 const createUserValidator = [
   check('role')
@@ -88,6 +89,50 @@ const createUserValidator = [
     .bail()
     .isLength({ min: 8 })
     .withMessage('Must be at least 8 characters'),
+  check('status')
+    .exists()
+    .withMessage('Must have status')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string')
+    .bail()
+    .custom((value, { req }) => {
+      switch (req.body.role) {
+        case USER_ROLE.PENGAJAR:
+          const statusPengajar = [
+            'REGISTERED',
+            'WAITING',
+            'INTERVIEWED',
+            'REJECTED',
+            'ACTIVE',
+            'NONACTIVE',
+          ].indexOf(value);
+          if (statusPengajar < 0)
+            throw new Error(
+              'User role must be REGISTERED / WAITING / INTERVIEWED / REJECTED / ACTIVE / NONACTIVE]'
+            );
+          break;
+
+        case USER_ROLE.PESERTA:
+          const statusPeserta = [
+            'REGISTERED',
+            'ADMINISTRATION',
+            'REJECTED',
+            'ACTIVE',
+            'NONACTIVE',
+          ].indexOf(value);
+          if (statusPeserta < 0)
+            throw new Error(
+              'User role must be REGISTERED / ADMINISTRATION / REJECTED / ACTIVE / NONACTIVE'
+            );
+          break;
+      }
+
+      return true;
+    }),
 ];
 
 const updateUserValidator = [
@@ -171,6 +216,48 @@ const updateUserValidator = [
     .withMessage('Must be string')
     .isNumeric()
     .withMessage('Must be number contained only'),
+  check('status')
+    .if(body('status').exists())
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string')
+    .bail()
+    .custom((value, { req }) => {
+      switch (req.body.role) {
+        case USER_ROLE.PENGAJAR:
+          const statusPengajar = [
+            'REGISTERED',
+            'WAITING',
+            'INTERVIEWED',
+            'REJECTED',
+            'ACTIVE',
+            'NONACTIVE',
+          ].indexOf(value);
+          if (statusPengajar < 0)
+            throw new Error(
+              'User role must be REGISTERED / WAITING / INTERVIEWED / REJECTED / ACTIVE / NONACTIVE]'
+            );
+          break;
+
+        case USER_ROLE.PESERTA:
+          const statusPeserta = [
+            'REGISTERED',
+            'ADMINISTRATION',
+            'REJECTED',
+            'ACTIVE',
+            'NONACTIVE',
+          ].indexOf(value);
+          if (statusPeserta < 0)
+            throw new Error(
+              'User role must be REGISTERED / ADMINISTRATION / REJECTED / ACTIVE / NONACTIVE'
+            );
+          break;
+      }
+
+      return true;
+    }),
 ];
 
 module.exports = {
