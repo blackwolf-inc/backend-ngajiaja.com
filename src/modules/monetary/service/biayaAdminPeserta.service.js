@@ -34,7 +34,7 @@ class BiayaAdminPesertaService extends BaseService {
 
   async changeImages(req) {
     if (req.file) {
-      const imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+      const imageUrl = `${req.file.filename}`;
       req.body.bukti_pembayaran = imageUrl;
       req.body.status = 'null';
     } else {

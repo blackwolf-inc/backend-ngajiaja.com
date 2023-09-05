@@ -43,7 +43,7 @@ class Application {
     });
 
     this.app.use((error, req, res, next) => {
-      console.error('Error:', error.message);
+      console.error('Error:', error);
       return res.status(error.status || error.code || 500).send(error);
     });
   }
