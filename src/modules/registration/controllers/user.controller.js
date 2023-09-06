@@ -50,7 +50,7 @@ class UserController {
       if (req.body.password) {
         req.body.password = getHash(req.body.password);
       }
-      const result = await service.updateData(req.body, { id: req.params.id });
+      const result = await service.updateUserData(req.body, { id: req.params.id });
       delete result.password;
       delete result.token;
       return responseHandler.succes(res, `Success update ${service.db.name}`, result);
