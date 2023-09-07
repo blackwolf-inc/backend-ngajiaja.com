@@ -1,7 +1,10 @@
+const { USER_ROLE } = require('../../../helpers/constanta');
+const ApiError = require('../../../helpers/errorHandler');
 const StudentService = require('../services/student.service');
+const UserService = require('../services/user.service');
 const responseHandler = require('./../../../helpers/responseHandler');
 const db = require('./../../../models/index');
-const { Peserta, sequelize, JadwalBimbinganPeserta } = db;
+const { Peserta, sequelize, JadwalBimbinganPeserta, User } = db;
 
 class StudentController {
   static async getOne(req, res, next) {
@@ -26,10 +29,16 @@ class StudentController {
 
   static async create(req, res, next) {
     const service = new StudentService(req, Peserta);
+    const userService = new UserService(req, User);
     try {
-      await service.checkUserId(req);
-      await service.checkDuplicateUserId(req);
-      await service.checkDuplicatePengajarId(req);
+      const [userExist, _] = await Promise.all([
+        userService.getOneById(req.body.user_id),
+        service.checkDuplicateUserId(req),
+      ]);
+      if (userExist.role !== USER_ROLE.PESERTA) {
+        throw ApiError.badRequest(`User's role is not PESERTA`);
+      }
+
       const result = await service.createData(req.body);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {

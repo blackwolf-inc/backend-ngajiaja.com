@@ -12,6 +12,7 @@ router.get('/test', (req, res) => {
   res.send('test monetary');
 });
 // biaya administrasi peserta route
+router.get('/biaya-administrasi-peserta', BiayaAdministrasiPesertaController.getAll);
 router.post(
   '/biaya-administrasi-peserta',
   storageImage.image.single('media'),

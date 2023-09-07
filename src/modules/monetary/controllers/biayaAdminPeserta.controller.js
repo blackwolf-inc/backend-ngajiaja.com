@@ -4,6 +4,16 @@ const db = require('./../../../models/index');
 const { BiayaAdministrasi } = db;
 
 class StudentController {
+  static async getAll(req, res, next) {
+    const service = new BiayaAdminPesertaService(req, BiayaAdministrasi);
+    try {
+      const result = await service.getAll();
+      return responseHandler.succes(res, `Success get all ${service.db.name}s`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async create(req, res, next) {
     const service = new BiayaAdminPesertaService(req, BiayaAdministrasi);
     try {

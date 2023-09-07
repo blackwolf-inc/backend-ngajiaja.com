@@ -1,6 +1,6 @@
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
-const { User, Peserta, Pengajar } = require('../../../models');
+const { User, Peserta } = require('../../../models');
 
 class StudentService extends BaseService {
   async checkUserId(req) {
@@ -14,13 +14,6 @@ class StudentService extends BaseService {
     const data = await Peserta.findOne({ where: { id: req.body.peserta_id } });
     if (!data) {
       throw ApiError.badRequest(`Peserta not found`);
-    }
-  }
-
-  async checkDuplicatePengajarId(req) {
-    const data = await Pengajar.findOne({ where: { user_id: req.body.user_id } });
-    if (data) {
-      throw ApiError.badRequest(`user has been registered as a teacher`);
     }
   }
 
