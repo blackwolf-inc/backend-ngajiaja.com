@@ -29,6 +29,7 @@ class StudentController {
     try {
       await service.checkUserId(req);
       await service.checkDuplicateUserId(req);
+      await service.checkDuplicatePengajarId(req);
       const result = await service.createData(req.body);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {
