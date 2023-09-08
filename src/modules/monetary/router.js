@@ -12,6 +12,15 @@ router.get('/test', (req, res) => {
   res.send('test monetary');
 });
 // biaya administrasi peserta route
+
+// after login everything need to check auth
+router.use(isAuthenticate);
+
+// bank route
+router.get('/bank', BankController.getAll);
+router.get('/bank/:id', BankController.getOne);
+router.post('/bank', validate(createBankValidator), BankController.create);
+
 router.get('/biaya-administrasi-peserta', BiayaAdministrasiPesertaController.getAll);
 router.post(
   '/biaya-administrasi-peserta',
@@ -25,13 +34,4 @@ router.patch(
   validate(cost.updateBiayaAdminPesertaValidator),
   BiayaAdministrasiPesertaController.update
 );
-
-// after login everything need to check auth
-router.use(isAuthenticate);
-
-// bank route
-router.get('/bank', BankController.getAll);
-router.get('/bank/:id', BankController.getOne);
-router.post('/bank', validate(createBankValidator), BankController.create);
-
 module.exports = router;
