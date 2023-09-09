@@ -68,15 +68,16 @@ const createUserValidator = [
     .bail()
     .isString()
     .withMessage('Must be string'),
-  check('usia')
+  check('tgl_lahir')
     .exists()
-    .withMessage('Must have usia')
+    .withMessage('Must have tgl_lahir')
     .bail()
     .notEmpty()
     .withMessage('Can not be empty')
     .bail()
-    .isNumeric()
-    .withMessage('Must be number contained only'),
+    .isISO8601()
+    .toDate()
+    .withMessage('Must be using correct format yyyy-mm-dd'),
   check('password')
     .exists()
     .withMessage('Must have password')
@@ -190,13 +191,14 @@ const updateUserValidator = [
     .bail()
     .isString()
     .withMessage('Must be string'),
-  check('usia')
-    .if(body('usia').exists())
+  check('tgl_lahir')
+    .if(body('tgl_lahir').exists())
     .notEmpty()
     .withMessage('Can not be empty')
     .bail()
-    .isNumeric()
-    .withMessage('Must be number contained only'),
+    .isISO8601()
+    .toDate()
+    .withMessage('Must be using correct format yyyy-mm-dd'),
   check('password')
     .if(body('password').exists())
     .notEmpty()
