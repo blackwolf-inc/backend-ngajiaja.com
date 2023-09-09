@@ -13,6 +13,13 @@ class UserService extends BaseService {
     return data;
   }
 
+  async checkIsEmailExist(email) {
+    const data = await this.__findOne({ where: { email } });
+    if (!!data) {
+      throw ApiError.badRequest(`Email ${email} already exist`);
+    }
+  }
+
   async roleCreationUser() {
     if (this.req.user && this.req.user.role !== 'ADMIN' && this.req.body.role === 'ADMIN') {
       throw ApiError.badRequest('You can not create ADMIN role');

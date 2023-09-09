@@ -36,10 +36,9 @@ class UserController {
   static async create(req, res, next) {
     const service = new UserService(req, User);
     try {
-      req.body.password = getHash(req.body.password);
-      req.body.tgl_lahir = formatDateLocal(req.body.tgl_lahir);
-
-      const result = await service.createData(req.body);
+      const body = await UserController.#bodyHandler(req.body);
+      await service.checkIsEmailExist(body.email);
+      const result = await service.createData(body);
       delete result.password;
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {
@@ -48,6 +47,7 @@ class UserController {
   }
 
   static async update(req, res, next) {
+    /* can not use bodyHandler since need to update partially */
     const service = new UserService(req, User);
     try {
       if (req.body.password) {
@@ -56,6 +56,7 @@ class UserController {
       if (req.body.tgl_lahir) {
         req.body.tgl_lahir = formatDateLocal(req.body.tgl_lahir);
       }
+
       const result = await service.updateUserData(req.body, { id: req.params.id });
       delete result.password;
       delete result.token;
@@ -73,6 +74,21 @@ class UserController {
     } catch (error) {
       next(error);
     }
+  }
+
+  static async #bodyHandler(body) {
+    return {
+      role: body.role,
+      nama: body.nama,
+      email: body.email,
+      telp_wa: body.telp_wa,
+      jenis_kelamin: body.jenis_kelamin,
+      alamat: body.alamat,
+      tgl_lahir: formatDateLocal(body.tgl_lahir),
+      status: body.status,
+      password: getHash(body.password),
+      token: body.token,
+    };
   }
 }
 
