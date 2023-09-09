@@ -1,5 +1,6 @@
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
+const SendEmailNotification = require('../../../utils/nodemailer');
 const { User, Peserta } = require('../../../models');
 
 class StudentService extends BaseService {
@@ -22,6 +23,11 @@ class StudentService extends BaseService {
     if (data) {
       throw ApiError.badRequest(`Peserta for user_id ${data.user_id} already exist`);
     }
+  }
+
+  async sendNotificationEmail(email, name) {
+    const getHtml = await SendEmailNotification.getHtml('notifikasiPeserta.ejs', { name });
+    return SendEmailNotification.sendMail(email, 'Register Peserta Notification', getHtml);
   }
 }
 
