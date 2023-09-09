@@ -1,3 +1,4 @@
+const { formatDateLocal } = require('../../../helpers/dateConverter');
 const { getHash } = require('../../../helpers/passwordHash');
 const UserService = require('../services/user.service');
 const responseHandler = require('./../../../helpers/responseHandler');
@@ -36,6 +37,8 @@ class UserController {
     const service = new UserService(req, User);
     try {
       req.body.password = getHash(req.body.password);
+      req.body.tgl_lahir = formatDateLocal(req.body.tgl_lahir);
+
       const result = await service.createData(req.body);
       delete result.password;
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
@@ -49,6 +52,9 @@ class UserController {
     try {
       if (req.body.password) {
         req.body.password = getHash(req.body.password);
+      }
+      if (req.body.tgl_lahir) {
+        req.body.tgl_lahir = formatDateLocal(req.body.tgl_lahir);
       }
       const result = await service.updateUserData(req.body, { id: req.params.id });
       delete result.password;

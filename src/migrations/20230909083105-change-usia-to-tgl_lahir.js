@@ -5,7 +5,7 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.removeColumn('Users', 'usia');
     await queryInterface.addColumn('Users', 'tgl_lahir', {
-      type: Sequelize.DATE,
+      type: Sequelize.DATEONLY,
     });
   },
 
