@@ -28,6 +28,7 @@ class AuthController {
         jenis_kelamin: user.jenis_kelamin,
         alamat: user.alamat,
         usia: user.usia,
+        status: user.status,
       };
 
       const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '2d' });
@@ -51,27 +52,30 @@ class AuthController {
     }
   }
 
-  static async requestResetPassword(req, res, next){
+  static async requestResetPassword(req, res, next) {
     const service = new AuthService(req, UserResetPassword);
     const userService = new UserService(req, User);
     try {
       const user = await userService.getUserByEmail(req.body.email);
       req.body.user = user;
       const result = await service.generateResetPasswordToken(req);
-      service.sendNotificationEmail(user, result.reset_token)      
-      return responseHandler.succes(res, `Success`, result); 
+      service.sendNotificationEmail(user, result.reset_token);
+      return responseHandler.succes(res, `Success`, result);
     } catch (err) {
       next(err);
     }
   }
 
-  static async resetPassword(req, res, next){
+  static async resetPassword(req, res, next) {
     const service = new AuthService(req, UserResetPassword);
     const userService = new UserService(req, User);
     try {
       const token = await service.getDetailByToken(req.body.token);
       req.body.password = getHash(req.body.password);
-      const user = await userService.updateData({ password: req.body.password }, { id: token.user_id });
+      const user = await userService.updateData(
+        { password: req.body.password },
+        { id: token.user_id }
+      );
       await service.removeUserToken(user.id);
       delete user.password;
       delete user.token;
@@ -79,7 +83,6 @@ class AuthController {
     } catch (err) {
       next(err);
     }
-
   }
 }
 
