@@ -12,6 +12,15 @@ module.exports = (sequelize, DataTypes) => {
       Pengajar.belongsTo(models.User, {
         foreignKey: 'user_id',
         as: 'user',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
+
+      Pengajar.hasMany(models.JadwalMengajarPengajar, {
+        foreignKey: 'pengajar_id',
+        as: 'jadwal_mengajar',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       });
     }
   }
@@ -81,6 +90,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
+      tableName: 'Pengajars',
       modelName: 'Pengajar',
     }
   );
