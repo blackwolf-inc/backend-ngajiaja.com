@@ -4,14 +4,14 @@ class BaseRepository {
     this.req = req;
   }
 
-  async #jsonParseHandler(data) {
+  async jsonParseHandler(data) {
     let stringifyData = JSON.stringify(data);
     return JSON.parse(stringifyData);
   }
 
   async __findOne(query) {
     let data = await this.db.findOne(query);
-    return this.#jsonParseHandler(data);
+    return this.jsonParseHandler(data);
   }
 
   async __findAll(query, fieldOrder = 'updatedAt', ascDescOrder = 'DESC') {
@@ -40,8 +40,8 @@ class BaseRepository {
     ]);
 
     const [resultDatas, resultTotalDatas] = await Promise.all([
-      this.#jsonParseHandler(datas),
-      this.#jsonParseHandler(total_datas),
+      this.jsonParseHandler(datas),
+      this.jsonParseHandler(total_datas),
     ]);
 
     return {
@@ -52,23 +52,20 @@ class BaseRepository {
 
   async __create(payload, transaction) {
     const createdData = await this.db.create(payload, transaction);
-    return this.#jsonParseHandler(createdData);
+    return this.jsonParseHandler(createdData);
   }
 
   /* payload is array */
   async __createBulk(payload, transaction) {
-    const createdData = await this.db.bulkCreate(payload, transaction);
-    return createdData;
+    return this.db.bulkCreate(payload, transaction);
   }
 
   async __update(payload, query, transaction) {
-    const updatedData = await this.db.update(payload, query, transaction);
-    return updatedData;
+    return this.db.update(payload, query, transaction);
   }
 
   async __remove(query, transaction) {
-    const deletedData = await this.db.destroy(query, transaction);
-    return deletedData;
+    return this.db.destroy(query, transaction);
   }
 }
 

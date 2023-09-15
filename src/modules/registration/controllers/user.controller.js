@@ -10,7 +10,7 @@ class UserController {
   static async getOne(req, res, next) {
     const service = new UserService(req, User);
     try {
-      const result = await service.getOneById(req.params.id);
+      const result = await service.getOneUser(req.params.id);
       delete result.password;
       delete result.token;
       return responseHandler.succes(res, `Success get ${service.db.name}`, result);
@@ -22,7 +22,7 @@ class UserController {
   static async getAll(req, res, next) {
     const service = new UserService(req, User);
     try {
-      const result = await service.getAll();
+      const result = await service.getAllUsers();
       for (const data of result.datas) {
         delete data.password;
         delete data.token;

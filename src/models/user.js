@@ -18,11 +18,13 @@ module.exports = (sequelize, DataTypes) => {
       // Relation to student
       User.hasOne(models.Peserta, {
         foreignKey: 'user_id',
+        as: 'peserta',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
       // Relation to Biaya administrasi
       User.hasOne(models.BiayaAdministrasi, {
+        as: 'biaya_administrasi',
         foreignKey: 'user_id',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
