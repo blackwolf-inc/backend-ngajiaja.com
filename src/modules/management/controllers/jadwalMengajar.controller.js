@@ -49,7 +49,11 @@ class JadwalMengajar {
   static async update(req, res, next) {
     const service = new JadwalMengajarService(req, JadwalMengajarPengajar);
     try {
-      await service.getOneById(req.params.id);
+      await service.checkJadwalId(req.params.id);
+
+      await service.checkJadwalDuplicate(req.body);
+      await service.checkJadwalOverlap(req.body);
+
       const result = await service.updateData(req.body, req.params.id);
       return responseHandler.succes(res, `Success update ${service.db.name}`, result);
     } catch (error) {
