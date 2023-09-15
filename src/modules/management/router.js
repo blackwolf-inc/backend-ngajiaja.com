@@ -30,9 +30,9 @@ router.patch(
   JadwalMengajar.update
 );
 router.delete(
-  '/user/:id',
+  '/jadwal-pengajar/:id',
   hasRole([USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN, USER_ROLE.PENGAJAR]),
-  UserController.delete
+  JadwalMengajar.delete
 );
 
 module.exports = router;
