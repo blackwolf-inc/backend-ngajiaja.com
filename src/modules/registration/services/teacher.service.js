@@ -52,6 +52,13 @@ class TeacherService extends BaseService {
     return result;
   }
 
+  async getTeacherByUserId(id) {
+    const result = await Pengajar.findOne({ where: { user_id: id } });
+    if (!result) throw ApiError.notFound(`Pengajar with id ${id} not found`);
+
+    return result;
+  }
+
   async checkTeacherDuplicate(id) {
     const result = await Pengajar.findOne({ where: { user_id: id } });
     if (result) throw ApiError.badRequest(`Pengajar with user_id ${id} already exist`);

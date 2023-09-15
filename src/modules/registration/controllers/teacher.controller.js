@@ -8,7 +8,7 @@ class TeacherController {
   static async getOne(req, res, next) {
     const service = new TeacherService(req, Pengajar);
     try {
-      const result = await service.getOneById(req.params.id);
+      const result = await service.getTeacherByUserId(req.params.id);
       return responseHandler.succes(res, `Success get ${service.db.name}`, result);
     } catch (error) {
       next(error);
