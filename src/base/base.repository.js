@@ -4,17 +4,23 @@ class BaseRepository {
     this.req = req;
   }
 
-  async jsonParseHandler(data) {
+  async #jsonParseHandler(data) {
     let stringifyData = JSON.stringify(data);
     return JSON.parse(stringifyData);
   }
 
-  async __findOne(query) {
-    let data = await this.db.findOne(query);
-    return this.jsonParseHandler(data);
+  async __findOne(query, includeQuery) {
+    let data;
+    if (!includeQuery) {
+      data = await this.db.findOne(query);
+    } else {
+      data = await this.db.findOne({ ...query, include: includeQuery });
+    }
+
+    return this.#jsonParseHandler(data);
   }
 
-  async __findAll(query, fieldOrder = 'updatedAt', ascDescOrder = 'DESC') {
+  async __findAll(query, includeQuery, fieldOrder = 'updatedAt', ascDescOrder = 'DESC') {
     let { paginate, page } = this.req.query;
     let paginationCondition;
 
@@ -27,22 +33,44 @@ class BaseRepository {
       paginationCondition = {};
     }
 
-    const [datas, total_datas] = await Promise.all([
-      this.db.findAll({
-        ...query,
-        ...paginationCondition,
-        order: [[fieldOrder, ascDescOrder]],
-      }),
-      this.db.findAll({
-        ...query,
-        order: [[fieldOrder, ascDescOrder]],
-      }),
-    ]);
+    let resultDatas, resultTotalDatas;
+    if (!includeQuery) {
+      const [datas, total_datas] = await Promise.all([
+        this.db.findAll({
+          ...query,
+          ...paginationCondition,
+          order: [[fieldOrder, ascDescOrder]],
+        }),
+        this.db.findAll({
+          ...query,
+          order: [[fieldOrder, ascDescOrder]],
+        }),
+      ]);
 
-    const [resultDatas, resultTotalDatas] = await Promise.all([
-      this.jsonParseHandler(datas),
-      this.jsonParseHandler(total_datas),
-    ]);
+      [resultDatas, resultTotalDatas] = await Promise.all([
+        this.#jsonParseHandler(datas),
+        this.#jsonParseHandler(total_datas),
+      ]);
+    } else {
+      const [datas, total_datas] = await Promise.all([
+        this.db.findAll({
+          ...query,
+          include: includeQuery,
+          ...paginationCondition,
+          order: [[fieldOrder, ascDescOrder]],
+        }),
+        this.db.findAll({
+          ...query,
+          include: includeQuery,
+          order: [[fieldOrder, ascDescOrder]],
+        }),
+      ]);
+
+      [resultDatas, resultTotalDatas] = await Promise.all([
+        this.#jsonParseHandler(datas),
+        this.#jsonParseHandler(total_datas),
+      ]);
+    }
 
     return {
       total: resultTotalDatas.length,
@@ -52,7 +80,7 @@ class BaseRepository {
 
   async __create(payload, transaction) {
     const createdData = await this.db.create(payload, transaction);
-    return this.jsonParseHandler(createdData);
+    return this.#jsonParseHandler(createdData);
   }
 
   /* payload is array */

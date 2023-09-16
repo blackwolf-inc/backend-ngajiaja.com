@@ -5,7 +5,7 @@ const { sequelize, Pengajar, Peserta } = require('../../../models');
 
 class UserService extends BaseService {
   async getUserByEmail(email) {
-    const data = await this.__findOne({ where: { email } });
+    const data = await this.__findOne({ where: { email } }, this.#includeQuery);
     if (!data) {
       throw ApiError.badRequest(`Email ${email} not found`);
     }
@@ -14,10 +14,7 @@ class UserService extends BaseService {
   }
 
   async getOneUser(paramId) {
-    const data = await this.__findOne({
-      where: { id: paramId },
-      include: this.#includeQuery,
-    });
+    const data = await this.__findOne({ where: { id: paramId } }, this.#includeQuery);
     if (!data) {
       throw ApiError.badRequest(`${this.db.name} not found`);
     }
@@ -25,42 +22,9 @@ class UserService extends BaseService {
     return data;
   }
 
-  async getAllUsers(query, fieldOrder = 'updatedAt', ascDescOrder = 'DESC') {
-    let { paginate, page } = this.req.query;
-    let paginationCondition;
-
-    if (paginate && page) {
-      paginationCondition = {
-        limit: Number(paginate),
-        offset: Number(page - 1) * Number(paginate),
-      };
-    } else {
-      paginationCondition = {};
-    }
-
-    const [datas, total_datas] = await Promise.all([
-      this.db.findAll({
-        ...query,
-        include: this.#includeQuery,
-        ...paginationCondition,
-        order: [[fieldOrder, ascDescOrder]],
-      }),
-      this.db.findAll({
-        ...query,
-        include: this.#includeQuery,
-        order: [[fieldOrder, ascDescOrder]],
-      }),
-    ]);
-
-    const [resultDatas, resultTotalDatas] = await Promise.all([
-      this.jsonParseHandler(datas),
-      this.jsonParseHandler(total_datas),
-    ]);
-
-    return {
-      total: resultTotalDatas.length,
-      datas: resultDatas,
-    };
+  async getAllUsers() {
+    const datas = await this.__findAll({}, this.#includeQuery);
+    return datas;
   }
 
   async checkIsEmailExist(email) {
