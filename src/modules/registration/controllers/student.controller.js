@@ -4,13 +4,13 @@ const StudentService = require('../services/student.service');
 const UserService = require('../services/user.service');
 const responseHandler = require('./../../../helpers/responseHandler');
 const db = require('./../../../models/index');
-const { Peserta, sequelize, JadwalBimbinganPeserta, User } = db;
+const { Peserta, sequelize, JadwalBimbinganPeserta } = db;
 
 class StudentController {
   static async getOne(req, res, next) {
     const service = new StudentService(req, Peserta);
     try {
-      const result = await service.getOneById(req.params.id);
+      const result = await service.getStudentByUserId(req);
       return responseHandler.succes(res, `Success get ${service.db.name}`, result);
     } catch (error) {
       next(error);
@@ -29,10 +29,9 @@ class StudentController {
 
   static async create(req, res, next) {
     const service = new StudentService(req, Peserta);
-    const userService = new UserService(req, User);
     try {
       const [userExist, _] = await Promise.all([
-        userService.getOneById(req.body.user_id),
+        service.checkUserId(req),
         service.checkDuplicateUserId(req),
       ]);
       if (userExist.role !== USER_ROLE.PESERTA) {
@@ -61,7 +60,7 @@ class StudentController {
   static async update(req, res, next) {
     const service = new StudentService(req, Peserta);
     try {
-      const result = await service.updateData(req.body, { id: req.params.id });
+      const result = await service.updateData(req.body, { user_id: req.params.id });
       return responseHandler.succes(res, `Success update ${service.db.name}`, result);
     } catch (error) {
       next(error);
@@ -71,7 +70,7 @@ class StudentController {
   static async delete(req, res, next) {
     const service = new StudentService(req, Peserta);
     try {
-      await service.deleteData(req.params.id);
+      await service.deleteStudentByUserId(req);
       return responseHandler.succes(res, `Success delete ${service.db.name}`);
     } catch (error) {
       next(error);

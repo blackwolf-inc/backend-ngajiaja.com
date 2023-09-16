@@ -11,6 +11,22 @@ class StudentService extends BaseService {
     }
   }
 
+  async getStudentByUserId(req) {
+    const result = await Peserta.findOne({ where: { user_id: req.params.id } });
+    if (!result) throw ApiError.notFound(`Peserta with id ${id} not found`);
+
+    return result;
+  }
+
+  async deleteStudentByUserId(req) {
+    const result = await Peserta.destroy({ where: { user_id: req.params.id } });
+    if (result > 0) {
+      return result;
+    } else {
+      throw new Error(`Failed delete ${this.db.name}`);
+    }
+  }
+
   async checkPesertaId(req) {
     const data = await Peserta.findOne({ where: { id: req.body.peserta_id } });
     if (!data) {
