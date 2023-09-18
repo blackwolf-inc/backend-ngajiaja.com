@@ -7,7 +7,10 @@ const router = Router();
 const validate = require('./../../utils/validatorIndex');
 const isAuthenticate = require('./../../middlewares/authentication');
 const createBankValidator = require('./validators/bank.validator');
-const { createPencairanValidator } = require('./validators/pencairan.validator');
+const {
+  createPencairanValidator,
+  updatePencairanValidator,
+} = require('./validators/pencairan.validator');
 const cost = require('./validators/biayaAdminPeserta.validator');
 
 router.get('/test', (req, res) => {
@@ -42,7 +45,12 @@ router.patch(
 router.get('/pencairan', PencairanController.getAll);
 router.get('/pencairan/:id', PencairanController.getOne);
 router.post('/pencairan', validate(createPencairanValidator), PencairanController.create);
-router.patch('/pencairan/:id', storageImage.image.single('media'), PencairanController.update);
+router.patch(
+  '/pencairan/:id',
+  storageImage.image.single('media'),
+  validate(updatePencairanValidator),
+  PencairanController.update
+);
 router.delete('/pencairan/:id', PencairanController.delete);
 
 module.exports = router;
