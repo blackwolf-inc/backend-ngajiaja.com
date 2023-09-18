@@ -47,8 +47,7 @@ class TeacherController {
   static async update(req, res, next) {
     const service = new TeacherService(req, Pengajar);
     try {
-      await service.getOneById(req.params.id);
-      const result = await service.updateTeacher(req.body, req.params.id);
+      const result = await service.updateTeacherByUserId(req.body, req.params.id);
       return responseHandler.succes(res, `Success update ${service.db.name}`, result);
     } catch (error) {
       next(error);
@@ -58,9 +57,8 @@ class TeacherController {
   static async delete(req, res, next) {
     const service = new TeacherService(req, Pengajar);
     try {
-      await service.getOneById(req.params.id);
-      await service.deleteData(req.params.id);
-      return responseHandler.succes(res, `Success delete ${service.db.name}`);
+      const result = await service.deleteTeacherByUserId(req.params.id);
+      return responseHandler.succes(res, `Success delete ${service.db.name}`, result);
     } catch (error) {
       next(error);
     }
