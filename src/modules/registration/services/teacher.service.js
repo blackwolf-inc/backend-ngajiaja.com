@@ -21,9 +21,10 @@ class TeacherService extends BaseService {
     return createdTeacher;
   }
 
-  async updateTeacher(payload, id) {
+  async updateTeacherByUserId(payload, id) {
+    await this.getTeacherByUserId(req.params.id);
     if (!payload.jam_wawancara || !payload.tanggal_wawancara) {
-      const updatedTeacher = await this.updateData(payload, { id });
+      const updatedTeacher = await this.updateData(payload, { user_id: id });
       return updatedTeacher;
     }
 
@@ -40,9 +41,21 @@ class TeacherService extends BaseService {
       payload.jam_wawancara = timeObject;
     }
 
-    const createdTeacher = await this.updateData(payload, { id });
+    const createdTeacher = await this.updateData(payload, { user_id: id });
 
     return createdTeacher;
+  }
+
+  async deleteTeacherByUserId(id) {
+    await this.getTeacherByUserId(id);
+    const dataDeleted = await sequelize.transaction((t) => {
+      return this.__remove({ where: { user_id: id } }, t);
+    });
+    if (dataDeleted > 0) {
+      return dataDeleted;
+    } else {
+      throw new Error(`Failed delete ${this.db.name}`);
+    }
   }
 
   async checkUser(id) {
