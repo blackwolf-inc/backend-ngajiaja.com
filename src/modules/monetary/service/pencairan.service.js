@@ -29,7 +29,6 @@ class PencairanService extends BaseService {
     if (req.file) {
       const imageUrl = `${req.file.filename}`;
       req.body.bukti_pembayaran = imageUrl;
-      req.body.status = 'null';
     } else {
       throw ApiError.badRequest(`Image not found`);
     }
