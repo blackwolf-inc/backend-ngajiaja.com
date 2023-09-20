@@ -13,7 +13,7 @@ class StudentService extends BaseService {
 
   async getStudentByUserId(req) {
     const result = await Peserta.findOne({ where: { user_id: req.params.id } });
-    if (!result) throw ApiError.notFound(`Peserta with id ${id} not found`);
+    if (!result) throw ApiError.notFound(`Peserta with id ${req.params.id} not found`);
 
     return result;
   }
