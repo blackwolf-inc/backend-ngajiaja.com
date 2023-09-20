@@ -29,6 +29,13 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
+      // Relation to Pencairan
+      User.hasMany(models.Pencairan, {
+        foreignKey: 'user_id',
+        as: 'pencairan',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
     }
   }
   User.init(
