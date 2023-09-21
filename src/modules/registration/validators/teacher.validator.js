@@ -157,6 +157,9 @@ const updateTeacherValidator = [
     .notEmpty()
     .withMessage('Can not be empty')
     .bail()
+    .isString()
+    .withMessage('Must be string')
+    .bail()
     .isIn(['MUBTADI', 'YUKHTABAR', 'BARIE'])
     .withMessage('level must be: MUBTADI / YUKHTABAR / BARIE'),
   check('pendidikan_terakhir')
