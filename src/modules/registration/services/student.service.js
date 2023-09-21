@@ -9,6 +9,7 @@ class StudentService extends BaseService {
     if (!data) {
       throw ApiError.badRequest(`user not found`);
     }
+    return data;
   }
 
   async getStudentByUserId(req) {
@@ -16,6 +17,15 @@ class StudentService extends BaseService {
     if (!result) throw ApiError.notFound(`Peserta with id ${req.params.id} not found`);
 
     return result;
+  }
+
+  async updateStudentByUserId(req) {
+    const result = await Peserta.update(req.body, { where: { user_id: req.params.id } });
+    if (result > 0) {
+      return result;
+    } else {
+      throw new Error(`Failed update ${this.db.name}`);
+    }
   }
 
   async deleteStudentByUserId(req) {

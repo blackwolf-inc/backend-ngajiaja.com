@@ -60,7 +60,7 @@ class StudentController {
   static async update(req, res, next) {
     const service = new StudentService(req, Peserta);
     try {
-      const result = await service.updateData(req.body, { user_id: req.params.id });
+      const result = await service.updateStudentByUserId(req);
       return responseHandler.succes(res, `Success update ${service.db.name}`, result);
     } catch (error) {
       next(error);
