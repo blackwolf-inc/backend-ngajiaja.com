@@ -2,6 +2,7 @@ const { Router } = require('express');
 const BankController = require('./controllers/bank.controller');
 const PencairanController = require('./controllers/pencairan.controller');
 const BiayaAdministrasiPesertaController = require('./controllers/biayaAdminPeserta.controller');
+const InfaqController = require('./controllers/infaq.controller');
 const storageImage = require('../../utils/storageImage');
 const router = Router();
 const validate = require('./../../utils/validatorIndex');
@@ -12,6 +13,7 @@ const {
   updatePencairanValidator,
 } = require('./validators/pencairan.validator');
 const cost = require('./validators/biayaAdminPeserta.validator');
+const infaqValidator = require('./validators/infaq.validator');
 
 router.get('/test', (req, res) => {
   res.send('test monetary');
@@ -52,5 +54,17 @@ router.patch(
   PencairanController.update
 );
 router.delete('/pencairan/:id', PencairanController.delete);
+
+// infaq route
+router.get('/infaq', InfaqController.getAll);
+router.get('/infaq/:id', InfaqController.getOne);
+router.post(
+  '/infaq',
+  storageImage.image.single('media'),
+  validate(infaqValidator.createInfaqValidator),
+  InfaqController.create
+);
+router.patch('/infaq/:id', validate(infaqValidator.updateInfaqValidator), InfaqController.update);
+router.delete('/infaq/:id', InfaqController.delete);
 
 module.exports = router;
