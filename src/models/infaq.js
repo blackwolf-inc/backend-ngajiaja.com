@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Infaq.belongsTo(models.Period, {
-        foreignKey: 'period_id',
+        foreignKey: 'periode_id',
         as: 'periode',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
