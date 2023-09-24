@@ -1,0 +1,5 @@
+1. create infaq
+- user_id 14 (peserta_id 7) belajar ke user_id 3 (pengajar_id 1).
+- yang dibutuhkan di table infaq adalah peserta_id dan pengajar_id nya.
+- input dari user adalah pengajar, nominal, bank, bukti pembayaran.
+- bukti pembayaran harus dari api tersendiri, yaitu api untuk upload foto berdasarkan infaq id.

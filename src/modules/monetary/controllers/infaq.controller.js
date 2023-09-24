@@ -29,11 +29,11 @@ class InfaqController {
     const service = new InfaqService(req, Infaq);
     try {
       await Promise.all([
-        await service.checkUserById(req.body),
-        await service.checkUserById(req.body),
-        await service.checkPeriodById(req.body),
-        await service.updateDateNow(req),
-        await service.changeImages(req),
+        service.checkPesertaById(req.body),
+        service.checkPengajarById(req.body),
+        service.checkPeriodById(req.body),
+        service.checkBankById(req.body),
+        service.updateDateNow(req),
       ]);
       const result = await service.createData(req.body);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);

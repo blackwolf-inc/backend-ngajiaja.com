@@ -1,6 +1,6 @@
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
-const { User, Bank, Infaq, Period } = require('../../../models');
+const { User, Bank, Infaq, Period, Peserta, Pengajar } = require('../../../models');
 
 class InfaqService extends BaseService {
   async checkUserById(payload) {
@@ -8,13 +8,27 @@ class InfaqService extends BaseService {
     if (!result) throw ApiError.notFound(`User with id ${id} not found`);
     return result;
   }
+  async checkPesertaById(payload) {
+    let id = payload.peserta_id;
+    const result = await Peserta.findOne({ where: { id } });
+    if (!result) throw ApiError.notFound(`Peserta with id ${id} not found`);
+    return result;
+  }
+  async checkPengajarById(payload) {
+    let id = payload.pengajar_id;
+    const result = await Pengajar.findOne({ where: { id } });
+    if (!result) throw ApiError.notFound(`Pengajar with id ${id} not found`);
+    return result;
+  }
   async checkBankById(payload) {
-    const result = await Bank.findOne({ id: payload.bank_id });
+    let id = payload.bank_id;
+    const result = await Bank.findOne({ id });
     if (!result) throw ApiError.notFound(`Bank with id ${id} not found`);
     return result;
   }
   async checkPeriodById(payload) {
-    const result = await Period.findOne({ id: payload.period_id });
+    let id = payload.periode_id;
+    const result = await Period.findOne({ where: { id } });
     if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
     return result;
   }

@@ -1,9 +1,18 @@
 const { check, body } = require('express-validator');
 
 const createInfaqValidator = [
-  check('user_id')
+  check('peserta_id')
     .exists()
-    .withMessage('Must have user_id')
+    .withMessage('Must have peserta_id')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isNumeric()
+    .withMessage('Must be integer'),
+  check('pengajar_id')
+    .exists()
+    .withMessage('Must have pengajar_id')
     .bail()
     .notEmpty()
     .withMessage('Can not be empty')

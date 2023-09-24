@@ -22,10 +22,18 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: 'CASCADE',
       });
 
-      //Relation to User
-      Infaq.belongsTo(models.User, {
-        foreignKey: 'user_id',
-        as: 'user',
+      //Relation to Peserta
+      Infaq.belongsTo(models.Peserta, {
+        foreignKey: 'peserta_id',
+        as: 'peserta',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
+
+      //Relation to Pengajar
+      Infaq.belongsTo(models.Pengajar, {
+        foreignKey: 'pengajar_id',
+        as: 'pengajar',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
@@ -33,7 +41,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   Infaq.init(
     {
-      user_id: DataTypes.INTEGER,
+      peserta_id: DataTypes.INTEGER,
+      pengajar_id: DataTypes.INTEGER,
       bank_id: DataTypes.INTEGER,
       periode_id: DataTypes.INTEGER,
       status: DataTypes.STRING,

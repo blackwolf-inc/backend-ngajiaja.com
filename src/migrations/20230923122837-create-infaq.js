@@ -7,43 +7,46 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
-      user_id: {
-        type: Sequelize.INTEGER
+      peserta_id: {
+        type: Sequelize.INTEGER,
+      },
+      pengajar_id: {
+        type: Sequelize.INTEGER,
       },
       bank_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       periode_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       status: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       nominal: {
-        type: Sequelize.DOUBLE
+        type: Sequelize.DOUBLE,
       },
       waktu_pembayaran: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       bukti_pembayaran: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       keterangan: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Infaqs');
-  }
+  },
 };
