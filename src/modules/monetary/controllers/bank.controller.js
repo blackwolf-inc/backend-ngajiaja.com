@@ -1,7 +1,7 @@
 const BankService = require('../service/bank.service');
 const responseHandler = require('../../../helpers/responseHandler');
 const db = require('../../../models/index');
-const { Bank, sequelize } = db;
+const { Bank } = db;
 
 class BankController {
   static async getOne(req, res, next) {
@@ -27,7 +27,7 @@ class BankController {
   static async create(req, res, next) {
     const service = new BankService(req, Bank);
     try {
-      await service.checkBankDuplicate(req.body.nana_bank);
+      await service.checkBankDuplicate(req.body.nama_bank);
       const result = await service.createData(req.body);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {
