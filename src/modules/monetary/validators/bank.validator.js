@@ -30,6 +30,4 @@ const createBankValidator = [
     .withMessage('Must be string'),
 ];
 
-module.exports = {
-  createBankValidator,
-};
+module.exports = createBankValidator;
