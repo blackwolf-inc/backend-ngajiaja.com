@@ -27,6 +27,7 @@ class BankController {
   static async create(req, res, next) {
     const service = new BankService(req, Bank);
     try {
+      await service.checkBankDuplicate(req.body.nana_bank);
       const result = await service.createData(req.body);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {
