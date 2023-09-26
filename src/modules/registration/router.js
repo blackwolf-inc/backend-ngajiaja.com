@@ -39,7 +39,7 @@ router.get('/pengajar', PengajarController.getAll);
 router.get('/pengajar/:id', PengajarController.getOne);
 router.post('/pengajar', validate(createTeacherValidator), PengajarController.create);
 router.patch('/pengajar/:id', validate(updateTeacherValidator), PengajarController.update);
-router.delete('/pengajar', PengajarController.delete);
+router.delete('/pengajar/:id', PengajarController.delete);
 
 // students route
 router.get('/student', StudentController.getAll);
