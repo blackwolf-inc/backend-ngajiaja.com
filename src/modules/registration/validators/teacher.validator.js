@@ -100,42 +100,6 @@ const createTeacherValidator = [
     .bail()
     .isIn([0, 1])
     .withMessage('bagi_hasil_50persen must be 0 / 1'),
-  check('link_video_membaca_quran')
-    .exists()
-    .withMessage('Must have link_video_membaca_quran')
-    .bail()
-    .notEmpty()
-    .withMessage('Can not be empty')
-    .bail()
-    .isString()
-    .withMessage('Must be string'),
-  check('link_video_simulasi_mengajar')
-    .exists()
-    .withMessage('Must have link_video_simulasi_mengajar')
-    .bail()
-    .notEmpty()
-    .withMessage('Can not be empty')
-    .bail()
-    .isString()
-    .withMessage('Must be string'),
-  check('tanggal_wawancara')
-    .exists()
-    .withMessage('Must have tanggal_wawancara')
-    .bail()
-    .notEmpty()
-    .withMessage('Can not be empty')
-    .bail()
-    .isString()
-    .withMessage('Must be string'),
-  check('jam_wawancara')
-    .exists()
-    .withMessage('Must have jam_wawancara')
-    .bail()
-    .notEmpty()
-    .withMessage('Can not be empty')
-    .bail()
-    .isString()
-    .withMessage('Must be string'),
 ];
 
 const updateTeacherValidator = [
