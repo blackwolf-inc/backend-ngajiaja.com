@@ -277,6 +277,16 @@ const updateTeacherValidator = [
     .bail()
     .isString()
     .withMessage('Must be string'),
+  check('link_wawancara')
+    .if(body('link_wawancara').exists())
+    .notEmpty()
+    .withMessage('Must have link_wawancara')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string'),
 ];
 
 module.exports = {
