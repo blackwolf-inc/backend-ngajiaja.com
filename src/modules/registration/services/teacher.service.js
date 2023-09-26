@@ -48,14 +48,8 @@ class TeacherService extends BaseService {
 
   async deleteTeacherByUserId(id) {
     await this.getTeacherByUserId(id);
-    const dataDeleted = await sequelize.transaction((t) => {
-      return this.__remove({ where: { user_id: id } }, t);
-    });
-    if (dataDeleted > 0) {
-      return dataDeleted;
-    } else {
-      throw new Error(`Failed delete ${this.db.name}`);
-    }
+    const dataDeleted = await Pengajar.destroy({ where: { user_id: id } });
+    return dataDeleted;
   }
 
   async checkUser(id) {
