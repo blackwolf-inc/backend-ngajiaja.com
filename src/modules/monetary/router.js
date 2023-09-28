@@ -59,6 +59,7 @@ router.delete('/pencairan/:id', PencairanController.delete);
 router.get('/infaq', InfaqController.getAll);
 router.get('/infaq/:id', InfaqController.getOne);
 router.post('/infaq', validate(infaqValidator.createInfaqValidator), InfaqController.create);
+router.patch('/infaq/images/:id', storageImage.image.single('media'), InfaqController.updateImages);
 router.patch('/infaq/:id', validate(infaqValidator.updateInfaqValidator), InfaqController.update);
 router.delete('/infaq/:id', InfaqController.delete);
 
