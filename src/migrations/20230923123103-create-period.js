@@ -7,37 +7,34 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      nomor_siklus: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       tipe_bimbingan: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       peserta_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       pengajar_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       status: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       catatan_peserta: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Periods');
-  }
+  },
 };
