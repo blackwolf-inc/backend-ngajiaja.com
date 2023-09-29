@@ -37,14 +37,25 @@ class InfaqService extends BaseService {
     if (!result) throw ApiError.notFound(`Infaq with id ${id} not found`);
     return result;
   }
-  async getAllInfaqByUserId(id) {
-    const query = {
-      user_id: id,
-    };
+
+  async getAllInfaqByUserId(req) {
+    let query;
+    if (req.role == 'PESERTA') {
+      query = {
+        peserta_id: req.user.id,
+      };
+    } else if (req.role == 'PENGAJAR') {
+      query = {
+        pengajar_id: req.user.id,
+      };
+    } else {
+      query = {};
+    }
     const result = await this.getAll(query);
     return result;
   }
-  async changeImages(req) {
+
+  async updateImages(req) {
     if (req.file) {
       const imageUrl = `${req.file.filename}`;
       req.body.bukti_pembayaran = imageUrl;

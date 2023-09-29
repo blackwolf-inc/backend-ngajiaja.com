@@ -53,6 +53,18 @@ class InfaqController {
     }
   }
 
+  static async updateImages(req, res, next) {
+    const service = new InfaqService(req, Infaq);
+    try {
+      await service.checkInfaqById(req.params.id);
+      await service.updateImages(req);
+      const result = await service.updateData(req.body, { id: req.params.id });
+      return responseHandler.succes(res, `Success create ${service.db.name}`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async delete(req, res, next) {
     const service = new InfaqService(req, Infaq);
     try {
