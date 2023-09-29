@@ -43,12 +43,6 @@ class PencairanController {
   static async update(req, res, next) {
     const service = new PencairanService(req, Pencairan);
     try {
-      // console.log(req.body.status);
-      // if (req.body.status === 'ACCEPTED') {
-      //   console.log(req.body);
-      //   throw ApiError.badRequest('Error Status Null');
-      // }
-
       await service.checkPencairanById(req.params.id);
       await service.changeImages(req);
       await service.updateDateNow(req);
