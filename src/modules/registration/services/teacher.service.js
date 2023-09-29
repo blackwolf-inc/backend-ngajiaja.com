@@ -22,9 +22,9 @@ class TeacherService extends BaseService {
   }
 
   async updateTeacherByUserId(payload, id) {
-    await this.getTeacherByUserId(req.params.id);
+    await this.getTeacherByUserId(id);
     if (!payload.jam_wawancara || !payload.tanggal_wawancara) {
-      const updatedTeacher = await this.updateData(payload, { user_id: id });
+      const updatedTeacher = await Pengajar.update(payload, { user_id: id });
       return updatedTeacher;
     }
 
@@ -41,9 +41,9 @@ class TeacherService extends BaseService {
       payload.jam_wawancara = timeObject;
     }
 
-    const createdTeacher = await this.updateData(payload, { user_id: id });
+    const updatedTeacher = await Pengajar.update(payload, { where: { user_id: id } });
 
-    return createdTeacher;
+    return updatedTeacher;
   }
 
   async deleteTeacherByUserId(id) {
