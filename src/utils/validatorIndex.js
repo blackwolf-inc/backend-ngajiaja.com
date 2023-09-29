@@ -11,15 +11,16 @@ module.exports = (validations) => {
         return next();
       }
 
-      const extractedErrors = {};
-      errors.array().forEach((value) => {
-        if (!value.path) return;
+      // const extractedErrors = {};
+      // errors.array().forEach((value) => {
+      //   console.log(value);
+      //   if (!value.path) return;
 
-        if (!extractedErrors[value.path]) extractedErrors[value.path] = [value.msg];
-        else extractedErrors[value.path].push(value.msg);
-      });
+      //   if (!extractedErrors[value.path]) extractedErrors[value.path] = [value.msg];
+      //   else extractedErrors[value.path].push(value.msg);
+      // });
 
-      throw ApiError.unprocessableEntity('Please check your input data', extractedErrors);
+      throw ApiError.unprocessableEntity('Please check your input data', errors.array());
     } catch (error) {
       next(error);
     }

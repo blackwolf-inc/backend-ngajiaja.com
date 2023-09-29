@@ -1,4 +1,4 @@
-const { check } = require('express-validator');
+const { check, checkExact, body } = require('express-validator');
 
 const createBankValidator = [
   check('nama_bank')
@@ -28,6 +28,7 @@ const createBankValidator = [
     .bail()
     .isString()
     .withMessage('Must be string'),
+  checkExact([check('nama_bank'), check('atas_nama'), check('no_rekening')]),
 ];
 
 module.exports = createBankValidator;
