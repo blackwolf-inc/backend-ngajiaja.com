@@ -23,10 +23,6 @@ class TeacherService extends BaseService {
 
   async updateTeacherByUserId(payload, id) {
     await this.getTeacherByUserId(id);
-    if (!payload.jam_wawancara || !payload.tanggal_wawancara) {
-      const updatedTeacher = await Pengajar.update(payload, { user_id: id });
-      return updatedTeacher;
-    }
 
     if (payload.tanggal_wawancara) {
       const dateString = payload.tanggal_wawancara;
