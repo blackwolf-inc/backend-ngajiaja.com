@@ -34,6 +34,26 @@ class BankController {
       next(error);
     }
   }
+
+  static async update(req, res, next) {
+    const service = new BankService(req, Bank);
+    try {
+      const result = await service.updateBank(req.body, req.params.id);
+      return responseHandler.succes(res, `Success create ${service.db.name}`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async delete(req, res, next) {
+    const service = new BankService(req, Bank);
+    try {
+      const result = await service.deleteData(req.params.id);
+      return responseHandler.succes(res, `Success delete ${service.db.name}`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = BankController;
