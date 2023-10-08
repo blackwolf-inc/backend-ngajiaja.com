@@ -26,9 +26,19 @@ class TeacherService extends BaseService {
 
     if (payload.tanggal_wawancara) {
       const dateString = payload.tanggal_wawancara;
-      const dateObject = moment(dateString, 'DD-MM-YYYY').toDate();
-      const formattedDate = moment(dateObject).format('DD-MM-YYYY');
-      payload.tanggal_wawancara = formattedDate;
+
+      const dateParts = dateString.split('-');
+
+      const day = parseInt(dateParts[0], 10);
+      const month = parseInt(dateParts[1], 10) - 1;
+      const year = parseInt(dateParts[2], 10);
+      const dateObject = new Date(year, month, day);
+      const dateOnly = new Date(
+        dateObject.getFullYear(),
+        dateObject.getMonth(),
+        dateObject.getDate()
+      );
+      payload.tanggal_wawancara = dateOnly;
     }
 
     if (payload.jam_wawancara) {
