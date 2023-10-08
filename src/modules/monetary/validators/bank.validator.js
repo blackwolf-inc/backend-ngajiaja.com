@@ -31,4 +31,28 @@ const createBankValidator = [
   checkExact([check('nama_bank'), check('atas_nama'), check('no_rekening')]),
 ];
 
-module.exports = createBankValidator;
+const updateBankValidator = [
+  check('nama_bank')
+    .if(body('nama_bank').exists())
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string'),
+  check('atas_nama')
+    .if(body('atas_nama').exists())
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string'),
+  check('no_rekening')
+    .if(body('no_rekening').exists())
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string'),
+];
+
+module.exports = { createBankValidator, updateBankValidator };
