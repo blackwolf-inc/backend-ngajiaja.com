@@ -50,9 +50,10 @@ router.delete('/student/:id', StudentController.delete);
 
 // students route jadwal_bimbingan_peserta
 router.post(
-  '/student/jadwal',
+  '/jadwal',
   validate(students.createJadwalValidator),
   StudentController.createJadwalBimbingan
 );
+router.get('/jadwal', StudentController.getOneJadwal);
 
 module.exports = router;
