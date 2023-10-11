@@ -1,0 +1,160 @@
+const { check, body } = require('express-validator');
+
+const createPilihPengajarValidator = [
+  check('tipe_bimbingan')
+    .exists()
+    .withMessage('Must have tipe_bimbingan')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string')
+    .isIn(['REGULER', 'TAMBAHAN'])
+    .withMessage(`hari_mengajar must be REGULER / TAMBAHAN`),
+  check('peserta_id')
+    .exists()
+    .withMessage('Must have pengajar_id')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isNumeric()
+    .withMessage('Must be integer'),
+  check('pengajar_id')
+    .exists()
+    .withMessage('Must have pengajar_id')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isNumeric()
+    .withMessage('Must be integer'),
+  check('status')
+    .exists()
+    .withMessage('Must have status')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string')
+    .isIn(['WAITING', 'INFAQ_UNPAID', 'ACTIVATED', 'CANCELED', 'FINISHED'])
+    .withMessage(`hari_mengajar must be WAITING / INFAQ_UNPAID / CANCELED / FINISHED`),
+  check('hari_1')
+    .exists()
+    .withMessage('Must have hari_1')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string'),
+  check('jam_1')
+    .exists()
+    .withMessage('Must have jam_1')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string'),
+  check('hari_2')
+    .exists()
+    .withMessage('Must have hari_2')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string'),
+  check('jam_2')
+    .exists()
+    .withMessage('Must have jam_2')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string'),
+];
+
+const updatePilihPengajarValidator = [
+  check('status')
+    .if(body('status').exists())
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string')
+    .bail()
+    .isIn(['WAITING', 'INFAQ_UNPAID', 'ACTIVATED', 'CANCELED', 'FINISHED'])
+    .withMessage('User hari_mengajar must be WAITING / INFAQ_UNPAID / CANCELED / FINISHED'),
+];
+
+const createTambahanValidator = [
+  check('tipe_bimbingan')
+    .exists()
+    .withMessage('Must have tipe_bimbingan')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string')
+    .isIn(['REGULER', 'TAMBAHAN'])
+    .withMessage(`hari_mengajar must be REGULER / TAMBAHAN`),
+  check('peserta_id')
+    .exists()
+    .withMessage('Must have pengajar_id')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isNumeric()
+    .withMessage('Must be integer'),
+  check('pengajar_id')
+    .exists()
+    .withMessage('Must have pengajar_id')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isNumeric()
+    .withMessage('Must be integer'),
+  check('status')
+    .exists()
+    .withMessage('Must have status')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string')
+    .isIn(['WAITING', 'INFAQ_UNPAID', 'ACTIVATED', 'CANCELED', 'FINISHED'])
+    .withMessage(`hari_mengajar must be WAITING / INFAQ_UNPAID / CANCELED / FINISHED`),
+  check('hari_bimbingan')
+    .exists()
+    .withMessage('Must have hari_bimbingan')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string'),
+  check('jam_bimbingan')
+    .exists()
+    .withMessage('Must have jam_bimbingan')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string'),
+];
+
+module.exports = {
+  createPilihPengajarValidator,
+  createTambahanValidator,
+  updatePilihPengajarValidator,
+};
