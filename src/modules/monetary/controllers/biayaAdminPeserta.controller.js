@@ -14,6 +14,16 @@ class StudentController {
     }
   }
 
+  static async getOne(req, res, next) {
+    const service = new BiayaAdminPesertaService(req, BiayaAdministrasi);
+    try {
+      const result = await service.getOneIncludeDate(req);
+      return responseHandler.succes(res, `Success get ${service.db.name}`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async create(req, res, next) {
     const service = new BiayaAdminPesertaService(req, BiayaAdministrasi);
     try {

@@ -50,8 +50,18 @@ class StudentController {
     const service = new StudentService(req, JadwalBimbinganPeserta);
     try {
       await service.checkPesertaId(req);
-      const result = await service.createData(req.body);
+      const result = await service.createJadwalBimbingan(req);
       return responseHandler.succes(res, `Success create Jadwal_Bimbingan_Peserta`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getOneJadwal(req, res, next) {
+    const service = new StudentService(req, JadwalBimbinganPeserta);
+    try {
+      const result = await service.getOneJadwalBimbingan(req);
+      return responseHandler.succes(res, `Success get one ${service.db.name}`, result);
     } catch (error) {
       next(error);
     }

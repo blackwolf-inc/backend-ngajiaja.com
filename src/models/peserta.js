@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Peserta.belongsTo(models.User, { foreignKey: 'user_id' });
-      Peserta.hasMany(models.JadwalBimbinganPeserta, {
+      Peserta.hasOne(models.JadwalBimbinganPeserta, {
         foreignKey: 'peserta_id',
         as: 'jadwal_bimbingan_peserta',
         onDelete: 'CASCADE',

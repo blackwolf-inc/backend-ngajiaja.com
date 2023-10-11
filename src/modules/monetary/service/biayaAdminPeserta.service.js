@@ -1,5 +1,6 @@
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
+const formatTanggal = require('../../../utils/formatTime');
 const { User, Bank } = require('../../../models');
 
 class BiayaAdminPesertaService extends BaseService {
@@ -15,6 +16,22 @@ class BiayaAdminPesertaService extends BaseService {
     console.log(data[0]);
     if (data[0] === 0) {
       throw ApiError.badRequest(`failed update status user_id ${req.body.user_id}`);
+    }
+  }
+
+  async getOneIncludeDate(req) {
+    const data = await this.__findOne({ where: { user_id: req.user.id } });
+    if (data) {
+      const tanggal = formatTanggal(data.createdAt);
+
+      delete data.createdAt;
+      delete data.updatedAt;
+      data.tanggal = tanggal;
+      return data;
+    } else {
+      throw ApiError.badRequest(
+        `failed get one data biaya administrasi with user_id ${req.user.id}`
+      );
     }
   }
 

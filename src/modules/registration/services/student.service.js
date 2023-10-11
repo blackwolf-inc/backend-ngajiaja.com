@@ -51,6 +51,26 @@ class StudentService extends BaseService {
     }
   }
 
+  async createJadwalBimbingan(req) {
+    const data = await this.__findOne({ where: { peserta_id: req.body.peserta_id } });
+    if (data) {
+      const result = await this.updateData(req.body, { id: data.id });
+      return result;
+    } else {
+      const result = await this.createData(req.body);
+      return result;
+    }
+  }
+
+  async getOneJadwalBimbingan(req) {
+    const data = await Peserta.findOne({ where: { user_id: req.user.id } });
+    if (!data) {
+      throw ApiError.badRequest(`Peserta not found`);
+    }
+    const result = await this.__findOne({ where: { peserta_id: data.id } });
+    return result;
+  }
+
   async sendNotificationEmail(email, name) {
     const getHtml = await SendEmailNotification.getHtml('notifikasiPeserta.ejs', { name });
     return SendEmailNotification.sendMail(email, 'Register Peserta Notification', getHtml);

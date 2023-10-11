@@ -32,6 +32,7 @@ router.delete('/bank/:id', BankController.delete);
 
 // biaya peserta route
 router.get('/biaya-administrasi-peserta', BiayaAdministrasiPesertaController.getAll);
+router.get('/biaya-administrasi-peserta/one', BiayaAdministrasiPesertaController.getOne);
 router.post(
   '/biaya-administrasi-peserta',
   storageImage.image.single('media'),
