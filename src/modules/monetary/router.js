@@ -7,7 +7,7 @@ const storageImage = require('../../utils/storageImage');
 const router = Router();
 const validate = require('./../../utils/validatorIndex');
 const isAuthenticate = require('./../../middlewares/authentication');
-const createBankValidator = require('./validators/bank.validator');
+const { createBankValidator, updateBankValidator } = require('./validators/bank.validator');
 const {
   createPencairanValidator,
   updatePencairanValidator,
@@ -27,6 +27,8 @@ router.use(isAuthenticate);
 router.get('/bank', BankController.getAll);
 router.get('/bank/:id', BankController.getOne);
 router.post('/bank', validate(createBankValidator), BankController.create);
+router.patch('/bank/:id', validate(updateBankValidator), BankController.update);
+router.delete('/bank/:id', BankController.delete);
 
 // biaya peserta route
 router.get('/biaya-administrasi-peserta', BiayaAdministrasiPesertaController.getAll);

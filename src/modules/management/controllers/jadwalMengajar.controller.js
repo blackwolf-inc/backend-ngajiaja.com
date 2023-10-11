@@ -17,10 +17,7 @@ class JadwalMengajar {
   static async create(req, res, next) {
     const service = new JadwalMengajarService(req, JadwalMengajarPengajar);
     try {
-      await Promise.all([
-        service.checkJadwalDuplicate(req.body),
-        service.checkJadwalOverlap(req.body),
-      ]);
+      await Promise.all([service.checkJadwalDuplicate(req.body)]);
       const result = await service.createJadwalMengajar(req.body);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {
@@ -43,12 +40,12 @@ class JadwalMengajar {
   static async update(req, res, next) {
     const service = new JadwalMengajarService(req, JadwalMengajarPengajar);
     try {
-      await service.checkJadwalId(req.params.id);
+      // await service.checkJadwalDuplicate(req.body);
+      // await service.checkJadwalOverlap(req.body);
+      console.log('req.params.id');
+      console.log(req.params.id);
 
-      await service.checkJadwalDuplicate(req.body);
-      await service.checkJadwalOverlap(req.body);
-
-      const result = await service.updateData(req.body, req.params.id);
+      const result = await service.updateData(req.body, { id: req.params.id });
       return responseHandler.succes(res, `Success update ${service.db.name}`, result);
     } catch (error) {
       next(error);

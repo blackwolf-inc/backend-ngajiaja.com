@@ -55,30 +55,30 @@ class PengajarService extends BaseService {
     }
   }
 
-  async checkJadwalOverlap(payload) {
-    const existingJadwal = await JadwalMengajarPengajar.findAll({
-      where: {
-        pengajar_id: payload.pengajar_id,
-        hari_mengajar: payload.hari_mengajar,
-        [Op.or]: [
-          {
-            mulai_mengajar: {
-              [Op.between]: [payload.mulai_mengajar, payload.selesai_mengajar],
-            },
-          },
-          {
-            selesai_mengajar: {
-              [Op.between]: [payload.mulai_mengajar, payload.selesai_mengajar],
-            },
-          },
-        ],
-      },
-    });
+  // async checkJadwalOverlap(payload) {
+  //   const existingJadwal = await JadwalMengajarPengajar.findAll({
+  //     where: {
+  //       pengajar_id: payload.pengajar_id,
+  //       hari_mengajar: payload.hari_mengajar,
+  //       [Op.or]: [
+  //         {
+  //           mulai_mengajar: {
+  //             [Op.between]: [payload.mulai_mengajar, payload.selesai_mengajar],
+  //           },
+  //         },
+  //         {
+  //           selesai_mengajar: {
+  //             [Op.between]: [payload.mulai_mengajar, payload.selesai_mengajar],
+  //           },
+  //         },
+  //       ],
+  //     },
+  //   });
 
-    if (existingJadwal.length > 0) {
-      throw ApiError.badRequest('Jadwal Overlap');
-    }
-  }
+  //     if (existingJadwal.length > 0) {
+  //       throw ApiError.badRequest('Jadwal Overlap');
+  //     }
+  //   }
 }
 
 module.exports = PengajarService;

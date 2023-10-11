@@ -3,7 +3,10 @@ const JadwalMengajar = require('./controllers/jadwalMengajar.controller');
 const router = Router();
 const validate = require('./../../utils/validatorIndex');
 const isAuthenticate = require('./../../middlewares/authentication');
-const { createJadwalMengajarValidator } = require('./validators/jadwalPengajar.validator');
+const {
+  createJadwalMengajarValidator,
+  updateJadwalValidator,
+} = require('./validators/jadwalPengajar.validator');
 const { USER_ROLE } = require('../../helpers/constanta');
 const { hasRole } = require('../../middlewares/roleAuth');
 
@@ -25,7 +28,7 @@ router.get('/jadwal-pengajar', JadwalMengajar.getAll);
 router.get('/jadwal-pengajar/:id', JadwalMengajar.getOne);
 router.patch(
   '/jadwal-pengajar/:id',
-  validate(createJadwalMengajarValidator),
+  validate(updateJadwalValidator),
   hasRole([USER_ROLE.PENGAJAR]),
   JadwalMengajar.update
 );

@@ -1,7 +1,7 @@
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
 const { Bank } = require('../../../models');
-const { Op, fn } = require('sequelize');
+const { Op, fn, sequelize, where } = require('sequelize');
 
 class BankService extends BaseService {
   async checkBankDuplicate(req) {
@@ -16,6 +16,32 @@ class BankService extends BaseService {
     }
 
     return result;
+  }
+
+  async updateBank(payload, id) {
+    const checkDuplicate = await Bank.findOne({
+      where: {
+        id: {
+          [Op.ne]: id,
+        },
+        [Op.or]: [{ nama_bank: { [Op.like]: fn('LOWER', `%${payload.nama_bank}%`) } }],
+      },
+    });
+
+    if (checkDuplicate) {
+      throw ApiError.badRequest(`Bank with name ${payload.nama_bank} already exists`);
+    }
+
+    const [updatedCount] = await Bank.update(payload, {
+      where: { id },
+    });
+
+    if (updatedCount > 0) {
+      const afterUpdateData = await this.getOneById(id);
+      return afterUpdateData;
+    } else {
+      throw new Error(`Failed update ${this.db.name}`);
+    }
   }
 }
 
