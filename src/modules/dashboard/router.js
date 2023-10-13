@@ -13,7 +13,7 @@ router.get('/test', (req, res) => {
 });
 
 router.use(isAuthenticate);
-router.use(hasRole([USER_ROLE.ADMIN]));
+router.use(hasRole([USER_ROLE.ADMIN, USER_ROLE.SUPER_ADMIN]));
 
 router.use('/admin', adminRouter);
 
