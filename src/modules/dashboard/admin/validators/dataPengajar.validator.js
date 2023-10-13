@@ -12,7 +12,7 @@ const getDataPengajarValidator = [
     .withMessage('Must be string')
     .bail()
     .isIn(['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'])
-    .withMessage(`hari_mengajar must be SENIN / SELASA / RABU / KAMIS / JUMAT / SABTU / MINGGU`),
+    .withMessage(`hariBimbingan1 must be SENIN / SELASA / RABU / KAMIS / JUMAT / SABTU / MINGGU`),
   check('hariBimbingan2')
     .exists()
     .withMessage('Must have hariBimbingan2')
@@ -24,7 +24,7 @@ const getDataPengajarValidator = [
     .withMessage('Must be string')
     .bail()
     .isIn(['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'])
-    .withMessage(`hari_mengajar must be SENIN / SELASA / RABU / KAMIS / JUMAT / SABTU / MINGGU`),
+    .withMessage(`hariBimbingan2 must be SENIN / SELASA / RABU / KAMIS / JUMAT / SABTU / MINGGU`),
   check('jamBimbingan1')
     .exists()
     .withMessage('Must have jamBimbingan1')
