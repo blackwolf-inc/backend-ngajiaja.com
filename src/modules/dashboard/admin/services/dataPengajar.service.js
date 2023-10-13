@@ -16,8 +16,8 @@ class DataPengajarService {
         `
         SELECT 
           p.id AS 'pengajar_id', 
-          u.id AS 'user_id', u.nama AS 'nama_pengajar', u.status, u.role, 
-          jmp.hari_mengajar, jmp.mulai_mengajar, jmp.selesai_mengajar 
+          u.id AS 'user_id', u.nama AS 'nama_pengajar', u.status, u.role
+          -- jmp.hari_mengajar, jmp.mulai_mengajar, jmp.selesai_mengajar 
         FROM JadwalMengajarPengajars jmp 
         JOIN Pengajars p ON jmp.pengajar_id = p.id 
         JOIN Users u ON p.user_id = u.id 

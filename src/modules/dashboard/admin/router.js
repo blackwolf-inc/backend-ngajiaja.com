@@ -5,6 +5,7 @@ const isAuthenticate = require('./../../../middlewares/authentication');
 const { USER_ROLE } = require('../../../helpers/constanta');
 const { hasRole } = require('../../../middlewares/roleAuth');
 const AdminDashboardController = require('./controllers/admin.controller');
+const { getDataPengajarValidator } = require('./validators/dataPengajar.validator');
 
 router.get('/test', (req, res) => {
   res.status(200).json({
@@ -12,6 +13,10 @@ router.get('/test', (req, res) => {
   });
 });
 
-router.get('/data/pengajar', AdminDashboardController.dataPengajar);
+router.get(
+  '/data/pengajar',
+  validate(getDataPengajarValidator),
+  AdminDashboardController.dataPengajar
+);
 
 module.exports = router;
