@@ -13,10 +13,6 @@ router.get('/test', (req, res) => {
   });
 });
 
-router.get(
-  '/data/pengajar',
-  validate(getDataPengajarValidator),
-  AdminDashboardController.dataPengajar
-);
+router.get('/data/pengajar', AdminDashboardController.dataPengajar);
 
 module.exports = router;

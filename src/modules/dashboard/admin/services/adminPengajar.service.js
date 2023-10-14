@@ -43,7 +43,7 @@ class AdminPengajarService {
     const [total_registered, total_active, total_nonactive, all_pengajars] = await Promise.all([
       sequelize.query(
         `
-        SELECT COUNT(*) AS 'total_pengajar'
+        SELECT COUNT(*) AS 'total'
         FROM Pengajars p 
         JOIN Users u ON p.user_id = u.id 
         WHERE u.role = 'PENGAJAR' AND u.status = 'REGISTERED'
@@ -52,7 +52,7 @@ class AdminPengajarService {
       ),
       sequelize.query(
         `
-        SELECT COUNT(*) AS 'total_pengajar'
+        SELECT COUNT(*) AS 'total'
         FROM Pengajars p 
         JOIN Users u ON p.user_id = u.id 
         WHERE u.role = 'PENGAJAR' AND u.status = 'ACTIVE'
@@ -61,7 +61,7 @@ class AdminPengajarService {
       ),
       sequelize.query(
         `
-        SELECT COUNT(*) AS 'total_pengajar'
+        SELECT COUNT(*) AS 'total'
         FROM Pengajars p 
         JOIN Users u ON p.user_id = u.id 
         WHERE u.role = 'PENGAJAR' AND u.status = 'NONACTIVE'
@@ -82,9 +82,9 @@ class AdminPengajarService {
     ]);
 
     return {
-      total_registered,
-      total_active,
-      total_nonactive,
+      total_registered: total_registered[0].total,
+      total_active: total_active[0].total,
+      total_nonactive: total_nonactive[0].total,
       all_pengajars,
     };
   }
