@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const JadwalMengajar = require('./controllers/jadwalMengajar.controller');
+const Bimbingan = require('./controllers/bimbingan.controller');
 const PilihPengajar = require('./controllers/pilihPengajar.controller');
 const router = Router();
 const validate = require('./../../utils/validatorIndex');
@@ -8,6 +9,7 @@ const {
   createJadwalMengajarValidator,
   updateJadwalValidator,
 } = require('./validators/jadwalPengajar.validator');
+const { updateBimbinganValidator } = require('./validators/bimbingan.validator');
 
 const {
   createPilihPengajarValidator,
@@ -65,5 +67,12 @@ router.patch(
   validate(createTambahanValidator),
   PilihPengajar.createTambahan
 );
+
+// Management Bimbingan Peserta & Pengajar
+router.get('/bimbingan', Bimbingan.getAll);
+router.get('/bimbingan/:id', Bimbingan.getOne);
+
+// Management Bimbingan Peserta & Pengajar
+router.patch('/bimbingan/:id', validate(updateBimbinganValidator), Bimbingan.updateReguler);
 
 module.exports = router;
