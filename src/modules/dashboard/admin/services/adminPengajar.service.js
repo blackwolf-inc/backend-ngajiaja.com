@@ -1,6 +1,8 @@
 const { QueryTypes } = require('sequelize');
 const db = require('../../../../models/index');
-const { Pengajar, sequelize } = db;
+const { Pengajar, User, sequelize } = db;
+const BaseService = require('./../../../../base/base.service');
+const UserService = require('./../../../registration/services/user.service');
 
 class AdminPengajarService {
   /**
@@ -87,6 +89,12 @@ class AdminPengajarService {
       total_nonactive: total_nonactive[0].total,
       all_pengajars,
     };
+  }
+
+  async updateJadwalWawancara(req, link_wawancara, pengajarId) {
+    const serviceUser = new UserService(req, Pengajar);
+    const afterUpdateDate = await serviceUser.updateData({ link_wawancara }, { id: pengajarId });
+    return afterUpdateDate;
   }
 }
 

@@ -14,5 +14,6 @@ router.get('/test', (req, res) => {
 });
 
 router.get('/data/pengajar', AdminDashboardController.dataPengajar);
+router.patch('/update/linkwawancara/:pengajarId', AdminDashboardController.updateWawancara);
 
 module.exports = router;
