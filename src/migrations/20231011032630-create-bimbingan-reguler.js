@@ -29,6 +29,9 @@ module.exports = {
       catatan_pengajar: {
         type: Sequelize.TEXT,
       },
+      keterangan_izin_peserta: {
+        type: Sequelize.TEXT,
+      },
       tanggal_pengingat_infaq: {
         type: Sequelize.DATEONLY,
       },
