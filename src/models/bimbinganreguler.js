@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
       absensi_peserta: DataTypes.INTEGER,
       absensi_pengajar: DataTypes.INTEGER,
       catatan_pengajar: DataTypes.TEXT,
+      keterangan_izin_peserta: DataTypes.TEXT,
       tanggal_pengingat_infaq: DataTypes.DATEONLY,
     },
     {
