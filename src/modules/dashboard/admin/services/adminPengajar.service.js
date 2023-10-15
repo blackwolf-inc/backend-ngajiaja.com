@@ -3,6 +3,7 @@ const db = require('../../../../models/index');
 const { Pengajar, User, sequelize } = db;
 const BaseService = require('./../../../../base/base.service');
 const UserService = require('./../../../registration/services/user.service');
+const PengajarService = require('./../../../registration/services/teacher.service');
 
 class AdminPengajarService {
   /**
@@ -91,10 +92,39 @@ class AdminPengajarService {
     };
   }
 
-  async updateJadwalWawancara(req, link_wawancara, pengajarId) {
-    const serviceUser = new UserService(req, Pengajar);
-    const afterUpdateDate = await serviceUser.updateData({ link_wawancara }, { id: pengajarId });
+  async updateJadwalWawancara(req, link_wawancara, userId) {
+    const serviceUser = new UserService(req, User);
+    const servicePengajar = new PengajarService(req, Pengajar);
+
+    const user = await serviceUser.getOneUser(userId);
+    const afterUpdateDate = await servicePengajar.updateData(
+      { link_wawancara },
+      { id: user.pengajar.id }
+    );
+
     return afterUpdateDate;
+  }
+
+  async updateStatusPengajar(req, payload, userId) {
+    const serviceUser = new UserService(req, User);
+    const servicePengajar = new PengajarService(req, Pengajar);
+
+    const [user, afterUpdateUser] = await Promise.all([
+      serviceUser.getOneUser(userId),
+      serviceUser.updateUserData({ status: payload.status_pengajar }, { id: userId }),
+    ]);
+
+    console.log(user.pengajar.id);
+
+    const afterUpdatePengajar = await servicePengajar.updateData(
+      { level: payload.level_pengajar },
+      { id: user.pengajar.id }
+    );
+
+    return {
+      status: afterUpdateUser.status,
+      level: afterUpdatePengajar.level,
+    };
   }
 }
 

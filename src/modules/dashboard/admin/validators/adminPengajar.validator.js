@@ -1,4 +1,4 @@
-const { check, body } = require('express-validator');
+const { check, body, checkExact } = require('express-validator');
 
 const getDataPengajarValidator = [
   check('hariBimbingan1')
@@ -45,6 +45,37 @@ const getDataPengajarValidator = [
     .withMessage('Must be string'),
 ];
 
+const updateStatusPengajar = [
+  check('status_pengajar')
+    .exists()
+    .withMessage('Must have status_pengajar')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string')
+    .bail()
+    .isIn(['REGISTERED', 'WAITING', 'INTERVIEWED', 'REJECTED', 'ACTIVE', 'NONACTIVE'])
+    .withMessage(
+      `status_pengajar must be REGISTERED / WAITING / INTERVIEWED / REJECTED / ACTIVE / NONACTIVE`
+    ),
+  check('level_pengajar')
+    .exists()
+    .withMessage('Must have level_pengajar')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string')
+    .bail()
+    .isIn(['MUBTADI', 'YUKHTABAR', 'BARIE'])
+    .withMessage(`level_pengajar must be MUBTADI / YUKHTABAR / BARIE`),
+  checkExact([body('status_pengajar'), body('level_pengajar')]),
+];
+
 module.exports = {
   getDataPengajarValidator,
+  updateStatusPengajar,
 };
