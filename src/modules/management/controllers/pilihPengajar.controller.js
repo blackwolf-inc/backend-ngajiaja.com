@@ -71,6 +71,16 @@ class PilihPengajar {
       next(error);
     }
   }
+
+  // static async testDays(req, res, next) {
+  //   const service = new PilihPengajarService(req, Period);
+  //   try {
+  //     const result = await service.updateTanggal(req.params.id);
+  //     return responseHandler.succes(res, `Success get ${service.db.name}`, result);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
 }
 
 module.exports = PilihPengajar;
