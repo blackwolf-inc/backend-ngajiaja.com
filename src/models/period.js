@@ -15,6 +15,18 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
+      Period.belongsTo(models.Peserta, {
+        foreignKey: 'peserta_id',
+        as: 'peserta',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
+      Period.belongsTo(models.Pengajar, {
+        foreignKey: 'pengajar_id',
+        as: 'pengajar',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
     }
   }
   Period.init(
