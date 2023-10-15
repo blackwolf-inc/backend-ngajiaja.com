@@ -75,7 +75,21 @@ const updateStatusPengajar = [
   checkExact([body('status_pengajar'), body('level_pengajar')]),
 ];
 
+const updateLinkWawancara = [
+  check('link_wawancara')
+    .exists()
+    .withMessage('Must have link_wawancara')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string'),
+  checkExact([body('link_wawancara')]),
+];
+
 module.exports = {
   getDataPengajarValidator,
   updateStatusPengajar,
+  updateLinkWawancara,
 };

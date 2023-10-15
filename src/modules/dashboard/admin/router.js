@@ -5,7 +5,10 @@ const isAuthenticate = require('./../../../middlewares/authentication');
 const { USER_ROLE } = require('../../../helpers/constanta');
 const { hasRole } = require('../../../middlewares/roleAuth');
 const AdminDashboardController = require('./controllers/admin.controller');
-const { updateStatusPengajar } = require('./validators/adminPengajar.validator');
+const {
+  updateStatusPengajar,
+  updateLinkWawancara,
+} = require('./validators/adminPengajar.validator');
 
 router.get('/test', (req, res) => {
   res.status(200).json({
@@ -14,7 +17,11 @@ router.get('/test', (req, res) => {
 });
 
 router.get('/data/pengajar', AdminDashboardController.dataPengajar);
-router.patch('/update/linkwawancara/:userId', AdminDashboardController.updateWawancara);
+router.patch(
+  '/update/linkwawancara/:userId',
+  validate(updateLinkWawancara),
+  AdminDashboardController.updateWawancara
+);
 router.patch(
   '/update/statuspengajar/:userId',
   validate(updateStatusPengajar),
