@@ -1,6 +1,6 @@
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
-const { Period, BimbinganReguler, BimbinganTambahan } = require('../../../models');
+const { Period, BimbinganReguler, BimbinganTambahan, Pengajar } = require('../../../models');
 
 class PilihPengajar extends BaseService {
   async checkDays(hari_1, hari_2) {
@@ -49,11 +49,14 @@ class PilihPengajar extends BaseService {
     }
 
     if (Object.keys(query1).length === 0 && Object.keys(query2).length === 0) {
-      const allData = await this.getAll({});
+      const allData = await this.__findAll({}, this.#includeQuery);
       return allData;
     }
 
-    const [result1, result2] = await Promise.all([this.getAll(query1), this.getAll(query2)]);
+    const [result1, result2] = await Promise.all([
+      this.__findAll({ where: query1 }, this.#includeQuery),
+      this.__findAll({ where: query2 }, this.#includeQuery),
+    ]);
     const data = [result1, result2];
 
     return data;
@@ -153,6 +156,13 @@ class PilihPengajar extends BaseService {
   //   // };
   //   // const mentorAcceptanceDay = new Date();
   // }
+
+  #includeQuery = [
+    {
+      model: Pengajar,
+      as: 'pengajar',
+    },
+  ];
 }
 
 module.exports = PilihPengajar;
