@@ -16,6 +16,7 @@ router.get('/test', (req, res) => {
   });
 });
 
+router.use(hasRole([USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN]));
 router.get('/data/pengajar', AdminDashboardController.dataPengajar);
 router.patch(
   '/update/linkwawancara/:userId',
