@@ -28,7 +28,7 @@ const createBankValidator = [
     .bail()
     .isString()
     .withMessage('Must be string'),
-  checkExact([check('nama_bank'), check('atas_nama'), check('no_rekening')]),
+  checkExact([body('nama_bank'), body('atas_nama'), body('no_rekening')]),
 ];
 
 const updateBankValidator = [

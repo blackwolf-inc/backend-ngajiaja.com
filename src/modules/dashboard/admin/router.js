@@ -5,6 +5,10 @@ const isAuthenticate = require('./../../../middlewares/authentication');
 const { USER_ROLE } = require('../../../helpers/constanta');
 const { hasRole } = require('../../../middlewares/roleAuth');
 const AdminDashboardController = require('./controllers/admin.controller');
+const {
+  updateStatusPengajar,
+  updateLinkWawancara,
+} = require('./validators/adminPengajar.validator');
 
 router.get('/test', (req, res) => {
   res.status(200).json({
@@ -12,6 +16,17 @@ router.get('/test', (req, res) => {
   });
 });
 
+router.use(hasRole([USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN]));
 router.get('/data/pengajar', AdminDashboardController.dataPengajar);
+router.patch(
+  '/update/linkwawancara/:userId',
+  validate(updateLinkWawancara),
+  AdminDashboardController.updateWawancara
+);
+router.patch(
+  '/update/statuspengajar/:userId',
+  validate(updateStatusPengajar),
+  AdminDashboardController.updateStatusPengajar
+);
 
 module.exports = router;
