@@ -1,7 +1,35 @@
 const BaseService = require('../../../base/base.service');
+const ApiError = require('../../../helpers/errorHandler');
 const { Period, BimbinganReguler, BimbinganTambahan } = require('../../../models');
 
 class PilihPengajar extends BaseService {
+  async checkDays(hari_1, hari_2) {
+    const arrayDays = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'];
+    let indexDay1 = 0;
+    let indexDay2 = 0;
+
+    let days = '';
+
+    for (let i = 0; i < 2; i++) {
+      if (i == 0) {
+        days = hari_1;
+      } else {
+        days = hari_2;
+      }
+
+      for (let i = 0; i < arrayDays.length; i++) {
+        if (arrayDays[i] == hari_1) {
+          indexDay1 = i;
+        } else if (arrayDays[i] == hari_2) {
+          indexDay2 = i;
+        }
+      }
+      if (indexDay1 > indexDay2) {
+        throw ApiError.badRequest(`Invalid date first day: ${hari_1} > last day: ${hari_2}`);
+      }
+    }
+  }
+
   async getAllPengajar(hari_1, jam_1, hari_2, jam_2) {
     let query1 = {};
     let query2 = {};
@@ -32,6 +60,7 @@ class PilihPengajar extends BaseService {
   }
 
   async createPeriode(payload) {
+    await this.checkDays(payload.hari_1, payload.hari_2);
     const createPeriod = await Period.create(payload);
 
     return createPeriod;
@@ -96,6 +125,34 @@ class PilihPengajar extends BaseService {
 
     return result;
   }
+
+  // async updateTanggal(id) {
+  //   const prefDaysSet = new Set();
+  //   const userPrefDays = await Period.findOne({
+  //     where: { id },
+  //     include: [
+  //       {
+  //         model: BimbinganReguler,
+  //         as: 'bimbingan_reguler',
+  //       },
+  //     ],
+  //   });
+
+  //   userPrefDays.bimbingan_reguler.forEach((element) => {
+  //     prefDaysSet.add(element.hari_bimbingan);
+  //   });
+
+  //   const arrayDaysSet = Array.from(prefDaysSet);
+
+  //   const userPrefDay1 = arrayDaysSet[0];
+  //   const userPrefDay2 = arrayDaysSet[1];
+
+  //   // return {
+  //   //   userPrefDay1,
+  //   //   userPrefDay2,
+  //   // };
+  //   // const mentorAcceptanceDay = new Date();
+  // }
 }
 
 module.exports = PilihPengajar;
