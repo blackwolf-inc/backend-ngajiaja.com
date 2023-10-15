@@ -47,8 +47,10 @@ router.delete(
   JadwalMengajar.delete
 );
 
-// pilih pengajar & buat bimbingan route
+// pilih pengajar
 router.get('/bimbingan-pengajar', PilihPengajar.getAll);
+
+// bimbingan reguler
 router.post('/bimbingan-pengajar', validate(createPilihPengajarValidator), PilihPengajar.create);
 router.patch(
   '/bimbingan-pengajar/:id',
@@ -57,6 +59,7 @@ router.patch(
 );
 router.delete('/bimbingan-pengajar/:id', PilihPengajar.delete);
 
+// bimbingan tambahan
 router.post(
   '/bimbingan-tambahan-pengajar',
   validate(createTambahanValidator),
