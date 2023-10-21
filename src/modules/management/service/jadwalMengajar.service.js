@@ -12,7 +12,14 @@ class PengajarService extends BaseService {
 
   async checkTeacherId(user_id) {
     const result = await Pengajar.findOne({ where: { user_id } });
-    if (!result) throw ApiError.notFound(`Teacher with id ${result.id}`);
+    if (!result) throw ApiError.notFound(`Teacher with id ${result.id} not found`);
+    return result;
+  }
+
+  async checkTeacherExist(pengajar_id) {
+    // console.log(pengajar_id);
+    const result = await Pengajar.findOne({ where: { id: pengajar_id } });
+    if (!result) throw ApiError.notFound(`Teacher with id ${result.id} not found`);
     return result;
   }
 
@@ -20,7 +27,6 @@ class PengajarService extends BaseService {
     const query = {
       pengajar_id: id,
     };
-
     const result = await this.getAll(query);
     return result;
   }

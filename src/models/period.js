@@ -2,13 +2,31 @@
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Period extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // define association here
+      Period.hasMany(models.BimbinganReguler, {
+        foreignKey: 'period_id',
+        as: 'bimbingan_reguler',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
+      Period.hasMany(models.BimbinganTambahan, {
+        foreignKey: 'period_id',
+        as: 'bimbingan_tambahan',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
+      Period.belongsTo(models.Peserta, {
+        foreignKey: 'peserta_id',
+        as: 'peserta',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
+      Period.belongsTo(models.Pengajar, {
+        foreignKey: 'pengajar_id',
+        as: 'pengajar',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
     }
   }
   Period.init(
