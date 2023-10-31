@@ -1,3 +1,4 @@
+var moment = require('moment');
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
 const { Period, BimbinganReguler, BimbinganTambahan, Pengajar } = require('../../../models');
@@ -48,8 +49,9 @@ class PilihPengajar extends BaseService {
       };
     }
 
-    if (Object.keys(query1).length === 0 && Object.keys(query2).length === 0) {
+    if (Object.keys(query1).length == 0 && Object.keys(query2).length == 0) {
       const allData = await this.__findAll({}, this.#includeQuery);
+
       return allData;
     }
 
@@ -71,46 +73,38 @@ class PilihPengajar extends BaseService {
 
   async createBimbinganReguler(id, tanggal_pengingat_infaq, hari_1, jam_1, hari_2, jam_2) {
     const records = [];
+    const dateNow = moment(new Date()).format('YYYY-MM-DD');
+    const dateVerifikasi = moment(dateNow).add('days', 3).format('YYYY-MM-DD');
+    const dateEnd = moment(dateVerifikasi).endOf('month').format('YYYY-MM-DD');
+    const dateRemember = moment(tanggal_pengingat_infaq).format('YYYY-MM-DD');
+    const dateDiff = moment(dateEnd).diff(dateVerifikasi, 'days');
 
-    const dateString = tanggal_pengingat_infaq;
-
-    const dateParts = dateString.split('-');
-
-    const day = parseInt(dateParts[0], 10);
-    const month = parseInt(dateParts[1], 10) - 1;
-    const year = parseInt(dateParts[2], 10);
-    const dateObject = new Date(year, month, day);
-    const dateOnly = new Date(
-      dateObject.getFullYear(),
-      dateObject.getMonth(),
-      dateObject.getDate()
-    );
-
-    for (let i = 0; i < 4; i++) {
-      if (hari_1 && jam_1) {
+    let dateThisMonth = dateVerifikasi;
+    for (let i = 1; i <= dateDiff; i++) {
+      if (hari_1 == moment(dateThisMonth).format('dddd')?.toUpperCase()) {
         const query = {
           period_id: id,
-          tanggal_pengingat_infaq: dateOnly,
+          tanggal_pengingat_infaq: dateRemember,
+          tanggal: moment(dateThisMonth).format('YYYY-MM-DD'),
           hari_bimbingan: hari_1,
           jam_bimbingan: jam_1,
         };
-
         const result = await BimbinganReguler.create(query);
         records.push(result);
-      }
-    }
-
-    for (let i = 0; i < 4; i++) {
-      if (hari_2 && jam_2) {
+        dateThisMonth = moment(dateThisMonth).add('days', 1).format('YYYY-MM-DD');
+      } else if (hari_2 == moment(dateThisMonth).format('dddd')?.toUpperCase()) {
         const query = {
           period_id: id,
-          tanggal_pengingat_infaq: dateOnly,
+          tanggal_pengingat_infaq: dateRemember,
+          tanggal: moment(dateThisMonth).format('YYYY-MM-DD'),
           hari_bimbingan: hari_2,
           jam_bimbingan: jam_2,
         };
-
         const result = await BimbinganReguler.create(query);
         records.push(result);
+        dateThisMonth = moment(dateThisMonth).add('days', 1).format('YYYY-MM-DD');
+      } else {
+        dateThisMonth = moment(dateThisMonth).add('days', 1).format('YYYY-MM-DD');
       }
     }
 
