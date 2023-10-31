@@ -30,6 +30,9 @@ class PengajarService extends BaseService {
     for (const period of result.datas) {
       if (period.peserta.jadwal_bimbingan_peserta === null) continue; // just for testing (dummy data), peserta must have jadwal bimbingan, so this line can be removed if the data is real
       const bimbinganPending = {
+        period_id: period.id,
+        peserta_id: period.peserta.id,
+        user_id: period.peserta.User.id,
         category: period.tipe_bimbingan,
         name: period.peserta.User.nama,
         schedule: {
@@ -62,6 +65,10 @@ class PengajarService extends BaseService {
           if (bimbinganReguler.absensi_pengajar === 1 || bimbinganReguler.absensi_peserta === 1)
             continue;
           const bimbinganOnGoing = {
+            period_id: period.id,
+            peserta_id: period.peserta.id,
+            user_id: period.peserta.User.id,
+            bimbingan_reguler_id: bimbinganReguler.id,
             status: null, // no data in db, waiting for db update
             name: period.peserta.User.nama,
             date: null, // no data in db, waiting for db update
@@ -78,6 +85,10 @@ class PengajarService extends BaseService {
           if (bimbinganTambahan.absensi_pengajar === 1 || bimbinganTambahan.absensi_peserta === 1)
             continue;
           const bimbinganOnGoing = {
+            period_id: period.id,
+            peserta_id: period.peserta.id,
+            user_id: period.peserta.User.id,
+            bimbingan_tambahan_id: bimbinganTambahan.id,
             status: null, // no data in db, waiting for db update
             name: period.peserta.User.nama,
             date: null, // no data in db, waiting for db update
