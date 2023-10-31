@@ -1,7 +1,7 @@
 const PengajarService = require('../services/pengajar.service');
 const UserService = require('../../../registration/services/user.service');
 const responseHandler = require('../../../../helpers/responseHandler');
-const { Pengajar, Period, User } = require('../../../../models');
+const { Pengajar, Period, User, Infaq } = require('../../../../models');
 
 class PengajarController extends PengajarService {
   static async getOne(req, res, next) {
@@ -20,7 +20,7 @@ class PengajarController extends PengajarService {
     try {
       const user = await userService.getOneUser(req.user.id);
       const result = await service.bimbinganPending(user.pengajar.id);
-      return responseHandler.succes(res, `Success get ${service.db.name}`, result);
+      return responseHandler.succes(res, `Success get bimbingan menunggu`, result);
     } catch (error) {
       next(error);
     }
@@ -32,7 +32,7 @@ class PengajarController extends PengajarService {
     try {
       const user = await userService.getOneUser(req.user.id);
       const result = await service.bimbinganOnGoing(user.pengajar.id);
-      return responseHandler.succes(res, `Success get ${service.db.name}`, result);
+      return responseHandler.succes(res, `Success get bimbingan akan datang`, result);
     } catch (error) {
       next(error);
     }
@@ -44,17 +44,63 @@ class PengajarController extends PengajarService {
     try {
       const user = await userService.getOneUser(req.user.id);
       const result = await service.filterPesertaByName(user.pengajar.id, req.query.name);
-      return responseHandler.succes(res, `Success get filtered ${service.db.name}`, result);
+      return responseHandler.succes(res, `Success get filtered peserta`, result);
     } catch (error) {
       next(error);
     }
   }
 
-  static async filterByNameAndDate(req, res, next) {}
+  static async filterByNameAndDate(req, res, next) {
+    const service = new PengajarService(req, Period);
+    const userService = new UserService(req, User);
+    try {
+      const user = await userService.getOneUser(req.user.id);
+      const result = await service.filterPesertaByNameAndDate(
+        user.pengajar.id,
+        req.query.name,
+        req.query.date,
+      );
+      return responseHandler.succes(res, `Success get filtered peserta`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-  static async getTotalBimbingan(req, res, next) {}
+  static async getTotalBimbingan(req, res, next) {
+    const service = new PengajarService(req, Period);
+    const userService = new UserService(req, User);
+    try {
+      const user = await userService.getOneUser(req.user.id);
+      const result = await service.getBimbinganActivated(user.pengajar.id);
+      return responseHandler.succes(res, `Success get total bimbingan`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-  static async getTotalIncome(req, res, next) {}
+  static async getTotalAbsent(req, res, next) {
+    const service = new PengajarService(req, Period);
+    const userService = new UserService(req, User);
+    try {
+      const user = await userService.getOneUser(req.user.id);
+      const result = await service.getAbsent(user.pengajar.id);
+      return responseHandler.succes(res, `Success get total absent`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getTotalIncome(req, res, next) {
+    const service = new PengajarService(req, Infaq);
+    const userService = new UserService(req, User);
+    try {
+      const user = await userService.getOneUser(req.user.id);
+      const result = await service.getIncome(user.pengajar.id);
+      return responseHandler.succes(res, `Success get total income`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = PengajarController;
