@@ -1,8 +1,7 @@
 const PencairanService = require('../service/pencairan.service');
 const responseHandler = require('../../../helpers/responseHandler');
 const db = require('../../../models/index');
-const { Pencairan, sequelize } = db;
-const ApiError = require('../../../helpers/errorHandler');
+const { Pencairan } = db;
 
 class PencairanController {
   static async getOne(req, res, next) {
@@ -29,10 +28,7 @@ class PencairanController {
   static async create(req, res, next) {
     const service = new PencairanService(req, Pencairan);
     try {
-      await Promise.all([
-        await service.checkUserById(req.body),
-        await service.checkUserById(req.body),
-      ]);
+      await service.checkUserById(req.body);
       const result = await service.createData(req.body);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {
