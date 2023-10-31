@@ -7,61 +7,68 @@ const {
   JadwalBimbinganPeserta,
   User,
 } = require('../../../../models');
+const moment = require('moment');
 
 class PengajarService extends BaseService {
-  static async getPengajarByUserId(id) {
-    const result = await this.getOneById(id);
+  async getPengajarByUserId(id) {
+    const result = await this.__findOne({ where: { user_id: id } });
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
     return result;
   }
 
-  static async getBimbinganWaiting(id) {
-    await this.getPengajarByUserId(id);
+  async bimbinganPending(id) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: 'WAITING' } },
-      this.#includeQueryBimbinganWaiting,
+      this.#includeQueryBimbinganPending,
+      'createdAt',
+      'ASC',
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
-    for (const period of result) {
-      result.lastApproved = result.createdAt.getTime() + 60 * 60 * 1000;
+    for (const period of result.datas) {
+      period.last_approved = moment(period.createdAt).add(1, 'hours').format('YYYY-MM-DD HH:mm:ss');
     }
 
     return result;
   }
 
-  static async getBimbinganComing(id) {
-    await this.getPengajarByUserId(id);
+  async bimbinganOnGoing(id) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: 'ACTIVATED' } },
-      this.#includeQueryBimbinganWaiting,
+      this.#includeQueryBimbinganOnGoing,
     );
+    if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
+    return result;
   }
 
-  static async filterPesertaByName(pengajarId, pesertaName) {
-    await this.getPengajarByUserId(pengajarId);
-    const data = await this.getBimbinganWaiting(pengajarId);
-    const filteredPeserta = data.filter((d) => {
-      d.peserta.user.name.includes(pesertaName);
+  async filterPesertaByName(id, pesertaName) {
+    const result = await this.bimbinganPending(id);
+    if (pesertaName.length < 3)
+      throw ApiError.badRequest('Peserta name must be at least 3 characters');
+    const filteredPeserta = result.datas.filter((d) => {
+      return d.peserta.User.nama.includes(pesertaName);
     });
     if (!filteredPeserta) throw ApiError.notFound(`Peserta with name ${pesertaName} not found`);
     return filteredPeserta;
   }
 
-  static async getTotalBimbinganActivated(id) {
-    await this.getPengajarByUserId(id);
-    const result = await this.__findAll({ where: { pengajar_id: id, status: 'ACTIVATED' } });
+  async getBimbinganActivated(id) {
+    const pengajar = await this.getPengajarByUserId(id);
+    const result = await this.__findAll(
+      { where: { pengajar_id: pengajar.id, status: 'ACTIVATED' } },
+      {},
+    );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
     return result.length;
   }
 
-  static async getTotalIncome(id) {}
+  async getIncome(id) {}
 
-  #includeQueryBimbinganWaiting = [
+  #includeQueryBimbinganPending = [
     {
       model: Peserta,
       as: 'peserta',
-      includes: [
+      include: [
         {
           model: JadwalBimbinganPeserta,
           attributes: {
@@ -74,7 +81,6 @@ class PengajarService extends BaseService {
           attributes: {
             exclude: ['password', 'token'],
           },
-          as: 'user',
         },
       ],
     },
