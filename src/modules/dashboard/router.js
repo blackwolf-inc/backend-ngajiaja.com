@@ -5,6 +5,7 @@ const isAuthenticate = require('./../../middlewares/authentication');
 const { USER_ROLE } = require('../../helpers/constanta');
 const { hasRole } = require('../../middlewares/roleAuth');
 const adminRouter = require('./admin/router');
+const pesertaRouter = require('./peserta/router');
 
 router.get('/test', (req, res) => {
   res.status(200).json({
@@ -14,5 +15,6 @@ router.get('/test', (req, res) => {
 
 router.use(isAuthenticate);
 router.use('/admin', adminRouter);
+router.use('/peserta', pesertaRouter);
 
 module.exports = router;
