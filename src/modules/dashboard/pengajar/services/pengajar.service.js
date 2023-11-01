@@ -17,7 +17,7 @@ class PengajarService extends BaseService {
     return result;
   }
 
-  async bimbinganPending(id) {
+  async bimbinganPending(id, pesertaName) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: 'WAITING' } },
       this.#includeQueryBimbinganPending,
@@ -48,10 +48,24 @@ class PengajarService extends BaseService {
       data.push(bimbinganPending);
     }
 
+    if (pesertaName) {
+      if (pesertaName.length < 3)
+        throw ApiError.badRequest('Peserta name must be at least 3 characters');
+
+      const filteredPeserta = data.filter((peserta) => {
+        return peserta.name.includes(pesertaName);
+      });
+      if (!filteredPeserta) throw ApiError.notFound(`Peserta with name ${pesertaName} not found`);
+      if (filteredPeserta.length === 0)
+        throw ApiError.notFound(`Peserta with name ${pesertaName} not found`);
+
+      return filteredPeserta;
+    }
+
     return data;
   }
 
-  async bimbinganOnGoing(id) {
+  async bimbinganOnGoing(id, pesertaName, status) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: 'ACTIVATED' } },
       this.#includeQueryBimbinganOnGoing,
@@ -101,37 +115,35 @@ class PengajarService extends BaseService {
       }
     }
 
+    let filteredPeserta;
+    if (pesertaName) {
+      if (pesertaName.length < 3)
+        throw ApiError.badRequest('Peserta name must be at least 3 characters');
+
+      if (status) {
+        filteredPeserta = data.filter((peserta) => {
+          return peserta.name.includes(pesertaName) && peserta.status === status;
+        });
+      } else {
+        filteredPeserta = data.filter((peserta) => {
+          return peserta.name.includes(pesertaName);
+        });
+      }
+    }
+
+    if (status) {
+      filteredPeserta = data.filter((peserta) => {
+        return peserta.status === status;
+      });
+    }
+
+    if (filteredPeserta) {
+      if (filteredPeserta.length === 0) throw ApiError.notFound(`Peserta not found`);
+
+      return filteredPeserta;
+    }
+
     return data; // data returned is not sorted by date because there is no date data in db
-  }
-
-  async filterPesertaByName(id, pesertaName) {
-    const result = await this.bimbinganPending(id);
-    if (pesertaName.length < 3)
-      throw ApiError.badRequest('Peserta name must be at least 3 characters');
-
-    const filteredPeserta = result.filter((peserta) => {
-      return peserta.name.includes(pesertaName);
-    });
-    if (!filteredPeserta) throw ApiError.notFound(`Peserta with name ${pesertaName} not found`);
-    if (filteredPeserta.length === 0)
-      throw ApiError.notFound(`Peserta with name ${pesertaName} not found`);
-
-    return filteredPeserta;
-  }
-
-  async filterPesertaByNameAndDate(id, pesertaName, date) {
-    const result = await this.bimbinganOnGoing(id);
-    if (pesertaName.length < 3)
-      throw ApiError.badRequest('Peserta name must be at least 3 characters');
-
-    const filteredPeserta = result.filter((peserta) => {
-      return peserta.name.includes(pesertaName) && peserta.date === date;
-    });
-    if (!filteredPeserta) throw ApiError.notFound(`Peserta with name ${pesertaName} not found`);
-    if (filteredPeserta.length === 0)
-      throw ApiError.notFound(`Peserta with name ${pesertaName} not found`);
-
-    return filteredPeserta;
   }
 
   async getBimbinganActivated(id) {
