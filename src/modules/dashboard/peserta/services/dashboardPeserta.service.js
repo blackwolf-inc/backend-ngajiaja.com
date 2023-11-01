@@ -85,8 +85,12 @@ class DashboardPesertaService extends BaseService {
   }
 
   async getBimbinganPeserta(id, query) {
-    const { page = 1, pageSize = 10, instructorName, startDate, endDate } = query;
+    query = {
+      page: 1,
+      pageSize: 10,
+    };
 
+    console.log(query);
     const whereClause = {
       id,
     };
@@ -108,10 +112,10 @@ class DashboardPesertaService extends BaseService {
                 model: User,
                 as: 'user',
                 attributes: ['nama'],
-                where: instructorName
+                where: query.instructorName
                   ? {
                       nama: {
-                        [Op.like]: `%${instructorName}%`,
+                        [Op.like]: `%${query.instructorName}%`,
                       },
                     }
                   : {},
@@ -133,19 +137,23 @@ class DashboardPesertaService extends BaseService {
       },
     ];
 
-    if (startDate && endDate) {
-      whereClause['period.start_date'] = { [Op.between]: [startDate, endDate] };
+    if (query.startDate && query.endDate) {
+      whereClause['period.start_date'] = { [Op.between]: [query.startDate, query.endDate] };
     }
 
     const result = await Peserta.findAndCountAll({
       where: whereClause,
       include: includeQuery,
-      limit: pageSize,
-      offset: (page - 1) * pageSize,
+      limit: query.pageSize,
+      offset: (query.page - 1) * query.pageSize,
     });
+
+    const totalPages = Math.ceil(result.count / query.pageSize);
 
     return {
       total: result.count,
+      currentPage: query.page,
+      totalPages,
       datas: result.rows,
     };
   }
