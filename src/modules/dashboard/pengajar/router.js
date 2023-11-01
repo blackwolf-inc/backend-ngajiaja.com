@@ -18,8 +18,5 @@ router.get('/bimbingan/pending', PengajarDashboardController.getBimbinganPending
 router.get('/bimbingan/ongoing', PengajarDashboardController.getBimbinganOnGoing);
 router.get('/bimbingan/pending/filter', PengajarDashboardController.filterByName);
 router.get('/bimbingan/ongoing/filter', PengajarDashboardController.filterByNameAndDate);
-router.get('/total/bimbingan', PengajarDashboardController.getTotalBimbingan);
-router.get('/total/absen', PengajarDashboardController.getTotalAbsent);
-router.get('/total/income', PengajarDashboardController.getTotalIncome);
 
 module.exports = router;
