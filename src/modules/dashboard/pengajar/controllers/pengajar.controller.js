@@ -11,9 +11,9 @@ class PengajarController extends PengajarService {
     try {
       const pengajar = await service.getPengajarByUserId(req.user.id);
       const [totalBimbingan, totalAbsent, totalIncome] = await Promise.all([
-        await periodService.getBimbinganActivated(pengajar.id),
-        await periodService.getAbsent(pengajar.id),
-        await infaqService.getIncome(pengajar.id),
+        periodService.getBimbinganActivated(pengajar.id),
+        periodService.getAbsent(pengajar.id),
+        infaqService.getIncome(pengajar.id),
       ]);
       return responseHandler.succes(res, `Success get ${service.db.name}`, {
         pengajar,
