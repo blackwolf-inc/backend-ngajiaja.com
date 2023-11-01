@@ -55,11 +55,12 @@ class PengajarService extends BaseService {
       const filteredPeserta = data.filter((peserta) => {
         return peserta.name.includes(pesertaName);
       });
-      if (!filteredPeserta) throw ApiError.notFound(`Peserta with name ${pesertaName} not found`);
-      if (filteredPeserta.length === 0)
-        throw ApiError.notFound(`Peserta with name ${pesertaName} not found`);
+      if (filteredPeserta) {
+        if (filteredPeserta.length === 0)
+          throw ApiError.notFound(`Peserta with name ${pesertaName} not found`);
 
-      return filteredPeserta;
+        return filteredPeserta;
+      }
     }
 
     return data;
