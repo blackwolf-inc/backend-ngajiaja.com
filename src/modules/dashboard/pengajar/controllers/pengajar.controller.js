@@ -6,9 +6,21 @@ const { Pengajar, Period, User, Infaq } = require('../../../../models');
 class PengajarController extends PengajarService {
   static async getOne(req, res, next) {
     const service = new PengajarService(req, Pengajar);
+    const periodService = new PengajarService(req, Period);
+    const infaqService = new PengajarService(req, Infaq);
     try {
-      const result = await service.getPengajarByUserId(req.user.id);
-      return responseHandler.succes(res, `Success get ${service.db.name}`, result);
+      const pengajar = await service.getPengajarByUserId(req.user.id);
+      const [totalBimbingan, totalAbsent, totalIncome] = await Promise.all([
+        await periodService.getBimbinganActivated(pengajar.id),
+        await periodService.getAbsent(pengajar.id),
+        await infaqService.getIncome(pengajar.id),
+      ]);
+      return responseHandler.succes(res, `Success get ${service.db.name}`, {
+        pengajar,
+        total_bimbingan: totalBimbingan,
+        total_absent: totalAbsent,
+        total_income: totalIncome,
+      });
     } catch (error) {
       next(error);
     }
@@ -61,42 +73,6 @@ class PengajarController extends PengajarService {
         req.query.date,
       );
       return responseHandler.succes(res, `Success get filtered peserta`, result);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async getTotalBimbingan(req, res, next) {
-    const service = new PengajarService(req, Period);
-    const userService = new UserService(req, User);
-    try {
-      const user = await userService.getOneUser(req.user.id);
-      const result = await service.getBimbinganActivated(user.pengajar.id);
-      return responseHandler.succes(res, `Success get total bimbingan`, result);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async getTotalAbsent(req, res, next) {
-    const service = new PengajarService(req, Period);
-    const userService = new UserService(req, User);
-    try {
-      const user = await userService.getOneUser(req.user.id);
-      const result = await service.getAbsent(user.pengajar.id);
-      return responseHandler.succes(res, `Success get total absent`, result);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async getTotalIncome(req, res, next) {
-    const service = new PengajarService(req, Infaq);
-    const userService = new UserService(req, User);
-    try {
-      const user = await userService.getOneUser(req.user.id);
-      const result = await service.getIncome(user.pengajar.id);
-      return responseHandler.succes(res, `Success get total income`, result);
     } catch (error) {
       next(error);
     }
