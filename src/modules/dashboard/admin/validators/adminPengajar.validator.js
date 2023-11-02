@@ -88,8 +88,36 @@ const updateLinkWawancara = [
   checkExact([body('link_wawancara')]),
 ];
 
+const getPesertaPengajar = [
+  check('status')
+    .exists()
+    .withMessage('Must have status')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string')
+    .bail()
+    .isIn(['REGISTERED', 'WAITING', 'INTERVIEWED', 'REJECTED', 'ACTIVE', 'NONACTIVE'])
+    .withMessage(
+      `status must be REGISTERED / WAITING / INTERVIEWED / REJECTED / ACTIVE / NONACTIVE`
+    ),
+  check('keyword')
+    .exists()
+    .withMessage('Must have keyword')
+    .bail()
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string'),
+  checkExact([body('status'), body('keyword')]),
+];
+
 module.exports = {
   getDataPengajarValidator,
   updateStatusPengajar,
   updateLinkWawancara,
+  getPesertaPengajar,
 };

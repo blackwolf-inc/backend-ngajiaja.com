@@ -29,4 +29,6 @@ router.patch(
   AdminDashboardController.updateStatusPengajar
 );
 
+router.get('/data/peserta/', AdminDashboardController.getPengajar);
+
 module.exports = router;

@@ -126,6 +126,35 @@ class AdminPengajarService {
       level: afterUpdatePengajar.level,
     };
   }
+
+  async getPesertaPengajar(query, status, keyword) {
+    const { page = 1, pageSize = 10 } = query;
+    const offset = (page - 1) * pageSize;
+
+    let whereClause = "WHERE u.role = 'PENGAJAR'";
+    if (status) {
+      whereClause += ` AND u.status = '${status}'`;
+    }
+    if (keyword) {
+      whereClause += ` AND u.nama LIKE '%${keyword}%'`;
+    }
+
+    const result = await sequelize.query(
+      `
+      SELECT 
+        u.id AS 'user_id', u.nama, u.role, u.status,
+        p.id AS 'pengajar_id', p.tanggal_wawancara, p.jam_wawancara, p.link_wawancara
+      FROM Pengajars p 
+      JOIN Users u ON p.user_id = u.id 
+      ${whereClause}
+      LIMIT ${pageSize} OFFSET ${offset}
+      `,
+      { type: QueryTypes.SELECT }
+    );
+
+    return result;
+  }
+
 }
 
 module.exports = AdminPengajarService;

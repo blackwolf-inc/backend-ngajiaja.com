@@ -40,6 +40,18 @@ class AdminDashboardController {
       next(error);
     }
   }
+
+  static async getPengajar(req, res, next) {
+    const service = new AdminPengajarService();
+    try {
+      const { query } = req;
+      const { status, keyword } = query;
+      const result = await service.getPesertaPengajar(query, status, keyword);
+      return responseHandler.succes(res, 'Success get pengajar', result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = AdminDashboardController;
