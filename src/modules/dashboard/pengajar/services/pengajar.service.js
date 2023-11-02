@@ -26,9 +26,46 @@ class PengajarService extends BaseService {
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
+    const bimbinganOnGoing = await this.__findAll(
+      { where: { pengajar_id: id, status: 'ACTIVATED' } },
+      this.#includeQueryBimbinganOnGoing,
+    );
+
     const data = [];
     for (const period of result.datas) {
       if (period.peserta.jadwal_bimbingan_peserta === null) continue; // just for testing (dummy data), peserta must have jadwal bimbingan, so this line can be removed if the data is real
+      const lastApproved = moment(period.createdAt).add(1, 'days').format('YYYY-MM-DD HH:mm:ss');
+
+      // check if there are other peserta with same jadwal bimbingan
+      let isSameJadwal = false;
+      const fieldDaysToCompare = ['hari_bimbingan_1', 'hari_bimbingan_2'];
+      const fieldHoursToCompare = ['jam_bimbingan_1', 'jam_bimbingan_2'];
+
+      for (const bimbingan of bimbinganOnGoing.datas) {
+        for (const fieldDay of fieldDaysToCompare) {
+          if (
+            period.peserta.jadwal_bimbingan_peserta[fieldDay] ===
+            bimbingan.peserta.jadwal_bimbingan_peserta[fieldDay]
+          ) {
+            for (const fieldHour of fieldHoursToCompare) {
+              if (
+                period.peserta.jadwal_bimbingan_peserta[fieldHour] ===
+                bimbingan.peserta.jadwal_bimbingan_peserta[fieldHour]
+              ) {
+                isSameJadwal = true;
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // check if last approved is passed
+      if (moment().isAfter(lastApproved) || isSameJadwal) {
+        await this.updateData({ status: 'CANCELED' }, { id: period.id });
+        continue;
+      }
+
       const bimbinganPending = {
         period_id: period.id,
         peserta_id: period.peserta.id,
@@ -42,12 +79,13 @@ class PengajarService extends BaseService {
           hour2: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_2,
         },
         level: period.peserta.level,
-        last_approved: moment(period.createdAt).add(1, 'hours').format('YYYY-MM-DD HH:mm:ss'),
+        last_approved: lastApproved,
       };
 
       data.push(bimbinganPending);
     }
 
+    // check if peserta name is provided for filtering
     if (pesertaName) {
       if (pesertaName.length < 3)
         throw ApiError.badRequest('Peserta name must be at least 3 characters');
@@ -217,6 +255,13 @@ class PengajarService extends BaseService {
       },
       as: 'peserta',
       include: [
+        {
+          model: JadwalBimbinganPeserta,
+          attributes: {
+            exclude: ['peserta_id'],
+          },
+          as: 'jadwal_bimbingan_peserta',
+        },
         {
           model: User,
           attributes: {
