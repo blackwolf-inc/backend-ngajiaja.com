@@ -56,21 +56,6 @@ class AdminDashboardController {
     }
   }
 
-  static async updateJadwalPengajarRegistered(req, res, next) {
-    const service = new AdminPengajarService();
-    try {
-      const { userId } = req.params;
-      const { tanggal_wawancara, jam_wawancara, link_wawancara } = req.body;
-      const result = await service.updateJadwalPengajarRegistered(
-        req,
-        { tanggal_wawancara, jam_wawancara, link_wawancara },
-        userId
-      );
-      return responseHandler.succes(res, 'Success update jadwal wawancara pengajar', result);
-    } catch (error) {
-      next(error);
-    }
-  }
 }
 
 module.exports = AdminDashboardController;
