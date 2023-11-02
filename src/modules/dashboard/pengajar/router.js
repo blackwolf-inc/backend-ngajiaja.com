@@ -16,7 +16,5 @@ router.use(hasRole([USER_ROLE.PENGAJAR]));
 router.get('/', PengajarDashboardController.getOne);
 router.get('/bimbingan/pending', PengajarDashboardController.getBimbinganPending);
 router.get('/bimbingan/ongoing', PengajarDashboardController.getBimbinganOnGoing);
-router.get('/bimbingan/pending/filter', PengajarDashboardController.filterByName);
-router.get('/bimbingan/ongoing/filter', PengajarDashboardController.filterByNameAndDate);
 
 module.exports = router;

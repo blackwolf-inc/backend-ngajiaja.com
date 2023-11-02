@@ -31,7 +31,7 @@ class PengajarController extends PengajarService {
     const userService = new UserService(req, User);
     try {
       const user = await userService.getOneUser(req.user.id);
-      const result = await service.bimbinganPending(user.pengajar.id);
+      const result = await service.bimbinganPending(user.pengajar.id, req.query.name);
       return responseHandler.succes(res, `Success get bimbingan menunggu`, result);
     } catch (error) {
       next(error);
@@ -43,36 +43,12 @@ class PengajarController extends PengajarService {
     const userService = new UserService(req, User);
     try {
       const user = await userService.getOneUser(req.user.id);
-      const result = await service.bimbinganOnGoing(user.pengajar.id);
-      return responseHandler.succes(res, `Success get bimbingan akan datang`, result);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async filterByName(req, res, next) {
-    const service = new PengajarService(req, Period);
-    const userService = new UserService(req, User);
-    try {
-      const user = await userService.getOneUser(req.user.id);
-      const result = await service.filterPesertaByName(user.pengajar.id, req.query.name);
-      return responseHandler.succes(res, `Success get filtered peserta`, result);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async filterByNameAndDate(req, res, next) {
-    const service = new PengajarService(req, Period);
-    const userService = new UserService(req, User);
-    try {
-      const user = await userService.getOneUser(req.user.id);
-      const result = await service.filterPesertaByNameAndDate(
+      const result = await service.bimbinganOnGoing(
         user.pengajar.id,
         req.query.name,
-        req.query.date,
+        req.query.status,
       );
-      return responseHandler.succes(res, `Success get filtered peserta`, result);
+      return responseHandler.succes(res, `Success get bimbingan akan datang`, result);
     } catch (error) {
       next(error);
     }
