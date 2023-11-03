@@ -13,10 +13,21 @@ class PesertaDashboardController {
       next(error);
     }
   }
+
   static async bimbinganPeseta(req, res, next) {
     const service = new DashboardPesertaService(req, Period);
     try {
       const result = await service.getBimbinganPeserta(req.params.id, req.query);
+      return responseHandler.succes(res, 'Success get data bimbingan peserta', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async filterBimbinganPeserta(req, res, next) {
+    const service = new DashboardPesertaService(req, Period);
+    try {
+      const result = await service.filterByStatus(req.params.id, req.query);
       return responseHandler.succes(res, 'Success get data bimbingan peserta', result);
     } catch (error) {
       next(error);
