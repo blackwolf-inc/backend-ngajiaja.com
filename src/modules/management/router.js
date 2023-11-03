@@ -31,7 +31,7 @@ router.post(
   '/jadwal-pengajar',
   validate(createJadwalMengajarValidator),
   hasRole([USER_ROLE.PENGAJAR]),
-  JadwalMengajar.create
+  JadwalMengajar.create,
 );
 router.get('/jadwal-pengajar', JadwalMengajar.getAll);
 router.get('/jadwal-pengajar/:id', JadwalMengajar.getOne);
@@ -39,12 +39,12 @@ router.patch(
   '/jadwal-pengajar/:id',
   validate(updateJadwalValidator),
   hasRole([USER_ROLE.PENGAJAR]),
-  JadwalMengajar.update
+  JadwalMengajar.update,
 );
 router.delete(
   '/jadwal-pengajar/:id',
   hasRole([USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN, USER_ROLE.PENGAJAR]),
-  JadwalMengajar.delete
+  JadwalMengajar.delete,
 );
 
 // pilih pengajar
@@ -55,7 +55,7 @@ router.post('/bimbingan-pengajar', validate(createPilihPengajarValidator), Pilih
 router.patch(
   '/bimbingan-pengajar/:id',
   validate(updatePilihPengajarValidator),
-  PilihPengajar.update
+  PilihPengajar.update,
 );
 router.delete('/bimbingan-pengajar/:id', PilihPengajar.delete);
 
@@ -63,17 +63,20 @@ router.delete('/bimbingan-pengajar/:id', PilihPengajar.delete);
 router.post(
   '/bimbingan-tambahan-pengajar',
   validate(createTambahanValidator),
-  PilihPengajar.createTambahan
+  PilihPengajar.createTambahan,
 );
 router.patch(
   '/bimbingan-tambahan-pengajar/:id',
   validate(createTambahanValidator),
-  PilihPengajar.createTambahan
+  PilihPengajar.createTambahan,
 );
 
 // Management Bimbingan Peserta & Pengajar
-router.get('/bimbingan', Bimbingan.getAll);
-router.get('/bimbingan/:id', Bimbingan.getOne);
+router.get('/bimbingan', Bimbingan.getDataBimbingan);
+router.get('/bimbingan/pending', Bimbingan.getBimbinganPending);
+router.get('/bimbingan/ongoing', Bimbingan.getBimbinganOnGoing);
+router.get('/bimbingan/done', Bimbingan.getBimbinganDone);
+// router.get('/bimbingan/:id', Bimbingan.getOne);
 
 // Management Bimbingan Peserta & Pengajar
 router.patch('/bimbingan/:id', validate(updateBimbinganValidator), Bimbingan.updateReguler);
