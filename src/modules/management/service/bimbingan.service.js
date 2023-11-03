@@ -1,7 +1,6 @@
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
 const {
-  Period,
   JadwalBimbinganPeserta,
   User,
   Peserta,
@@ -29,7 +28,6 @@ class BimbinganService extends BaseService {
           period_id: period.id,
           peserta_id: period.peserta.id,
           user_id: period.peserta.User.id,
-          bimbingan_reguler_id: bimbinganReguler.id,
           name: period.peserta.User.nama,
           schedule: {
             day1: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_1,
@@ -55,7 +53,6 @@ class BimbinganService extends BaseService {
           period_id: period.id,
           peserta_id: period.peserta.id,
           user_id: period.peserta.User.id,
-          bimbingan_tambahan_id: bimbinganTambahan.id,
           name: period.peserta.User.nama,
           schedule: {
             day1: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_1,
@@ -186,6 +183,71 @@ class BimbinganService extends BaseService {
     }
 
     return data;
+  }
+
+  async detailBimbingan(id, pengajarId) {
+    const result = await this.__findOne(
+      { where: { id, pengajar_id: pengajarId } },
+      this.#includeQuery,
+    );
+    if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
+
+    const data = [];
+    if (result.tipe_bimbingan === 'REGULER') {
+      for (const bimbinganReguler of result.bimbingan_reguler) {
+        const dataBimbinganReguler = {
+          status: bimbinganReguler.status,
+          date: bimbinganReguler.tanggal,
+          time: bimbinganReguler.jam_bimbingan,
+          attendance: bimbinganReguler.absensi_peserta,
+          pengajar_review: bimbinganReguler.catatan_pengajar,
+        };
+
+        data.push(dataBimbinganReguler);
+      }
+    }
+
+    if (result.tipe_bimbingan === 'TAMBAHAN') {
+      for (const bimbinganTambahan of result.bimbingan_tambahan) {
+        const dataBimbinganTambahan = {
+          status: bimbinganTambahan.status,
+          date: bimbinganTambahan.tanggal,
+          time: bimbinganTambahan.jam_bimbingan,
+          attendance: bimbinganTambahan.absensi_peserta,
+          pengajar_review: bimbinganTambahan.catatan_pengajar,
+        };
+
+        data.push(dataBimbinganTambahan);
+      }
+    }
+
+    // determine peserta age based on birthdate
+    let age = 0;
+    if (result.peserta.User.tgl_lahir) {
+      const birthdate = result.peserta.User.tgl_lahir;
+      const birthYear = birthdate.getFullYear();
+      const birthMonth = birthdate.getMonth();
+      const birthDay = birthdate.getDate();
+
+      const today = new Date();
+      const todayYear = today.getFullYear();
+      const todayMonth = today.getMonth();
+      const todayDay = today.getDate();
+
+      age = todayYear - birthYear;
+      if (todayMonth < birthMonth || (todayMonth === birthMonth && todayDay < birthDay)) age--;
+    }
+
+    return {
+      period_id: result.id,
+      peserta_id: result.peserta.id,
+      user_id: result.peserta.User.id,
+      name: result.peserta.User.nama,
+      gender: result.peserta.User.jenis_kelamin,
+      age,
+      level: result.peserta.level,
+      data,
+    };
   }
 
   #includeQuery = [
