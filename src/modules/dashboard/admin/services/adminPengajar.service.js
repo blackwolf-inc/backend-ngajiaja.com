@@ -1,9 +1,10 @@
 const { QueryTypes } = require('sequelize');
 const db = require('../../../../models/index');
 const { Pengajar, User, sequelize } = db;
-const BaseService = require('./../../../../base/base.service');
-const UserService = require('./../../../registration/services/user.service');
-const PengajarService = require('./../../../registration/services/teacher.service');
+const BaseService = require('../../../../base/base.service');
+const UserService = require('../../../registration/services/user.service');
+const PengajarService = require('../../../registration/services/teacher.service');
+const moment = require('moment');
 
 class AdminPengajarService {
   /**
@@ -92,13 +93,17 @@ class AdminPengajarService {
     };
   }
 
-  async updateJadwalWawancara(req, link_wawancara, userId) {
+  async updateJadwalWawancara(req, payload, userId) {
     const serviceUser = new UserService(req, User);
     const servicePengajar = new PengajarService(req, Pengajar);
 
     const user = await serviceUser.getOneUser(userId);
     const afterUpdateDate = await servicePengajar.updateData(
-      { link_wawancara },
+      {
+        tanggal_wawancara: payload.tanggal_wawancara,
+        jam_wawancara: payload.jam_wawancara,
+        link_wawancara: payload.link_wawancara,
+      },
       { id: user.pengajar.id }
     );
 
@@ -114,18 +119,88 @@ class AdminPengajarService {
       serviceUser.updateUserData({ status: payload.status_pengajar }, { id: userId }),
     ]);
 
-    console.log(user.pengajar.id);
-
     const afterUpdatePengajar = await servicePengajar.updateData(
-      { level: payload.level_pengajar },
+      {
+        level: payload.level_pengajar,
+        bagi_hasil_50persen: payload.bagi_hasil_50persen,
+      },
       { id: user.pengajar.id }
     );
 
     return {
       status: afterUpdateUser.status,
       level: afterUpdatePengajar.level,
+      bagi_hasil_50persen: afterUpdatePengajar.bagi_hasil_50persen,
     };
   }
+
+  async getPesertaPengajarRegistered(query, status, keyword, dateRange) {
+    const { page = 1, pageSize = 10 } = query;
+    const offset = (page - 1) * pageSize;
+
+    let whereClause = "WHERE u.role = 'PENGAJAR' AND u.status IN ('REGISTERED', 'WAITING', 'INTERVIEWED', 'REJECTED')";
+    if (status) {
+      whereClause += ` AND u.status = '${status}'`;
+    }
+    if (keyword) {
+      whereClause += ` AND u.nama LIKE '%${keyword}%'`;
+    }
+    if (dateRange) {
+      const [startDate, endDate] = dateRange.split(' - ').map(date => moment(date, 'YYYY-MM-DD').format('YYYY-MM-DD'));
+      whereClause += ` AND p.tanggal_wawancara BETWEEN '${startDate}' AND '${endDate}'`;
+    }
+
+    const result = await sequelize.query(
+      `
+      SELECT 
+        u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+        p.id AS 'pengajar_id', p.tanggal_wawancara, p.jam_wawancara, p.link_wawancara
+      FROM Pengajars p 
+      JOIN Users u ON p.user_id = u.id 
+      ${whereClause}
+      LIMIT ${pageSize} OFFSET ${offset}
+      `,
+      { type: QueryTypes.SELECT }
+    );
+
+    return result;
+  }
+
+  async getPesertaPengajarVerified(query, status, keyword, level, bagiHasil) {
+    const { page = 1, pageSize = 10 } = query;
+    const offset = (page - 1) * pageSize;
+
+    let whereClause = "WHERE u.role = 'PENGAJAR' AND u.status IN ('ACTIVE', 'NONACTIVE')";
+    if (status) {
+      whereClause += ` AND u.status = '${status}'`;
+    }
+    if (keyword) {
+      whereClause += ` AND u.nama LIKE '%${keyword}%'`;
+    }
+    if (level) {
+      whereClause += ` AND p.level = '${level}'`;
+    }
+    if (bagiHasil) {
+      whereClause += ` AND p.bagi_hasil_50persen = '${bagiHasil}'`;
+    }
+
+
+    const result = await sequelize.query(
+      `
+      SELECT 
+        u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+        p.id AS 'pengajar_id', p.level, p.bagi_hasil_50persen
+      FROM Pengajars p 
+      JOIN Users u ON p.user_id = u.id 
+      ${whereClause}
+      LIMIT ${pageSize} OFFSET ${offset}
+      `,
+      { type: QueryTypes.SELECT }
+    );
+
+    return result;
+  }
+
 }
 
 module.exports = AdminPengajarService;
