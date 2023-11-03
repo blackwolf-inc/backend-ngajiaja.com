@@ -1,7 +1,7 @@
-const { QueryTypes } = require('sequelize');
+const { QueryTypes, where } = require('sequelize');
 // const ApiError = require('../../../helpers/errorHandler');
 const db = require('../../../../models/index');
-const { User, Peserta, Period, BimbinganReguler, BimbinganTambahan, Pengajar, sequelize } = db;
+const { User, BimbinganReguler, BimbinganTambahan, Pengajar, sequelize } = db;
 const BaseService = require('./../../../../base/base.service');
 const { Op } = require('sequelize');
 
@@ -85,76 +85,56 @@ class DashboardPesertaService extends BaseService {
   }
 
   async getBimbinganPeserta(id, query) {
-    query = {
-      page: 1,
-      pageSize: 10,
+    const whereClause = {
+      where: { peserta_id: id },
     };
 
-    console.log(query);
-    const whereClause = {
-      id,
-    };
+    if (query.status) {
+      whereClause.where.status = query.status;
+    }
+
+    if (query.startDate && query.endDate) {
+      whereClause.where.start_date = { [Op.between]: [query.startDate, query.endDate] };
+    }
 
     const includeQuery = [
       {
-        model: Period,
-        as: 'period',
-        attributes: {
-          exclude: ['createdAt', 'updatedAt'],
-        },
+        model: Pengajar,
+        as: 'pengajar',
+        attributes: ['user_id', 'id'],
         include: [
           {
-            model: Pengajar,
-            as: 'pengajar',
-            attributes: ['user_id', 'id'],
-            include: [
-              {
-                model: User,
-                as: 'user',
-                attributes: ['nama'],
-                where: query.instructorName
-                  ? {
-                      nama: {
-                        [Op.like]: `%${query.instructorName}%`,
-                      },
-                    }
-                  : {},
-              },
-            ],
-          },
-          {
-            model: BimbinganReguler,
-            as: 'bimbingan_reguler',
-            attributes: ['id', 'period_id', 'hari_bimbingan', 'jam_bimbingan'],
-            separate: true,
-          },
-          {
-            model: BimbinganTambahan,
-            as: 'bimbingan_tambahan',
-            separate: true,
+            model: User,
+            as: 'user',
+            attributes: ['nama'],
+            where: query.instructorName
+              ? {
+                  nama: {
+                    [Op.like]: `%${query.instructorName}%`,
+                  },
+                }
+              : {},
           },
         ],
       },
+      {
+        model: BimbinganReguler,
+        as: 'bimbingan_reguler',
+        separate: true,
+      },
+      {
+        model: BimbinganTambahan,
+        as: 'bimbingan_tambahan',
+        separate: true,
+      },
     ];
 
-    if (query.startDate && query.endDate) {
-      whereClause['period.start_date'] = { [Op.between]: [query.startDate, query.endDate] };
-    }
-
-    const result = await Peserta.findAndCountAll({
-      where: whereClause,
-      include: includeQuery,
-      limit: query.pageSize,
-      offset: (query.page - 1) * query.pageSize,
-    });
-
-    const totalPages = Math.ceil(result.count / query.pageSize);
+    const result = await this.__findAll(whereClause, includeQuery);
 
     return {
-      total: result.count,
-      currentPage: query.page,
-      totalPages,
-      datas: result.rows,
+      result,
+      currentPage: parseInt(query.page),
+      total: parseInt(result.total),
     };
   }
 }
