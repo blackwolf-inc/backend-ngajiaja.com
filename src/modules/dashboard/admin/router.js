@@ -30,5 +30,6 @@ router.patch(
 );
 
 router.get('/data/pengajar/terdaftar', AdminDashboardController.getPengajarRegistered);
+router.get('/data/pengajar/terverifikasi', AdminDashboardController.getPengajarVerified);
 
 module.exports = router;

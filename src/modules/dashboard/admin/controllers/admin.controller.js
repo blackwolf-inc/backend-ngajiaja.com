@@ -33,7 +33,7 @@ class AdminDashboardController {
     try {
       const { userId } = req.params;
       const { status_pengajar, level_pengajar, bagi_hasil_50persen } = req.body;
-      const result = await service.updateStatusPengajarRegistered(
+      const result = await service.updateStatusPengajar(
         req,
         { status_pengajar, level_pengajar, bagi_hasil_50persen },
         userId
@@ -50,7 +50,19 @@ class AdminDashboardController {
       const { query } = req;
       const { status, keyword, dateRange } = query;
       const result = await service.getPesertaPengajarRegistered(query, status, keyword, dateRange);
-      return responseHandler.succes(res, 'Success get pengajar', result);
+      return responseHandler.succes(res, 'Success get pengajar Terdaftar', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getPengajarVerified(req, res, next) {
+    const service = new AdminPengajarService();
+    try {
+      const { query } = req;
+      const { status, keyword, level, bagiHasil } = query;
+      const result = await service.getPesertaPengajarVerified(query, status, keyword, level, bagiHasil);
+      return responseHandler.succes(res, 'Success get pengajar Terverifikasi', result);
     } catch (error) {
       next(error);
     }

@@ -153,7 +153,7 @@ class AdminPengajarService {
     const result = await sequelize.query(
       `
       SELECT 
-        u.id AS 'user_id', u.nama, u.role, u.status,
+        u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
         p.id AS 'pengajar_id', p.tanggal_wawancara, p.jam_wawancara, p.link_wawancara
       FROM Pengajars p 
       JOIN Users u ON p.user_id = u.id 
@@ -166,6 +166,40 @@ class AdminPengajarService {
     return result;
   }
 
+  async getPesertaPengajarVerified(query, status, keyword, level, bagiHasil) {
+    const { page = 1, pageSize = 10 } = query;
+    const offset = (page - 1) * pageSize;
+
+    let whereClause = "WHERE u.role = 'PENGAJAR' AND u.status IN ('ACTIVE', 'NONACTIVE')";
+    if (status) {
+      whereClause += ` AND u.status = '${status}'`;
+    }
+    if (keyword) {
+      whereClause += ` AND u.nama LIKE '%${keyword}%'`;
+    }
+    if (level) {
+      whereClause += ` AND p.level = '${level}'`;
+    }
+    if (bagiHasil) {
+      whereClause += ` AND p.bagi_hasil_50persen = '${bagiHasil}'`;
+    }
+
+
+    const result = await sequelize.query(
+      `
+      SELECT 
+        u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+        p.id AS 'pengajar_id', p.level, p.bagi_hasil_50persen
+      FROM Pengajars p 
+      JOIN Users u ON p.user_id = u.id 
+      ${whereClause}
+      LIMIT ${pageSize} OFFSET ${offset}
+      `,
+      { type: QueryTypes.SELECT }
+    );
+
+    return result;
+  }
 
 }
 
