@@ -70,6 +70,18 @@ class BimbinganPeserta {
     }
   }
 
+  static async getOneBimbingan(req, res, next) {
+    const service = new BimbinganService(req, Period);
+    const userService = new UserService(req, User);
+    try {
+      const user = await userService.getOneUser(req.user.id);
+      const result = await service.detailBimbingan(req.params.id, user.pengajar.id);
+      return responseHandler.succes(res, `Success get bimbingan`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async updateReguler(req, res, next) {
     const service = new BimbinganService(req, BimbinganReguler);
     try {
