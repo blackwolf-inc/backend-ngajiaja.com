@@ -124,7 +124,7 @@ class PengajarService extends BaseService {
             bimbingan_reguler_id: bimbinganReguler.id,
             status: null, // no data in db, waiting for db update
             name: period.peserta.User.nama,
-            date: null, // no data in db, waiting for db update
+            date: bimbinganReguler.tanggal,
             time: bimbinganReguler.jam_bimbingan,
             level: period.peserta.level,
           };
@@ -144,7 +144,7 @@ class PengajarService extends BaseService {
             bimbingan_tambahan_id: bimbinganTambahan.id,
             status: null, // no data in db, waiting for db update
             name: period.peserta.User.nama,
-            date: null, // no data in db, waiting for db update
+            date: bimbinganTambahan.tanggal,
             time: bimbinganTambahan.jam_bimbingan,
             level: period.peserta.level,
           };
@@ -154,24 +154,29 @@ class PengajarService extends BaseService {
       }
     }
 
+    // sort data by date ascending
+    const sortedData = data.sort((a, b) => {
+      return new Date(a.date) - new Date(b.date);
+    });
+
     let filteredPeserta;
     if (pesertaName) {
       if (pesertaName.length < 3)
         throw ApiError.badRequest('Peserta name must be at least 3 characters');
 
       if (status) {
-        filteredPeserta = data.filter((peserta) => {
+        filteredPeserta = sortedData.filter((peserta) => {
           return peserta.name.includes(pesertaName) && peserta.status === status;
         });
       } else {
-        filteredPeserta = data.filter((peserta) => {
+        filteredPeserta = sortedData.filter((peserta) => {
           return peserta.name.includes(pesertaName);
         });
       }
     }
 
     if (status) {
-      filteredPeserta = data.filter((peserta) => {
+      filteredPeserta = sortedData.filter((peserta) => {
         return peserta.status === status;
       });
     }
@@ -182,7 +187,7 @@ class PengajarService extends BaseService {
       return filteredPeserta;
     }
 
-    return data; // data returned is not sorted by date because there is no date data in db
+    return sortedData;
   }
 
   async getBimbinganActivated(id) {
