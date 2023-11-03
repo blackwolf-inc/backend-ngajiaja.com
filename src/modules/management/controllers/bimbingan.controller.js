@@ -1,26 +1,70 @@
 const BimbinganService = require('../service/bimbingan.service');
+const PengajarService = require('../../dashboard/pengajar/services/pengajar.service');
+const UserService = require('../../registration/services/user.service');
 const responseHandler = require('../../../helpers/responseHandler');
 const db = require('../../../models/index');
-const { Period, BimbinganReguler } = db;
+const { Period, BimbinganReguler, User } = db;
 
 class BimbinganPeserta {
-  static async getAll(req, res, next) {
-    const service = new BimbinganService(req, Period);
+  static async getDataBimbingan(req, res, next) {
+    const service = new PengajarService(req, Period);
+    const userService = new UserService(req, User);
     try {
-      const result = await service.getAllPeriod(req.query);
-
-      return responseHandler.succes(res, `Success get all ${service.db.name}s`, result);
+      const user = await userService.getOneUser(req.user.id);
+      const [totalPending, totalOnGoing, totalAbsent] = await Promise.all([
+        service.bimbinganPending(user.pengajar.id, null),
+        service.getBimbinganActivated(user.pengajar.id),
+        service.getAbsent(user.pengajar.id),
+      ]);
+      return responseHandler.succes(res, `Success get bimbingan akan datang`, {
+        total_pending: totalPending.length,
+        total_on_going: totalOnGoing,
+        total_absent: totalAbsent,
+      });
     } catch (error) {
       next(error);
     }
   }
 
-  static async getOne(req, res, next) {
-    const service = new BimbinganService(req, Period);
+  static async getBimbinganPending(req, res, next) {
+    const service = new PengajarService(req, Period);
+    const userService = new UserService(req, User);
     try {
-      const result = await service.getOnePeriod(req.params.id);
+      const user = await userService.getOneUser(req.user.id);
+      const result = await service.bimbinganPending(user.pengajar.id, req.query.name);
+      return responseHandler.succes(res, `Success get bimbingan menunggu`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-      return responseHandler.succes(res, `Success get ${service.db.name}s`, result);
+  static async getBimbinganOnGoing(req, res, next) {
+    const service = new BimbinganService(req, Period);
+    const userService = new UserService(req, User);
+    try {
+      const user = await userService.getOneUser(req.user.id);
+      const result = await service.bimbinganOnGoing(
+        user.pengajar.id,
+        req.query.name,
+        req.query.level,
+      );
+      return responseHandler.succes(res, `Success get bimbingan akan datang`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getBimbinganDone(req, res, next) {
+    const service = new BimbinganService(req, Period);
+    const userService = new UserService(req, User);
+    try {
+      const user = await userService.getOneUser(req.user.id);
+      const result = await service.bimbinganDone(
+        user.pengajar.id,
+        req.query.name,
+        req.query.period,
+      );
+      return responseHandler.succes(res, `Success get bimbingan selesai`, result);
     } catch (error) {
       next(error);
     }
