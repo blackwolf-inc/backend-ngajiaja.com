@@ -120,7 +120,6 @@ class DashboardPesertaService extends BaseService {
       {
         model: BimbinganReguler,
         as: 'bimbingan_reguler',
-        attributes: ['id', 'period_id', 'hari_bimbingan', 'jam_bimbingan'],
         separate: true,
       },
       {
