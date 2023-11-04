@@ -1,6 +1,15 @@
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
-const { User, Bank, Infaq, Period, Peserta, Pengajar } = require('../../../models');
+const {
+  User,
+  Bank,
+  Infaq,
+  Period,
+  Peserta,
+  Pengajar,
+  PenghasilanPengajar,
+  sequelize,
+} = require('../../../models');
 
 class InfaqService extends BaseService {
   async checkUserById(payload) {
@@ -70,6 +79,19 @@ class InfaqService extends BaseService {
     } else {
       throw ApiError.badRequest('Invalid Date');
     }
+  }
+
+  async addToPenghasilanPengajar(req) {
+    const data = {
+      pengajar_id: req.pengajar_id,
+      peserta_id: req.peserta_id,
+      pembayaran: req.nominal,
+      penghasilan: parseFloat(req.nominal) / 50.0,
+      persentase_bagi_hasil: 50.0,
+      waktu_pembayaran: req.waktu_pembayaran,
+    };
+    const result = await PenghasilanPengajar.create(data);
+    console.log('Success create', result);
   }
 }
 
