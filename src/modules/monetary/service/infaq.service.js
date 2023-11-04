@@ -81,12 +81,14 @@ class InfaqService extends BaseService {
   }
 
   async addToPenghasilanPengajar(req) {
+    const penguranganPenghasilan = (50 / 100) * parseFloat(req.nominal);
+
     const data = {
       pengajar_id: req.pengajar_id,
       peserta_id: req.peserta_id,
       pembayaran: req.nominal,
-      penghasilan: parseFloat(req.nominal) / 50.0,
-      persentase_bagi_hasil: 50.0,
+      penghasilan: parseFloat(req.nominal) - penguranganPenghasilan,
+      persentase_bagi_hasil: 50,
       waktu_pembayaran: req.waktu_pembayaran,
     };
     const result = await PenghasilanPengajar.create(data);
