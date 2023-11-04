@@ -113,7 +113,7 @@ class PengajarService extends BaseService {
 
     const data = [];
     for (const period of result.datas) {
-      if (period.bimbingan_reguler !== null) {
+      if (period.tipe_bimbingan === 'REGULER') {
         for (const bimbinganReguler of period.bimbingan_reguler) {
           if (bimbinganReguler.absensi_pengajar === 1 || bimbinganReguler.absensi_peserta === 1)
             continue;
@@ -133,7 +133,7 @@ class PengajarService extends BaseService {
         }
       }
 
-      if (period.bimbingan_tambahan !== null) {
+      if (period.tipe_bimbingan === 'TAMBAHAN') {
         for (const bimbinganTambahan of period.bimbingan_tambahan) {
           if (bimbinganTambahan.absensi_pengajar === 1 || bimbinganTambahan.absensi_peserta === 1)
             continue;
