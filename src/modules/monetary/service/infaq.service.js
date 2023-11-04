@@ -8,7 +8,6 @@ const {
   Peserta,
   Pengajar,
   PenghasilanPengajar,
-  sequelize,
 } = require('../../../models');
 
 class InfaqService extends BaseService {
@@ -91,7 +90,6 @@ class InfaqService extends BaseService {
       waktu_pembayaran: req.waktu_pembayaran,
     };
     const result = await PenghasilanPengajar.create(data);
-    console.log('Success create', result);
   }
 }
 
