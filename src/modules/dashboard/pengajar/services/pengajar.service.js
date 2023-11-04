@@ -1,6 +1,6 @@
 const BaseService = require('../../../../base/base.service');
 const ApiError = require('../../../../helpers/errorHandler');
-const { TYPE_BIMBINGAN } = require('../../../../helpers/constanta');
+const { TYPE_BIMBINGAN, STATUS_BIMBINGAN } = require('../../../../helpers/constanta');
 const {
   BimbinganReguler,
   BimbinganTambahan,
@@ -20,7 +20,7 @@ class PengajarService extends BaseService {
 
   async bimbinganPending(id, pesertaName) {
     const result = await this.__findAll(
-      { where: { pengajar_id: id, status: 'WAITING' } },
+      { where: { pengajar_id: id, status: STATUS_BIMBINGAN.WAITING } },
       this.#includeQueryBimbinganPending,
       'createdAt',
       'ASC',
@@ -28,7 +28,7 @@ class PengajarService extends BaseService {
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
     const bimbinganOnGoing = await this.__findAll(
-      { where: { pengajar_id: id, status: 'ACTIVATED' } },
+      { where: { pengajar_id: id, status: STATUS_BIMBINGAN.ACTIVATED } },
       this.#includeQueryBimbinganOnGoing,
     );
 
@@ -63,7 +63,7 @@ class PengajarService extends BaseService {
 
       // check if last approved is passed
       if (moment().isAfter(lastApproved) || isSameJadwal) {
-        await this.updateData({ status: 'CANCELED' }, { id: period.id });
+        await this.updateData({ status: STATUS_BIMBINGAN.CANCELED }, { id: period.id });
         continue;
       }
 
@@ -107,7 +107,7 @@ class PengajarService extends BaseService {
 
   async bimbinganOnGoing(id, pesertaName, status) {
     const result = await this.__findAll(
-      { where: { pengajar_id: id, status: 'ACTIVATED' } },
+      { where: { pengajar_id: id, status: STATUS_BIMBINGAN.ACTIVATED } },
       this.#includeQueryBimbinganOnGoing,
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
@@ -200,7 +200,7 @@ class PengajarService extends BaseService {
 
   async getAbsent(id) {
     const result = await this.__findAll(
-      { where: { pengajar_id: id, status: 'ACTIVATED' } },
+      { where: { pengajar_id: id, status: STATUS_BIMBINGAN.ACTIVATED } },
       this.#includeQueryBimbinganOnGoing,
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);

@@ -1,6 +1,6 @@
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
-const { TYPE_BIMBINGAN } = require('../../../helpers/constanta');
+const { TYPE_BIMBINGAN, STATUS_BIMBINGAN } = require('../../../helpers/constanta');
 const {
   JadwalBimbinganPeserta,
   User,
@@ -12,7 +12,7 @@ const {
 class BimbinganService extends BaseService {
   async bimbinganOnGoing(id, pesertaName, level) {
     const result = await this.__findAll(
-      { where: { pengajar_id: id, status: 'ACTIVATED' } },
+      { where: { pengajar_id: id, status: STATUS_BIMBINGAN.ACTIVATED } },
       this.#includeQuery,
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
@@ -104,7 +104,7 @@ class BimbinganService extends BaseService {
 
   async bimbinganDone(id, pesertaName, periodDate) {
     const result = await this.__findAll(
-      { where: { pengajar_id: id, status: 'FINISHED' } },
+      { where: { pengajar_id: id, status: STATUS_BIMBINGAN.FINISHED } },
       this.#includeQuery,
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
