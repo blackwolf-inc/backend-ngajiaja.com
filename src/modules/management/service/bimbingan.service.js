@@ -18,7 +18,7 @@ class BimbinganService extends BaseService {
 
     const data = [];
     for (const period of result.datas) {
-      if (period.bimbingan_reguler !== null) {
+      if (period.tipe_bimbingan === 'REGULER') {
         let attendance = 0;
         for (const bimbinganReguler of period.bimbingan_reguler) {
           if (bimbinganReguler.absensi_peserta === 1) attendance += 1;
@@ -43,7 +43,7 @@ class BimbinganService extends BaseService {
         data.push(bimbinganOnGoing);
       }
 
-      if (period.bimbingan_tambahan !== null) {
+      if (period.tipe_bimbingan === 'TAMBAHAN') {
         let attendance = 0;
         for (const bimbinganTambahan of period.bimbingan_tambahan) {
           if (bimbinganTambahan.absensi_peserta === 1) attendance += 1;
@@ -110,7 +110,7 @@ class BimbinganService extends BaseService {
 
     const data = [];
     for (const period of result.datas) {
-      if (period.bimbingan_reguler !== null) {
+      if (period.tipe_bimbingan === 'REGULER') {
         let absent = 0;
         for (const bimbinganReguler of period.bimbingan_reguler) {
           if (bimbinganReguler.absensi_peserta === 0) absent += 1;
@@ -131,7 +131,7 @@ class BimbinganService extends BaseService {
         data.push(bimbinganDone);
       }
 
-      if (period.bimbingan_tambahan !== null) {
+      if (period.tipe_bimbingan === 'TAMBAHAN') {
         let absent = 0;
         for (const bimbinganTambahan of period.bimbingan_tambahan) {
           if (bimbinganTambahan.absensi_peserta === 0) absent += 1;
