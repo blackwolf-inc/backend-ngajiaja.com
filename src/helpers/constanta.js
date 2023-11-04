@@ -15,7 +15,13 @@ const STATUS_USER = {
   NONACTIVE: 'NONACTIVE',
 };
 
+const TYPE_BIMBINGAN = {
+  REGULER: 'REGULER',
+  TAMBAHAN: 'TAMBAHAN',
+};
+
 module.exports = {
   USER_ROLE,
   STATUS_USER,
+  TYPE_BIMBINGAN,
 };

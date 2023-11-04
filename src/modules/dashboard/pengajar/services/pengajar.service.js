@@ -1,5 +1,6 @@
 const BaseService = require('../../../../base/base.service');
 const ApiError = require('../../../../helpers/errorHandler');
+const { TYPE_BIMBINGAN } = require('../../../../helpers/constanta');
 const {
   BimbinganReguler,
   BimbinganTambahan,
@@ -113,7 +114,7 @@ class PengajarService extends BaseService {
 
     const data = [];
     for (const period of result.datas) {
-      if (period.tipe_bimbingan === 'REGULER') {
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
         for (const bimbinganReguler of period.bimbingan_reguler) {
           if (bimbinganReguler.absensi_pengajar === 1 || bimbinganReguler.absensi_peserta === 1)
             continue;
@@ -133,7 +134,7 @@ class PengajarService extends BaseService {
         }
       }
 
-      if (period.tipe_bimbingan === 'TAMBAHAN') {
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
         for (const bimbinganTambahan of period.bimbingan_tambahan) {
           if (bimbinganTambahan.absensi_pengajar === 1 || bimbinganTambahan.absensi_peserta === 1)
             continue;

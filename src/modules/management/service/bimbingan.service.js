@@ -1,5 +1,6 @@
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
+const { TYPE_BIMBINGAN } = require('../../../helpers/constanta');
 const {
   JadwalBimbinganPeserta,
   User,
@@ -18,7 +19,7 @@ class BimbinganService extends BaseService {
 
     const data = [];
     for (const period of result.datas) {
-      if (period.tipe_bimbingan === 'REGULER') {
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
         let attendance = 0;
         for (const bimbinganReguler of period.bimbingan_reguler) {
           if (bimbinganReguler.absensi_peserta === 1) attendance += 1;
@@ -43,7 +44,7 @@ class BimbinganService extends BaseService {
         data.push(bimbinganOnGoing);
       }
 
-      if (period.tipe_bimbingan === 'TAMBAHAN') {
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
         let attendance = 0;
         for (const bimbinganTambahan of period.bimbingan_tambahan) {
           if (bimbinganTambahan.absensi_peserta === 1) attendance += 1;
@@ -110,7 +111,7 @@ class BimbinganService extends BaseService {
 
     const data = [];
     for (const period of result.datas) {
-      if (period.tipe_bimbingan === 'REGULER') {
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
         let absent = 0;
         for (const bimbinganReguler of period.bimbingan_reguler) {
           if (bimbinganReguler.absensi_peserta === 0) absent += 1;
@@ -131,7 +132,7 @@ class BimbinganService extends BaseService {
         data.push(bimbinganDone);
       }
 
-      if (period.tipe_bimbingan === 'TAMBAHAN') {
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
         let absent = 0;
         for (const bimbinganTambahan of period.bimbingan_tambahan) {
           if (bimbinganTambahan.absensi_peserta === 0) absent += 1;
@@ -193,7 +194,7 @@ class BimbinganService extends BaseService {
     if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
 
     const data = [];
-    if (result.tipe_bimbingan === 'REGULER') {
+    if (result.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
       for (const bimbinganReguler of result.bimbingan_reguler) {
         const dataBimbinganReguler = {
           status: bimbinganReguler.status,
@@ -207,7 +208,7 @@ class BimbinganService extends BaseService {
       }
     }
 
-    if (result.tipe_bimbingan === 'TAMBAHAN') {
+    if (result.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
       for (const bimbinganTambahan of result.bimbingan_tambahan) {
         const dataBimbinganTambahan = {
           status: bimbinganTambahan.status,
