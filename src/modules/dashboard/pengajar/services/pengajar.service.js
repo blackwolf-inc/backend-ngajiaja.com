@@ -1,5 +1,6 @@
 const BaseService = require('../../../../base/base.service');
 const ApiError = require('../../../../helpers/errorHandler');
+const { TYPE_BIMBINGAN, STATUS_BIMBINGAN } = require('../../../../helpers/constanta');
 const {
   BimbinganReguler,
   BimbinganTambahan,
@@ -19,16 +20,53 @@ class PengajarService extends BaseService {
 
   async bimbinganPending(id, pesertaName) {
     const result = await this.__findAll(
-      { where: { pengajar_id: id, status: 'WAITING' } },
+      { where: { pengajar_id: id, status: STATUS_BIMBINGAN.WAITING } },
       this.#includeQueryBimbinganPending,
       'createdAt',
       'ASC',
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
+    const bimbinganOnGoing = await this.__findAll(
+      { where: { pengajar_id: id, status: STATUS_BIMBINGAN.ACTIVATED } },
+      this.#includeQueryBimbinganOnGoing,
+    );
+
     const data = [];
     for (const period of result.datas) {
       if (period.peserta.jadwal_bimbingan_peserta === null) continue; // just for testing (dummy data), peserta must have jadwal bimbingan, so this line can be removed if the data is real
+      const lastApproved = moment(period.createdAt).add(1, 'days').format('YYYY-MM-DD HH:mm:ss');
+
+      // check if there are other peserta with same jadwal bimbingan
+      let isSameJadwal = false;
+      const fieldDaysToCompare = ['hari_bimbingan_1', 'hari_bimbingan_2'];
+      const fieldHoursToCompare = ['jam_bimbingan_1', 'jam_bimbingan_2'];
+
+      for (const bimbingan of bimbinganOnGoing.datas) {
+        for (const fieldDay of fieldDaysToCompare) {
+          if (
+            period.peserta.jadwal_bimbingan_peserta[fieldDay] ===
+            bimbingan.peserta.jadwal_bimbingan_peserta[fieldDay]
+          ) {
+            for (const fieldHour of fieldHoursToCompare) {
+              if (
+                period.peserta.jadwal_bimbingan_peserta[fieldHour] ===
+                bimbingan.peserta.jadwal_bimbingan_peserta[fieldHour]
+              ) {
+                isSameJadwal = true;
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // check if last approved is passed
+      if (moment().isAfter(lastApproved) || isSameJadwal) {
+        await this.updateData({ status: STATUS_BIMBINGAN.CANCELED }, { id: period.id });
+        continue;
+      }
+
       const bimbinganPending = {
         period_id: period.id,
         peserta_id: period.peserta.id,
@@ -42,12 +80,13 @@ class PengajarService extends BaseService {
           hour2: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_2,
         },
         level: period.peserta.level,
-        last_approved: moment(period.createdAt).add(1, 'hours').format('YYYY-MM-DD HH:mm:ss'),
+        last_approved: lastApproved,
       };
 
       data.push(bimbinganPending);
     }
 
+    // check if peserta name is provided for filtering
     if (pesertaName) {
       if (pesertaName.length < 3)
         throw ApiError.badRequest('Peserta name must be at least 3 characters');
@@ -68,14 +107,14 @@ class PengajarService extends BaseService {
 
   async bimbinganOnGoing(id, pesertaName, status) {
     const result = await this.__findAll(
-      { where: { pengajar_id: id, status: 'ACTIVATED' } },
+      { where: { pengajar_id: id, status: STATUS_BIMBINGAN.ACTIVATED } },
       this.#includeQueryBimbinganOnGoing,
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
     const data = [];
     for (const period of result.datas) {
-      if (period.bimbingan_reguler !== null) {
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
         for (const bimbinganReguler of period.bimbingan_reguler) {
           if (bimbinganReguler.absensi_pengajar === 1 || bimbinganReguler.absensi_peserta === 1)
             continue;
@@ -86,7 +125,7 @@ class PengajarService extends BaseService {
             bimbingan_reguler_id: bimbinganReguler.id,
             status: null, // no data in db, waiting for db update
             name: period.peserta.User.nama,
-            date: null, // no data in db, waiting for db update
+            date: bimbinganReguler.tanggal,
             time: bimbinganReguler.jam_bimbingan,
             level: period.peserta.level,
           };
@@ -95,7 +134,7 @@ class PengajarService extends BaseService {
         }
       }
 
-      if (period.bimbingan_tambahan !== null) {
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
         for (const bimbinganTambahan of period.bimbingan_tambahan) {
           if (bimbinganTambahan.absensi_pengajar === 1 || bimbinganTambahan.absensi_peserta === 1)
             continue;
@@ -106,7 +145,7 @@ class PengajarService extends BaseService {
             bimbingan_tambahan_id: bimbinganTambahan.id,
             status: null, // no data in db, waiting for db update
             name: period.peserta.User.nama,
-            date: null, // no data in db, waiting for db update
+            date: bimbinganTambahan.tanggal,
             time: bimbinganTambahan.jam_bimbingan,
             level: period.peserta.level,
           };
@@ -116,24 +155,29 @@ class PengajarService extends BaseService {
       }
     }
 
+    // sort data by date ascending
+    const sortedData = data.sort((a, b) => {
+      return new Date(a.date) - new Date(b.date);
+    });
+
     let filteredPeserta;
     if (pesertaName) {
       if (pesertaName.length < 3)
         throw ApiError.badRequest('Peserta name must be at least 3 characters');
 
       if (status) {
-        filteredPeserta = data.filter((peserta) => {
+        filteredPeserta = sortedData.filter((peserta) => {
           return peserta.name.includes(pesertaName) && peserta.status === status;
         });
       } else {
-        filteredPeserta = data.filter((peserta) => {
+        filteredPeserta = sortedData.filter((peserta) => {
           return peserta.name.includes(pesertaName);
         });
       }
     }
 
     if (status) {
-      filteredPeserta = data.filter((peserta) => {
+      filteredPeserta = sortedData.filter((peserta) => {
         return peserta.status === status;
       });
     }
@@ -144,7 +188,7 @@ class PengajarService extends BaseService {
       return filteredPeserta;
     }
 
-    return data; // data returned is not sorted by date because there is no date data in db
+    return sortedData;
   }
 
   async getBimbinganActivated(id) {
@@ -156,7 +200,7 @@ class PengajarService extends BaseService {
 
   async getAbsent(id) {
     const result = await this.__findAll(
-      { where: { pengajar_id: id, status: 'ACTIVATED' } },
+      { where: { pengajar_id: id, status: STATUS_BIMBINGAN.ACTIVATED } },
       this.#includeQueryBimbinganOnGoing,
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
@@ -217,6 +261,13 @@ class PengajarService extends BaseService {
       },
       as: 'peserta',
       include: [
+        {
+          model: JadwalBimbinganPeserta,
+          attributes: {
+            exclude: ['peserta_id'],
+          },
+          as: 'jadwal_bimbingan_peserta',
+        },
         {
           model: User,
           attributes: {

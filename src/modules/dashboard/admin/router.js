@@ -1,10 +1,10 @@
 const { Router } = require('express');
 const router = Router();
-const validate = require('./../../../utils/validatorIndex');
-const isAuthenticate = require('./../../../middlewares/authentication');
+const validate = require('../../../utils/validatorIndex');
+const isAuthenticate = require('../../../middlewares/authentication');
 const { USER_ROLE } = require('../../../helpers/constanta');
 const { hasRole } = require('../../../middlewares/roleAuth');
-const AdminDashboardController = require('./controllers/admin.controller');
+const AdminDashboardController = require('./controllers/admin.controller.js');
 const {
   updateStatusPengajar,
   updateLinkWawancara,
@@ -28,5 +28,8 @@ router.patch(
   validate(updateStatusPengajar),
   AdminDashboardController.updateStatusPengajar
 );
+
+router.get('/data/pengajar/terdaftar', AdminDashboardController.getPengajarRegistered);
+router.get('/data/pengajar/terverifikasi', AdminDashboardController.getPengajarVerified);
 
 module.exports = router;

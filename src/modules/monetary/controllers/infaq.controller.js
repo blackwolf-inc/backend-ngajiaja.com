@@ -47,7 +47,10 @@ class InfaqController {
     try {
       await service.checkInfaqById(req.params.id);
       const result = await service.updateData(req.body, { id: req.params.id });
-      return responseHandler.succes(res, `Success create ${service.db.name}`, result);
+      if (result) {
+        await service.addToPenghasilanPengajar(result);
+        return responseHandler.succes(res, `Success create ${service.db.name}`, result);
+      }
     } catch (error) {
       next(error);
     }

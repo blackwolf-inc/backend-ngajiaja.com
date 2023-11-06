@@ -3,7 +3,7 @@ const UserService = require('../../../registration/services/user.service');
 const responseHandler = require('../../../../helpers/responseHandler');
 const { Pengajar, Period, User, Infaq } = require('../../../../models');
 
-class PengajarController extends PengajarService {
+class PengajarController {
   static async getOne(req, res, next) {
     const service = new PengajarService(req, Pengajar);
     const periodService = new PengajarService(req, Period);
