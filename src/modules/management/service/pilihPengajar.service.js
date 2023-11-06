@@ -66,7 +66,7 @@ class PilihPengajar extends BaseService {
 
   async createPeriode(payload) {
     await this.checkDays(payload.hari_1, payload.hari_2);
-    const createPeriod = await Period.create(payload);
+    const createPeriod = await this.__create(payload);
 
     return createPeriod;
   }
