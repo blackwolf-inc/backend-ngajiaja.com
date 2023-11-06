@@ -5,9 +5,11 @@ const {
   JadwalBimbinganPeserta,
   User,
   Peserta,
+  Pengajar,
   BimbinganReguler,
   BimbinganTambahan,
 } = require('../../../models');
+const moment = require('moment');
 
 class BimbinganService extends BaseService {
   async bimbinganOnGoing(id, pesertaName, level) {
@@ -186,6 +188,37 @@ class BimbinganService extends BaseService {
     return data;
   }
 
+  async dataDetailBimbingan(id, pengajarId) {
+    const result = await this.__findOne(
+      { where: { id, pengajar_id: pengajarId } },
+      this.#includeQuery,
+    );
+    if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
+
+    let age = 0;
+    if (result.peserta.User.tgl_lahir) {
+      const birthdate = moment(result.peserta.User.tgl_lahir, 'YYYY-MM-DD').toDate();
+      const birthYear = birthdate.getFullYear();
+      const birthMonth = birthdate.getMonth();
+      const birthDay = birthdate.getDate();
+
+      const today = moment().toDate();
+      const todayYear = today.getFullYear();
+      const todayMonth = today.getMonth();
+      const todayDay = today.getDate();
+
+      age = todayYear - birthYear;
+      if (todayMonth < birthMonth || (todayMonth === birthMonth && todayDay < birthDay)) age--;
+    }
+
+    return {
+      name: result.peserta.User.nama,
+      gender: result.peserta.User.jenis_kelamin,
+      age,
+      level: result.peserta.level,
+    };
+  }
+
   async detailBimbingan(id, pengajarId) {
     const result = await this.__findOne(
       { where: { id, pengajar_id: pengajarId } },
@@ -197,7 +230,10 @@ class BimbinganService extends BaseService {
     if (result.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
       for (const bimbinganReguler of result.bimbingan_reguler) {
         const dataBimbinganReguler = {
-          status: bimbinganReguler.status,
+          period_id: result.id,
+          peserta_id: result.peserta.id,
+          user_id: result.peserta.User.id,
+          status: null,
           date: bimbinganReguler.tanggal,
           time: bimbinganReguler.jam_bimbingan,
           attendance: bimbinganReguler.absensi_peserta,
@@ -211,7 +247,10 @@ class BimbinganService extends BaseService {
     if (result.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
       for (const bimbinganTambahan of result.bimbingan_tambahan) {
         const dataBimbinganTambahan = {
-          status: bimbinganTambahan.status,
+          period_id: result.id,
+          peserta_id: result.peserta.id,
+          user_id: result.peserta.User.id,
+          status: null,
           date: bimbinganTambahan.tanggal,
           time: bimbinganTambahan.jam_bimbingan,
           attendance: bimbinganTambahan.absensi_peserta,
@@ -222,33 +261,17 @@ class BimbinganService extends BaseService {
       }
     }
 
-    // determine peserta age based on birthdate
-    let age = 0;
-    if (result.peserta.User.tgl_lahir) {
-      const birthdate = result.peserta.User.tgl_lahir;
-      const birthYear = birthdate.getFullYear();
-      const birthMonth = birthdate.getMonth();
-      const birthDay = birthdate.getDate();
+    return data;
+  }
 
-      const today = new Date();
-      const todayYear = today.getFullYear();
-      const todayMonth = today.getMonth();
-      const todayDay = today.getDate();
+  async progressPeserta(id) {
+    const result = await this.__findAll(
+      { where: { peserta_id: id } },
+      this.#includeQueryProgressPeserta,
+    );
+    if (!result) throw ApiError.notFound(`Peserta with id ${id} not found`);
 
-      age = todayYear - birthYear;
-      if (todayMonth < birthMonth || (todayMonth === birthMonth && todayDay < birthDay)) age--;
-    }
-
-    return {
-      period_id: result.id,
-      peserta_id: result.peserta.id,
-      user_id: result.peserta.User.id,
-      name: result.peserta.User.nama,
-      gender: result.peserta.User.jenis_kelamin,
-      age,
-      level: result.peserta.level,
-      data,
-    };
+    return result;
   }
 
   #includeQuery = [
@@ -271,6 +294,39 @@ class BimbinganService extends BaseService {
           attributes: {
             exclude: ['password', 'token'],
           },
+        },
+      ],
+    },
+    {
+      model: BimbinganReguler,
+      attributes: {
+        exclude: ['period_id'],
+      },
+      as: 'bimbingan_reguler',
+    },
+    {
+      model: BimbinganTambahan,
+      attributes: {
+        exclude: ['period_id'],
+      },
+      as: 'bimbingan_tambahan',
+    },
+  ];
+
+  #includeQueryProgressPeserta = [
+    {
+      model: Pengajar,
+      attributes: {
+        exclude: ['user_id'],
+      },
+      as: 'pengajar',
+      include: [
+        {
+          model: User,
+          attributes: {
+            exclude: ['password', 'token'],
+          },
+          as: 'user',
         },
       ],
     },
