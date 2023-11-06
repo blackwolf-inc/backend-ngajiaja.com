@@ -76,7 +76,9 @@ router.get('/bimbingan', Bimbingan.getDataBimbingan);
 router.get('/bimbingan/pending', Bimbingan.getBimbinganPending);
 router.get('/bimbingan/ongoing', Bimbingan.getBimbinganOnGoing);
 router.get('/bimbingan/done', Bimbingan.getBimbinganDone);
-router.get('/bimbingan/detail/:id', Bimbingan.getOneBimbingan);
+router.get('/bimbingan/detail/:id', Bimbingan.getDataDetailBimbingan);
+router.get('/bimbingan/detail/bimbingan-saya/:id', Bimbingan.getOneBimbingan);
+router.get('/bimbingan/detail/progress-peserta/:id', Bimbingan.getProgressPeserta);
 
 // Management Bimbingan Peserta & Pengajar
 router.patch('/bimbingan/:id', validate(updateBimbinganValidator), Bimbingan.updateReguler);
