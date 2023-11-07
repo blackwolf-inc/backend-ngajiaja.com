@@ -37,4 +37,6 @@ router.patch(
   AdminDashboardController.updateStatusPeserta
 );
 
+router.get('/data/peserta/terverifikasi', AdminDashboardController.getPesertaVerified);
+
 module.exports = router;

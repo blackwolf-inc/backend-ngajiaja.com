@@ -108,6 +108,18 @@ class AdminDashboardController {
     }
   }
 
+  static async getPesertaVerified(req, res, next) {
+    const service = new AdminPesertaService();
+    try {
+      const { query } = req;
+      const { status, keyword, level } = query;
+      const result = await service.getPesertaVerified(query, status, keyword, level);
+      return responseHandler.succes(res, 'Success get peserta Terverifikasi', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 module.exports = AdminDashboardController;

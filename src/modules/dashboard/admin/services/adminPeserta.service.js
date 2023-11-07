@@ -117,6 +117,37 @@ class AdminPesertaService {
             level: afterUpdatePeserta.level,
         };
     }
+
+    async getPesertaVerified(query, status, keyword, level) {
+        const { page = 1, pageSize = 10 } = query;
+        const offset = (page - 1) * pageSize;
+
+        let whereClause = "WHERE u.role = 'PESERTA' AND u.status IN ('ACTIVE', 'NONACTIVE')";
+        if (status) {
+            whereClause += ` AND u.status = '${status}'`;
+        }
+        if (keyword) {
+            whereClause += ` AND u.nama LIKE '%${keyword}%'`;
+        }
+        if (level) {
+            whereClause += ` AND p.level = '${level}'`;
+        }
+
+        const result = await sequelize.query(
+            `
+          SELECT 
+            u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+            p.id AS 'peserta_id', p.level
+            FROM Pesertas p 
+          JOIN Users u ON p.user_id = u.id 
+          ${whereClause}
+          LIMIT ${pageSize} OFFSET ${offset}
+          `,
+            { type: QueryTypes.SELECT }
+        );
+
+        return result;
+    }
 }
 
 module.exports = AdminPesertaService;
