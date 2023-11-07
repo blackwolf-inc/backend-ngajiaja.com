@@ -84,6 +84,18 @@ class AdminDashboardController {
     }
   }
 
+  static async getPesertaRegistered(req, res, next) {
+    const service = new AdminPesertaService();
+    try {
+      const { query } = req;
+      const { status, keyword, startDate, endDate, bankName } = query;
+      const result = await service.getPesertaRegistered(query, status, keyword, startDate, endDate, bankName);
+      return responseHandler.succes(res, 'Success get peserta Terdaftar', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 module.exports = AdminDashboardController;
