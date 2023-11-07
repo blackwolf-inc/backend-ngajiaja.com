@@ -134,7 +134,7 @@ class AdminPengajarService {
     };
   }
 
-  async getPesertaPengajarRegistered(query, status, keyword, dateRange) {
+  async getPesertaPengajarRegistered(query, status, keyword, startDate, endDate) {
     const { page = 1, pageSize = 10 } = query;
     const offset = (page - 1) * pageSize;
 
@@ -145,9 +145,10 @@ class AdminPengajarService {
     if (keyword) {
       whereClause += ` AND u.nama LIKE '%${keyword}%'`;
     }
-    if (dateRange) {
-      const [startDate, endDate] = dateRange.split(' - ').map(date => moment(date, 'YYYY-MM-DD').format('YYYY-MM-DD'));
-      whereClause += ` AND p.tanggal_wawancara BETWEEN '${startDate}' AND '${endDate}'`;
+    if (startDate && endDate) {
+      const startDateInit = moment(startDate).format('YYYY-MM-DD');
+      const endDateInit = moment(endDate).format('YYYY-MM-DD');
+      whereClause += ` AND p.tanggal_wawancara BETWEEN '${startDateInit}' AND '${endDateInit}'`;
     }
 
     const result = await sequelize.query(
