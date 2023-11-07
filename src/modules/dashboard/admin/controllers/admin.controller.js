@@ -1,4 +1,5 @@
 const AdminPengajarService = require('../services/adminPengajar.service.js');
+const AdminPesertaService = require('../services/adminPeserta.service.js');
 const responseHandler = require('../../../../helpers/responseHandler');
 
 class AdminDashboardController {
@@ -68,6 +69,16 @@ class AdminDashboardController {
       let result = await service.getPesertaPengajarVerified(query, status, keyword, level);
       result = result.map(item => ({ ...item, bagi_hasil: 50 }));
       return responseHandler.succes(res, 'Success get pengajar Terverifikasi', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getAllDataPeserta(req, res, next) {
+    const service = new AdminPesertaService();
+    try {
+      const result = await service.getDataPeserta();
+      return responseHandler.succes(res, 'Success get all data peserta', result);
     } catch (error) {
       next(error);
     }
