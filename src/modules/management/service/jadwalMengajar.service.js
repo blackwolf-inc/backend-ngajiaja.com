@@ -139,6 +139,29 @@ class PengajarService extends BaseService {
     }
   }
 
+  async dataJadwalMengajar(id) {
+    const result = await this.getAllByPengajarId(id);
+    if (!result) throw ApiError.notFound(`Jadwal with pengajar id ${id} not found`);
+
+    let jadwalAvailable = 0;
+    let jadwalBimbingan = 0;
+    for (const jadwal of result) {
+      if (jadwal.status === STATUS_JADWAL.AVAILABLE) {
+        jadwalAvailable++;
+      }
+
+      if (jadwal.status === STATUS_JADWAL.BIMBINGAN) {
+        jadwalBimbingan++;
+      }
+    }
+
+    return {
+      total_available: jadwalAvailable,
+      total_bimbingan: jadwalBimbingan,
+      total_jadwal: result.length,
+    };
+  }
+
   #includeQuery = [
     {
       model: Pengajar,

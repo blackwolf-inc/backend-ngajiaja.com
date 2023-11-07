@@ -35,6 +35,7 @@ router.post(
 );
 router.get('/jadwal-pengajar', JadwalMengajar.getAll);
 router.get('/jadwal-pengajar/:id', JadwalMengajar.getOne);
+router.get('/jadwal-pengajar/data', JadwalMengajar.getDataJadwalMengajar);
 router.patch(
   '/jadwal-pengajar/:id',
   validate(updateJadwalValidator),
