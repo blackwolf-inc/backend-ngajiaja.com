@@ -30,4 +30,17 @@ router.patch(
 router.get('/data/pengajar/terdaftar', AdminDashboardController.getPengajarRegistered);
 router.get('/data/pengajar/terverifikasi', AdminDashboardController.getPengajarVerified);
 
+router.get('/data/peserta', AdminDashboardController.getAllDataPeserta);
+router.get('/data/peserta/terdaftar', AdminDashboardController.getPesertaRegistered);
+router.patch(
+  '/data/peserta/terdaftar/:userId',
+  AdminDashboardController.updateStatusPeserta
+);
+
+router.get('/data/peserta/terverifikasi', AdminDashboardController.getPesertaVerified);
+router.patch(
+  '/data/peserta/terverifikasi/:userId',
+  AdminDashboardController.updateStatusPesertaVerified
+);
+
 module.exports = router;
