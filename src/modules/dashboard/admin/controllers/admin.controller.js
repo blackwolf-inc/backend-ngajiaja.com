@@ -48,8 +48,8 @@ class AdminDashboardController {
     const service = new AdminPengajarService();
     try {
       const { query } = req;
-      const { status, keyword, dateRange } = query;
-      const result = await service.getPesertaPengajarRegistered(query, status, keyword, dateRange);
+      const { status, keyword, startDate, endDate } = query;
+      const result = await service.getPesertaPengajarRegistered(query, status, keyword, startDate, endDate);
       return responseHandler.succes(res, 'Success get pengajar Terdaftar', result);
     } catch (error) {
       next(error);
