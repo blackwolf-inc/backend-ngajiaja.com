@@ -97,17 +97,26 @@ class AdminPengajarService {
     const serviceUser = new UserService(req, User);
     const servicePengajar = new PengajarService(req, Pengajar);
 
-    const user = await serviceUser.getOneUser(userId);
-    const afterUpdateDate = await servicePengajar.updateData(
+    const [user, afterUpdateUser] = await Promise.all([
+      serviceUser.getOneUser(userId),
+      serviceUser.updateUserData({ status: payload.status_pengajar }, { id: userId }),
+    ]);
+
+    const afterUpdateJadwal = await servicePengajar.updateData(
       {
+        link_wawancara: payload.link_wawancara,
         tanggal_wawancara: payload.tanggal_wawancara,
         jam_wawancara: payload.jam_wawancara,
-        link_wawancara: payload.link_wawancara,
       },
       { id: user.pengajar.id }
     );
 
-    return afterUpdateDate;
+    return {
+      status: afterUpdateUser.status,
+      link_wawancara: afterUpdateJadwal.link_wawancara,
+      tanggal_wawancara: afterUpdateJadwal.tanggal_wawancara,
+      jam_wawancara: afterUpdateJadwal.jam_wawancara,
+    }
   }
 
   async updateStatusPengajar(req, payload, userId) {
@@ -122,7 +131,6 @@ class AdminPengajarService {
     const afterUpdatePengajar = await servicePengajar.updateData(
       {
         level: payload.level_pengajar,
-        bagi_hasil_50persen: payload.bagi_hasil_50persen,
       },
       { id: user.pengajar.id }
     );
@@ -130,7 +138,6 @@ class AdminPengajarService {
     return {
       status: afterUpdateUser.status,
       level: afterUpdatePengajar.level,
-      bagi_hasil_50persen: afterUpdatePengajar.bagi_hasil_50persen,
     };
   }
 
@@ -167,7 +174,7 @@ class AdminPengajarService {
     return result;
   }
 
-  async getPesertaPengajarVerified(query, status, keyword, level, bagiHasil) {
+  async getPesertaPengajarVerified(query, status, keyword, level) {
     const { page = 1, pageSize = 10 } = query;
     const offset = (page - 1) * pageSize;
 
@@ -181,16 +188,13 @@ class AdminPengajarService {
     if (level) {
       whereClause += ` AND p.level = '${level}'`;
     }
-    if (bagiHasil) {
-      whereClause += ` AND p.bagi_hasil_50persen = '${bagiHasil}'`;
-    }
 
 
     const result = await sequelize.query(
       `
       SELECT 
         u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
-        p.id AS 'pengajar_id', p.level, p.bagi_hasil_50persen
+        p.id AS 'pengajar_id', p.level
       FROM Pengajars p 
       JOIN Users u ON p.user_id = u.id 
       ${whereClause}
