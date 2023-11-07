@@ -16,13 +16,17 @@ class AdminDashboardController {
     const service = new AdminPengajarService();
     try {
       const { userId } = req.params;
-      const { tanggal_wawancara, jam_wawancara, link_wawancara } = req.body;
-      const result = await service.updateJadwalPengajarRegistered(
+      const { link_wawancara, tanggal_wawancara, jam_wawancara, status_pengajar } = req.body;
+      const result = await service.updateJadwalWawancara(
         req,
-        { tanggal_wawancara, jam_wawancara, link_wawancara },
-        userId
-      );
-      return responseHandler.succes(res, 'Success update jadwal wawancara pengajar', result);
+        {
+          link_wawancara,
+          tanggal_wawancara,
+          jam_wawancara,
+          status_pengajar
+        },
+        userId);
+      return responseHandler.succes(res, 'Success update pengajar registered', result);
     } catch (error) {
       next(error);
     }
@@ -32,10 +36,10 @@ class AdminDashboardController {
     const service = new AdminPengajarService();
     try {
       const { userId } = req.params;
-      const { status_pengajar, level_pengajar, bagi_hasil_50persen } = req.body;
+      const { status_pengajar, level_pengajar } = req.body;
       const result = await service.updateStatusPengajar(
         req,
-        { status_pengajar, level_pengajar, bagi_hasil_50persen },
+        { status_pengajar, level_pengajar },
         userId
       );
       return responseHandler.succes(res, 'Success update status pengajar', result);
@@ -60,8 +64,9 @@ class AdminDashboardController {
     const service = new AdminPengajarService();
     try {
       const { query } = req;
-      const { status, keyword, level, bagiHasil } = query;
-      const result = await service.getPesertaPengajarVerified(query, status, keyword, level, bagiHasil);
+      const { status, keyword, level } = query;
+      let result = await service.getPesertaPengajarVerified(query, status, keyword, level);
+      result = result.map(item => ({ ...item, bagi_hasil: 50 }));
       return responseHandler.succes(res, 'Success get pengajar Terverifikasi', result);
     } catch (error) {
       next(error);
