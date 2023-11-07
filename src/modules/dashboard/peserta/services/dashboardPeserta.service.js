@@ -98,9 +98,25 @@ class DashboardPesertaService extends BaseService {
       whereClause.where.status = query.status;
     }
 
+    const dateWhere = {};
+
     if (query.startDate && query.endDate) {
-      whereClause.where.start_date = { [Op.between]: [query.startDate, query.endDate] };
+      // Parse tanggal dari format "2023-10-21" ke format "21 Nov 2023"
+      const startDateParts = query.startDate.split('-');
+      const startDateFormatted = `${startDateParts[2]} ${getMonthName(
+        parseInt(startDateParts[1])
+      )} ${startDateParts[0]}`;
+
+      const endDateParts = query.endDate.split('-');
+      const endDateFormatted = `${endDateParts[2]} ${getMonthName(parseInt(endDateParts[1]))} ${
+        endDateParts[0]
+      }`;
+
+      // Sekarang Anda dapat menggunakannya dalam `dateWhere`
+      dateWhere.tanggal = { [Op.between]: [startDateFormatted, endDateFormatted] };
     }
+
+    console.log(dateWhere);
 
     const includeQuery = [
       {
@@ -120,10 +136,13 @@ class DashboardPesertaService extends BaseService {
       },
       {
         model: BimbinganReguler,
+        // required: true,
         as: 'bimbingan_reguler',
+        where: dateWhere,
       },
       {
         model: BimbinganTambahan,
+        // required: true,
         as: 'bimbingan_tambahan',
       },
     ];
@@ -139,6 +158,24 @@ class DashboardPesertaService extends BaseService {
       total: parseInt(result.total),
     };
   }
+}
+
+function getMonthName(month) {
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  return months[month - 1];
 }
 
 module.exports = DashboardPesertaService;

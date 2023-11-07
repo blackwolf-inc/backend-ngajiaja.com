@@ -1,7 +1,7 @@
 const DashboardPesertaService = require('../services/dashboardPeserta.service');
 const responseHandler = require('./../../../../helpers/responseHandler');
 const db = require('../../../../models/index');
-const { Period, User, Peserta } = db;
+const { Period } = db;
 
 class PesertaDashboardController {
   static async dataBimbingan(req, res, next) {
@@ -16,12 +16,8 @@ class PesertaDashboardController {
 
   static async bimbinganPeseta(req, res, next) {
     const service = new DashboardPesertaService(req, Period);
-    // const user = req.user;
     try {
-      const user = {
-        id: 2,
-      };
-      const result = await service.getBimbinganPeserta(user.id, req.query);
+      const result = await service.getBimbinganPeserta(req.params.id, req.query);
       return responseHandler.succes(res, 'Success get data bimbingan peserta', result);
     } catch (error) {
       next(error);
