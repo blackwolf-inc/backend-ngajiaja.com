@@ -80,7 +80,7 @@ class AdminPesertaService {
             `
           SELECT 
             u.id AS 'user_id', u.nama, u.role, u.status,
-            p.id AS 'peserta_id', 
+            p.id AS 'peserta_id', p.level,
             b.bank_id, b.bukti_pembayaran, b.createdAt,
             bk.nama_bank
             FROM Pesertas p 
@@ -107,7 +107,7 @@ class AdminPesertaService {
 
         const afterUpdatePeserta = await servicePeserta.updateData(
             {
-                level: payload.level_Peserta,
+                level: payload.level_peserta,
             },
             { id: user.peserta.id }
         );

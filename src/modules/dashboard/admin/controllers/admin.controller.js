@@ -100,8 +100,8 @@ class AdminDashboardController {
     const service = new AdminPesertaService();
     try {
       const { userId } = req.params;
-      const { status_peserta, level } = req.body;
-      const result = await service.updateStatusPeserta(req, { status_peserta, level }, userId);
+      const { status_peserta, level_peserta } = req.body;
+      const result = await service.updateStatusPeserta(req, { status_peserta, level_peserta }, userId);
       return responseHandler.succes(res, 'Success update status peserta', result);
     } catch (error) {
       next(error);
