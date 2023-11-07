@@ -38,5 +38,9 @@ router.patch(
 );
 
 router.get('/data/peserta/terverifikasi', AdminDashboardController.getPesertaVerified);
+router.patch(
+  '/data/peserta/terverifikasi/:userId',
+  AdminDashboardController.updateStatusPesertaVerified
+);
 
 module.exports = router;

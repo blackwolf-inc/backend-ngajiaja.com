@@ -148,6 +148,28 @@ class AdminPesertaService {
 
         return result;
     }
+
+    async updateStatusPesertaVerified(req, payload, userId) {
+        const serviceUser = new UserService(req, User);
+        const servicePeserta = new PesertaService(req, Peserta);
+
+        const [user, afterUpdateUser] = await Promise.all([
+            serviceUser.getOneUser(userId),
+            serviceUser.updateUserData({ status: payload.status_peserta }, { id: userId }),
+        ]);
+
+        const afterUpdatePeserta = await servicePeserta.updateData(
+            {
+                level: payload.level_peserta,
+            },
+            { id: user.peserta.id }
+        );
+
+        return {
+            status: afterUpdateUser.status,
+            level: afterUpdatePeserta.level,
+        };
+    }
 }
 
 module.exports = AdminPesertaService;
