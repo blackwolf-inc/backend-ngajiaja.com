@@ -74,7 +74,7 @@ class PilihPengajar extends BaseService {
   async createBimbinganReguler(id, tanggal_pengingat_infaq, hari_1, jam_1, hari_2, jam_2) {
     const records = [];
     const dateNow = moment(new Date()).format('YYYY-MM-DD');
-    const dateVerifikasi = moment(dateNow).add('days', 3).format('YYYY-MM-DD');
+    const dateVerifikasi = moment(dateNow).add('days', 4).format('YYYY-MM-DD');
     const dateEnd = moment(dateVerifikasi).endOf('month').format('YYYY-MM-DD');
     const dateRemember = moment(tanggal_pengingat_infaq).format('YYYY-MM-DD');
     const dateDiff = moment(dateEnd).diff(dateVerifikasi, 'days');
