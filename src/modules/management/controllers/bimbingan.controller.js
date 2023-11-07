@@ -97,7 +97,7 @@ class BimbinganPeserta {
   static async getProgressPeserta(req, res, next) {
     const service = new BimbinganService(req, Period);
     try {
-      const result = await service.progressPeserta(req.params.id);
+      const result = await service.progressPeserta(req.params.id, req.query.name, req.query.period);
       return responseHandler.succes(res, `Success get progress peserta`, result);
     } catch (error) {
       next(error);

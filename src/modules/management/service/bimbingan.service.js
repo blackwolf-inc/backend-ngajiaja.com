@@ -264,14 +264,82 @@ class BimbinganService extends BaseService {
     return data;
   }
 
-  async progressPeserta(id) {
+  async progressPeserta(id, pengajarName, periodDate) {
     const result = await this.__findAll(
       { where: { peserta_id: id } },
       this.#includeQueryProgressPeserta,
     );
     if (!result) throw ApiError.notFound(`Peserta with id ${id} not found`);
 
-    return result;
+    const data = [];
+    for (const period of result.datas) {
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
+        for (const bimbinganReguler of period.bimbingan_reguler) {
+          if (bimbinganReguler.absensi_peserta === 0 || bimbinganReguler.absensi_pengajar === 0)
+            continue;
+          const dataBimbinganReguler = {
+            pengajar: period.pengajar.user.nama,
+            date: bimbinganReguler.tanggal,
+            time: bimbinganReguler.jam_bimbingan,
+            pengajar_review: bimbinganReguler.catatan_pengajar,
+          };
+
+          data.push(dataBimbinganReguler);
+        }
+      }
+
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
+        for (const bimbinganTambahan of period.bimbingan_tambahan) {
+          if (bimbinganTambahan.absensi_peserta === 0 || bimbinganTambahan.absensi_pengajar === 0)
+            continue;
+          const dataBimbinganTambahan = {
+            pengajar: period.pengajar.user.nama,
+            date: bimbinganTambahan.tanggal,
+            time: bimbinganTambahan.jam_bimbingan,
+            pengajar_review: bimbinganTambahan.catatan_pengajar,
+          };
+
+          data.push(dataBimbinganTambahan);
+        }
+      }
+    }
+
+    let filteredData;
+    if (pengajarName) {
+      if (pengajarName.length < 3)
+        throw ApiError.badRequest('Pengajar name must be at least 3 characters');
+
+      if (periodDate) {
+        filteredData = data.filter((pengajar) => {
+          return (
+            pengajar.pengajar.includes(pengajarName) &&
+            moment(pengajar.date) >= moment(periodDate.split(' - ')[0]) &&
+            moment(pengajar.date) <= moment(periodDate.split(' - ')[1])
+          );
+        });
+      } else {
+        filteredData = data.filter((pengajar) => {
+          return pengajar.pengajar.includes(pengajarName);
+        });
+      }
+    }
+
+    if (periodDate) {
+      filteredData = data.filter((pengajar) => {
+        return (
+          moment(pengajar.date) >= moment(periodDate.split(' - ')[0]) &&
+          moment(pengajar.date) <= moment(periodDate.split(' - ')[1])
+        );
+      });
+    }
+
+    if (filteredData) {
+      if (filteredData.length === 0) throw ApiError.notFound(`Pengajar not found`);
+
+      return filteredData;
+    }
+
+    return data;
   }
 
   #includeQuery = [
