@@ -96,6 +96,18 @@ class AdminDashboardController {
     }
   }
 
+  static async updateStatusPeserta(req, res, next) {
+    const service = new AdminPesertaService();
+    try {
+      const { userId } = req.params;
+      const { status_peserta, level } = req.body;
+      const result = await service.updateStatusPeserta(req, { status_peserta, level }, userId);
+      return responseHandler.succes(res, 'Success update status peserta', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 module.exports = AdminDashboardController;
