@@ -37,6 +37,14 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
+
+      //Relation to Period
+      Infaq.hasMany(models.Period, {
+        foreignKey: 'periode_id',
+        as: 'period',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
     }
   }
   Infaq.init(

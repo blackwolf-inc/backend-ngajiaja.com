@@ -18,7 +18,7 @@ class InfaqController {
     const service = new InfaqService(req, Infaq);
     const user = req.user;
     try {
-      const result = await service.getAllInfaqByUserId(user.id);
+      const result = await service.getAllInfaqByUserId(user, req.query);
       return responseHandler.succes(res, `Success get all ${service.db.name}s`, result);
     } catch (error) {
       next(error);

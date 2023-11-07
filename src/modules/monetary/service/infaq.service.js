@@ -9,6 +9,7 @@ const {
   Pengajar,
   PenghasilanPengajar,
 } = require('../../../models');
+const { Op, Sequelize } = require('sequelize');
 
 class InfaqService extends BaseService {
   async checkUserById(payload) {
@@ -46,20 +47,55 @@ class InfaqService extends BaseService {
     return result;
   }
 
-  async getAllInfaqByUserId(req) {
-    let query;
-    if (req.role == 'PESERTA') {
-      query = {
-        peserta_id: req.user.id,
-      };
-    } else if (req.role == 'PENGAJAR') {
-      query = {
-        pengajar_id: req.user.id,
-      };
-    } else {
-      query = {};
+  async getAllInfaqByUserId(user, query) {
+    let whereClause = {};
+    if (user.role == 'PESERTA') {
+      whereClause.peserta_id = user.user.id;
+    } else if (user.role == 'PENGAJAR') {
+      whereClause.pengajar_id = user.user.id;
     }
-    const result = await this.getAll(query);
+
+    if (query.status) {
+      whereClause.status = query.status;
+    }
+
+    if (query.startDate && query.endDate) {
+      whereClause.waktu_pembayaran = { [Op.between]: [query.startDate, query.endDate] };
+    }
+
+    console.log(whereClause);
+    console.log(query.instructorName ? query.instructorName : 'none');
+
+    const includeQuery = [
+      {
+        model: Pengajar,
+        attributes: {
+          exclude: ['user_id'],
+        },
+        as: 'pengajar',
+        attributes: ['id'],
+        include: [
+          {
+            model: User,
+            as: 'user',
+            attributes: ['nama'],
+            where: query.instructorName
+              ? {
+                  nama: {
+                    [Op.like]: Sequelize.literal(`'%${query.instructorName}%'`),
+                  },
+                }
+              : {},
+          },
+        ],
+      },
+      {
+        model: Bank,
+        as: 'bank',
+      },
+    ];
+
+    const result = await this.__findAll({ where: whereClause }, includeQuery);
     return result;
   }
 
