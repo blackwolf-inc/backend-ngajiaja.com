@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
-      Period.belongsTo(models.Infaq, {
+      Period.hasOne(models.Infaq, {
         foreignKey: 'periode_id',
         as: 'infaq',
         onDelete: 'CASCADE',

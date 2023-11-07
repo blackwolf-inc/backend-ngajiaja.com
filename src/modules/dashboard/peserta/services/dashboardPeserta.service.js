@@ -1,7 +1,7 @@
 const { QueryTypes, where } = require('sequelize');
 // const ApiError = require('../../../helpers/errorHandler');
 const db = require('../../../../models/index');
-const { User, BimbinganReguler, BimbinganTambahan, Pengajar, sequelize } = db;
+const { User, BimbinganReguler, BimbinganTambahan, Pengajar, Period, sequelize } = db;
 const BaseService = require('./../../../../base/base.service');
 const { Op } = require('sequelize');
 
@@ -79,7 +79,7 @@ class DashboardPesertaService extends BaseService {
 
     return {
       bimbingan_saya: bimbingan_saya[0].total,
-      total_tidak_hadir: parseInt(total_tidak_hadir[0].total),
+      total_tidak_hadir: parseInt(total_tidak_hadir[0].total ? total_tidak_hadir[0].total : 0),
       total_infaq: total_infaq[0].total ? total_infaq[0].total : 0,
     };
   }
@@ -89,6 +89,11 @@ class DashboardPesertaService extends BaseService {
       where: { peserta_id: id },
     };
 
+    const userWhere = {};
+
+    if (query.instructorName) {
+      userWhere.nama = { [Op.like]: `%${query.instructorName}%` };
+    }
     if (query.status) {
       whereClause.where.status = query.status;
     }
@@ -100,40 +105,37 @@ class DashboardPesertaService extends BaseService {
     const includeQuery = [
       {
         model: Pengajar,
+        required: true,
         as: 'pengajar',
         attributes: ['user_id', 'id'],
         include: [
           {
             model: User,
             as: 'user',
+            required: true,
             attributes: ['nama'],
-            where: query.instructorName
-              ? {
-                  nama: {
-                    [Op.like]: `%${query.instructorName}%`,
-                  },
-                }
-              : {},
+            where: userWhere,
           },
         ],
       },
       {
         model: BimbinganReguler,
         as: 'bimbingan_reguler',
-        separate: true,
       },
       {
         model: BimbinganTambahan,
         as: 'bimbingan_tambahan',
-        separate: true,
       },
     ];
 
     const result = await this.__findAll(whereClause, includeQuery);
+    const totalPage = Math.ceil(result.total / query.pageSize ? query.pageSize : 1);
 
     return {
       result,
-      currentPage: parseInt(query.page),
+      page: parseInt(query.page) ? parseInt(query.page) : 1,
+      totalPage: parseInt(totalPage),
+      pageSize: parseInt(query.pageSize) ? parseInt(query.pageSize) : 10,
       total: parseInt(result.total),
     };
   }
