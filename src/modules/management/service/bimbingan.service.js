@@ -1,14 +1,7 @@
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
 const { TYPE_BIMBINGAN, STATUS_BIMBINGAN } = require('../../../helpers/constanta');
-const {
-  JadwalBimbinganPeserta,
-  User,
-  Peserta,
-  Pengajar,
-  BimbinganReguler,
-  BimbinganTambahan,
-} = require('../../../models');
+const { User, Peserta, Pengajar, BimbinganReguler, BimbinganTambahan } = require('../../../models');
 const moment = require('moment');
 
 class BimbinganService extends BaseService {
@@ -33,10 +26,10 @@ class BimbinganService extends BaseService {
           user_id: period.peserta.User.id,
           name: period.peserta.User.nama,
           schedule: {
-            day1: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_1,
-            hour1: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_1,
-            day2: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_2,
-            hour2: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_2,
+            day1: period.bimbingan_reguler[0].hari_bimbingan,
+            hour1: period.bimbingan_reguler[0].jam_bimbingan,
+            day2: period.bimbingan_reguler[1].hari_bimbingan,
+            hour2: period.bimbingan_reguler[1].jam_bimbingan,
           },
           attendance,
           meet: `${attendance}/8`,
@@ -58,10 +51,10 @@ class BimbinganService extends BaseService {
           user_id: period.peserta.User.id,
           name: period.peserta.User.nama,
           schedule: {
-            day1: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_1,
-            hour1: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_1,
-            day2: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_2,
-            hour2: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_2,
+            day1: period.bimbingan_tambahan[0].hari_bimbingan,
+            hour1: period.bimbingan_tambahan[0].jam_bimbingan,
+            day2: period.bimbingan_tambahan[1].hari_bimbingan,
+            hour2: period.bimbingan_tambahan[1].jam_bimbingan,
           },
           attendance,
           meet: `${attendance}/2`,
@@ -233,6 +226,7 @@ class BimbinganService extends BaseService {
           period_id: result.id,
           peserta_id: result.peserta.id,
           user_id: result.peserta.User.id,
+          bimbingan_reguler_id: bimbinganReguler.id,
           status: null,
           date: bimbinganReguler.tanggal,
           time: bimbinganReguler.jam_bimbingan,
@@ -250,6 +244,7 @@ class BimbinganService extends BaseService {
           period_id: result.id,
           peserta_id: result.peserta.id,
           user_id: result.peserta.User.id,
+          bimbingan_tambahan_id: bimbinganTambahan.id,
           status: null,
           date: bimbinganTambahan.tanggal,
           time: bimbinganTambahan.jam_bimbingan,
@@ -264,7 +259,7 @@ class BimbinganService extends BaseService {
     return data;
   }
 
-  async progressPeserta(id, pengajarName, periodDate) {
+  async progressPeserta(id, pengajarName, startDate, endDate) {
     const result = await this.__findAll(
       { where: { peserta_id: id } },
       this.#includeQueryProgressPeserta,
@@ -309,12 +304,12 @@ class BimbinganService extends BaseService {
       if (pengajarName.length < 3)
         throw ApiError.badRequest('Pengajar name must be at least 3 characters');
 
-      if (periodDate) {
+      if (startDate && endDate) {
         filteredData = data.filter((pengajar) => {
           return (
             pengajar.pengajar.includes(pengajarName) &&
-            moment(pengajar.date) >= moment(periodDate.split(' - ')[0]) &&
-            moment(pengajar.date) <= moment(periodDate.split(' - ')[1])
+            moment(pengajar.date) >= moment(statDate) &&
+            moment(pengajar.date) <= moment(endDate)
           );
         });
       } else {
@@ -324,11 +319,12 @@ class BimbinganService extends BaseService {
       }
     }
 
-    if (periodDate) {
+    if (startDate && endDate) {
       filteredData = data.filter((pengajar) => {
         return (
-          moment(pengajar.date) >= moment(periodDate.split(' - ')[0]) &&
-          moment(pengajar.date) <= moment(periodDate.split(' - ')[1])
+          pengajar.pengajar.includes(pengajarName) &&
+          moment(pengajar.date) >= moment(statDate) &&
+          moment(pengajar.date) <= moment(endDate)
         );
       });
     }
@@ -350,13 +346,6 @@ class BimbinganService extends BaseService {
       },
       as: 'peserta',
       include: [
-        {
-          model: JadwalBimbinganPeserta,
-          attributes: {
-            exclude: ['peserta_id'],
-          },
-          as: 'jadwal_bimbingan_peserta',
-        },
         {
           model: User,
           attributes: {
