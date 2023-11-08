@@ -1,13 +1,7 @@
 const BaseService = require('../../../../base/base.service');
 const ApiError = require('../../../../helpers/errorHandler');
 const { TYPE_BIMBINGAN, STATUS_BIMBINGAN } = require('../../../../helpers/constanta');
-const {
-  BimbinganReguler,
-  BimbinganTambahan,
-  Peserta,
-  JadwalBimbinganPeserta,
-  User,
-} = require('../../../../models');
+const { BimbinganReguler, BimbinganTambahan, Peserta, User } = require('../../../../models');
 const moment = require('moment');
 
 class PengajarService extends BaseService {
@@ -21,7 +15,7 @@ class PengajarService extends BaseService {
   async bimbinganPending(id, pesertaName) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: STATUS_BIMBINGAN.WAITING } },
-      this.#includeQueryBimbinganPending,
+      this.#includeQuery,
       'createdAt',
       'ASC',
     );
@@ -29,39 +23,23 @@ class PengajarService extends BaseService {
 
     const bimbinganOnGoing = await this.__findAll(
       { where: { pengajar_id: id, status: STATUS_BIMBINGAN.ACTIVATED } },
-      this.#includeQueryBimbinganOnGoing,
+      this.#includeQuery,
     );
 
     const data = [];
     for (const period of result.datas) {
-      if (period.peserta.jadwal_bimbingan_peserta === null) continue; // just for testing (dummy data), peserta must have jadwal bimbingan, so this line can be removed if the data is real
       const lastApproved = moment(period.createdAt).add(1, 'days').format('YYYY-MM-DD HH:mm:ss');
+      let isSameJadwal;
 
-      // check if there are other peserta with same jadwal bimbingan
-      let isSameJadwal = false;
-      const fieldDaysToCompare = ['hari_bimbingan_1', 'hari_bimbingan_2'];
-      const fieldHoursToCompare = ['jam_bimbingan_1', 'jam_bimbingan_2'];
-
-      for (const bimbingan of bimbinganOnGoing.datas) {
-        for (const fieldDay of fieldDaysToCompare) {
-          if (
-            period.peserta.jadwal_bimbingan_peserta[fieldDay] ===
-            bimbingan.peserta.jadwal_bimbingan_peserta[fieldDay]
-          ) {
-            for (const fieldHour of fieldHoursToCompare) {
-              if (
-                period.peserta.jadwal_bimbingan_peserta[fieldHour] ===
-                bimbingan.peserta.jadwal_bimbingan_peserta[fieldHour]
-              ) {
-                isSameJadwal = true;
-                break;
-              }
-            }
-          }
-        }
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
+        isSameJadwal = this.#checkSameJadwal(period, bimbinganOnGoing.datas);
       }
 
-      // check if last approved is passed
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
+        isSameJadwal = this.#checkSameJadwal(period, bimbinganOnGoing.datas);
+      }
+
+      // check if last approved is passed or have same jadwal with bimbingan on going
       if (moment().isAfter(lastApproved) || isSameJadwal) {
         await this.updateData({ status: STATUS_BIMBINGAN.CANCELED }, { id: period.id });
         continue;
@@ -71,17 +49,31 @@ class PengajarService extends BaseService {
         period_id: period.id,
         peserta_id: period.peserta.id,
         user_id: period.peserta.User.id,
+        schedule: {
+          day1: null,
+          hour1: null,
+          day2: null,
+          hour2: null,
+        },
         category: period.tipe_bimbingan,
         name: period.peserta.User.nama,
-        schedule: {
-          day1: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_1,
-          hour1: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_1,
-          day2: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_2,
-          hour2: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_2,
-        },
         level: period.peserta.level,
         last_approved: lastApproved,
       };
+
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
+        bimbinganPending.schedule.day1 = period.bimbingan_reguler[0].hari_bimbingan;
+        bimbinganPending.schedule.hour1 = period.bimbingan_reguler[0].jam_bimbingan;
+        bimbinganPending.schedule.day2 = period.bimbingan_reguler[1].hari_bimbingan;
+        bimbinganPending.schedule.hour2 = period.bimbingan_reguler[1].jam_bimbingan;
+      }
+
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
+        bimbinganPending.schedule.day1 = period.bimbingan_tambahan[0].hari_bimbingan;
+        bimbinganPending.schedule.hour1 = period.bimbingan_tambahan[0].jam_bimbingan;
+        bimbinganPending.schedule.day2 = period.bimbingan_tambahan[1].hari_bimbingan;
+        bimbinganPending.schedule.hour2 = period.bimbingan_tambahan[1].jam_bimbingan;
+      }
 
       data.push(bimbinganPending);
     }
@@ -108,7 +100,7 @@ class PengajarService extends BaseService {
   async bimbinganOnGoing(id, pesertaName, status) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: STATUS_BIMBINGAN.ACTIVATED } },
-      this.#includeQueryBimbinganOnGoing,
+      this.#includeQuery,
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
@@ -201,7 +193,7 @@ class PengajarService extends BaseService {
   async getAbsent(id) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: STATUS_BIMBINGAN.ACTIVATED } },
-      this.#includeQueryBimbinganOnGoing,
+      this.#includeQuery,
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
@@ -231,29 +223,46 @@ class PengajarService extends BaseService {
     return totalIncome;
   }
 
-  #includeQueryBimbinganPending = [
-    {
-      model: Peserta,
-      as: 'peserta',
-      include: [
-        {
-          model: JadwalBimbinganPeserta,
-          attributes: {
-            exclude: ['peserta_id'],
-          },
-          as: 'jadwal_bimbingan_peserta',
-        },
-        {
-          model: User,
-          attributes: {
-            exclude: ['password', 'token'],
-          },
-        },
-      ],
-    },
-  ];
+  #checkSameJadwal(period, dataOnGoing) {
+    let isSameJadwal = false;
+    for (const bimbingan of dataOnGoing) {
+      if (bimbingan.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
+        for (let i = 0; i < 2; i++) {
+          if (
+            period.bimbingan_reguler[i].hari_bimbingan ===
+            bimbingan.bimbingan_reguler[i].hari_bimbingan
+          ) {
+            if (
+              period.bimbingan_reguler[i].jam_bimbingan ===
+              bimbingan.bimbingan_reguler[i].jam_bimbingan
+            ) {
+              isSameJadwal = true;
+            }
+          }
+        }
+      }
 
-  #includeQueryBimbinganOnGoing = [
+      if (bimbingan.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
+        for (let i = 0; i < 2; i++) {
+          if (
+            period.bimbingan_reguler[i].hari_bimbingan ===
+            bimbingan.bimbingan_tambahan[i].hari_bimbingan
+          ) {
+            if (
+              period.bimbingan_reguler[i].jam_bimbingan ===
+              bimbingan.bimbingan_tambahan[i].jam_bimbingan
+            ) {
+              isSameJadwal = true;
+            }
+          }
+        }
+      }
+    }
+
+    return isSameJadwal;
+  }
+
+  #includeQuery = [
     {
       model: Peserta,
       attributes: {
@@ -261,13 +270,6 @@ class PengajarService extends BaseService {
       },
       as: 'peserta',
       include: [
-        {
-          model: JadwalBimbinganPeserta,
-          attributes: {
-            exclude: ['peserta_id'],
-          },
-          as: 'jadwal_bimbingan_peserta',
-        },
         {
           model: User,
           attributes: {
