@@ -16,7 +16,7 @@ class BimbinganPeserta {
         service.getBimbinganActivated(user.pengajar.id),
         service.getAbsent(user.pengajar.id),
       ]);
-      return responseHandler.succes(res, `Success get bimbingan akan datang`, {
+      return responseHandler.succes(res, `Success get data bimbingan`, {
         total_pending: totalPending.length,
         total_on_going: totalOnGoing,
         total_absent: totalAbsent,
@@ -76,7 +76,34 @@ class BimbinganPeserta {
     try {
       const user = await userService.getOneUser(req.user.id);
       const result = await service.detailBimbingan(req.params.id, user.pengajar.id);
-      return responseHandler.succes(res, `Success get bimbingan`, result);
+      return responseHandler.succes(res, `Success get detail bimbingan`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getDataDetailBimbingan(req, res, next) {
+    const service = new BimbinganService(req, Period);
+    const userService = new UserService(req, User);
+    try {
+      const user = await userService.getOneUser(req.user.id);
+      const result = await service.dataDetailBimbingan(req.params.id, user.pengajar.id);
+      return responseHandler.succes(res, `Success get data detail bimbingan`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getProgressPeserta(req, res, next) {
+    const service = new BimbinganService(req, Period);
+    try {
+      const result = await service.progressPeserta(
+        req.params.id,
+        req.query.name,
+        req.query.start_date,
+        req.query.end_date,
+      );
+      return responseHandler.succes(res, `Success get progress peserta`, result);
     } catch (error) {
       next(error);
     }

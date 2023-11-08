@@ -1,13 +1,8 @@
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
 const { TYPE_BIMBINGAN, STATUS_BIMBINGAN } = require('../../../helpers/constanta');
-const {
-  JadwalBimbinganPeserta,
-  User,
-  Peserta,
-  BimbinganReguler,
-  BimbinganTambahan,
-} = require('../../../models');
+const { User, Peserta, Pengajar, BimbinganReguler, BimbinganTambahan } = require('../../../models');
+const moment = require('moment');
 
 class BimbinganService extends BaseService {
   async bimbinganOnGoing(id, pesertaName, level) {
@@ -31,10 +26,10 @@ class BimbinganService extends BaseService {
           user_id: period.peserta.User.id,
           name: period.peserta.User.nama,
           schedule: {
-            day1: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_1,
-            hour1: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_1,
-            day2: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_2,
-            hour2: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_2,
+            day1: period.bimbingan_reguler[0].hari_bimbingan,
+            hour1: period.bimbingan_reguler[0].jam_bimbingan,
+            day2: period.bimbingan_reguler[1].hari_bimbingan,
+            hour2: period.bimbingan_reguler[1].jam_bimbingan,
           },
           attendance,
           meet: `${attendance}/8`,
@@ -56,10 +51,10 @@ class BimbinganService extends BaseService {
           user_id: period.peserta.User.id,
           name: period.peserta.User.nama,
           schedule: {
-            day1: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_1,
-            hour1: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_1,
-            day2: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_2,
-            hour2: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_2,
+            day1: period.bimbingan_tambahan[0].hari_bimbingan,
+            hour1: period.bimbingan_tambahan[0].jam_bimbingan,
+            day2: period.bimbingan_tambahan[1].hari_bimbingan,
+            hour2: period.bimbingan_tambahan[1].jam_bimbingan,
           },
           attendance,
           meet: `${attendance}/2`,
@@ -186,6 +181,37 @@ class BimbinganService extends BaseService {
     return data;
   }
 
+  async dataDetailBimbingan(id, pengajarId) {
+    const result = await this.__findOne(
+      { where: { id, pengajar_id: pengajarId } },
+      this.#includeQuery,
+    );
+    if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
+
+    let age = 0;
+    if (result.peserta.User.tgl_lahir) {
+      const birthdate = moment(result.peserta.User.tgl_lahir, 'YYYY-MM-DD').toDate();
+      const birthYear = birthdate.getFullYear();
+      const birthMonth = birthdate.getMonth();
+      const birthDay = birthdate.getDate();
+
+      const today = moment().toDate();
+      const todayYear = today.getFullYear();
+      const todayMonth = today.getMonth();
+      const todayDay = today.getDate();
+
+      age = todayYear - birthYear;
+      if (todayMonth < birthMonth || (todayMonth === birthMonth && todayDay < birthDay)) age--;
+    }
+
+    return {
+      name: result.peserta.User.nama,
+      gender: result.peserta.User.jenis_kelamin,
+      age,
+      level: result.peserta.level,
+    };
+  }
+
   async detailBimbingan(id, pengajarId) {
     const result = await this.__findOne(
       { where: { id, pengajar_id: pengajarId } },
@@ -197,7 +223,11 @@ class BimbinganService extends BaseService {
     if (result.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
       for (const bimbinganReguler of result.bimbingan_reguler) {
         const dataBimbinganReguler = {
-          status: bimbinganReguler.status,
+          period_id: result.id,
+          peserta_id: result.peserta.id,
+          user_id: result.peserta.User.id,
+          bimbingan_reguler_id: bimbinganReguler.id,
+          status: null,
           date: bimbinganReguler.tanggal,
           time: bimbinganReguler.jam_bimbingan,
           attendance: bimbinganReguler.absensi_peserta,
@@ -211,7 +241,11 @@ class BimbinganService extends BaseService {
     if (result.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
       for (const bimbinganTambahan of result.bimbingan_tambahan) {
         const dataBimbinganTambahan = {
-          status: bimbinganTambahan.status,
+          period_id: result.id,
+          peserta_id: result.peserta.id,
+          user_id: result.peserta.User.id,
+          bimbingan_tambahan_id: bimbinganTambahan.id,
+          status: null,
           date: bimbinganTambahan.tanggal,
           time: bimbinganTambahan.jam_bimbingan,
           attendance: bimbinganTambahan.absensi_peserta,
@@ -222,33 +256,86 @@ class BimbinganService extends BaseService {
       }
     }
 
-    // determine peserta age based on birthdate
-    let age = 0;
-    if (result.peserta.User.tgl_lahir) {
-      const birthdate = result.peserta.User.tgl_lahir;
-      const birthYear = birthdate.getFullYear();
-      const birthMonth = birthdate.getMonth();
-      const birthDay = birthdate.getDate();
+    return data;
+  }
 
-      const today = new Date();
-      const todayYear = today.getFullYear();
-      const todayMonth = today.getMonth();
-      const todayDay = today.getDate();
+  async progressPeserta(id, pengajarName, startDate, endDate) {
+    const result = await this.__findAll(
+      { where: { peserta_id: id } },
+      this.#includeQueryProgressPeserta,
+    );
+    if (!result) throw ApiError.notFound(`Peserta with id ${id} not found`);
 
-      age = todayYear - birthYear;
-      if (todayMonth < birthMonth || (todayMonth === birthMonth && todayDay < birthDay)) age--;
+    const data = [];
+    for (const period of result.datas) {
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
+        for (const bimbinganReguler of period.bimbingan_reguler) {
+          if (bimbinganReguler.absensi_peserta === 1 || bimbinganReguler.absensi_pengajar === 1) {
+            const dataBimbinganReguler = {
+              pengajar: period.pengajar.user.nama,
+              date: bimbinganReguler.tanggal,
+              time: bimbinganReguler.jam_bimbingan,
+              pengajar_review: bimbinganReguler.catatan_pengajar,
+            };
+
+            data.push(dataBimbinganReguler);
+          }
+        }
+      }
+
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
+        for (const bimbinganTambahan of period.bimbingan_tambahan) {
+          if (bimbinganTambahan.absensi_peserta === 1 || bimbinganTambahan.absensi_pengajar === 1) {
+            const dataBimbinganTambahan = {
+              pengajar: period.pengajar.user.nama,
+              date: bimbinganTambahan.tanggal,
+              time: bimbinganTambahan.jam_bimbingan,
+              pengajar_review: bimbinganTambahan.catatan_pengajar,
+            };
+
+            data.push(dataBimbinganTambahan);
+          }
+        }
+      }
     }
 
-    return {
-      period_id: result.id,
-      peserta_id: result.peserta.id,
-      user_id: result.peserta.User.id,
-      name: result.peserta.User.nama,
-      gender: result.peserta.User.jenis_kelamin,
-      age,
-      level: result.peserta.level,
-      data,
-    };
+    let filteredData;
+    if (pengajarName) {
+      if (pengajarName.length < 3)
+        throw ApiError.badRequest('Pengajar name must be at least 3 characters');
+
+      if (startDate && endDate) {
+        filteredData = data.filter((pengajar) => {
+          return (
+            pengajar.pengajar.includes(pengajarName) &&
+            moment(pengajar.date) >= moment(startDate) &&
+            moment(pengajar.date) <= moment(endDate)
+          );
+        });
+      } else {
+        filteredData = data.filter((pengajar) => {
+          return pengajar.pengajar.includes(pengajarName);
+        });
+      }
+    }
+
+    if (startDate && endDate) {
+      filteredData = data.filter((pengajar) => {
+        return (
+          pengajar.pengajar.includes(pengajarName) &&
+          moment(pengajar.date) >= moment(startDate) &&
+          moment(pengajar.date) <= moment(endDate)
+        );
+      });
+    }
+
+    if (filteredData) {
+      if (filteredData.length === 0) throw ApiError.notFound(`Pengajar not found`);
+
+      return filteredData;
+    }
+
+    return data;
   }
 
   #includeQuery = [
@@ -260,17 +347,43 @@ class BimbinganService extends BaseService {
       as: 'peserta',
       include: [
         {
-          model: JadwalBimbinganPeserta,
+          model: User,
           attributes: {
-            exclude: ['peserta_id'],
+            exclude: ['password', 'token'],
           },
-          as: 'jadwal_bimbingan_peserta',
         },
+      ],
+    },
+    {
+      model: BimbinganReguler,
+      attributes: {
+        exclude: ['period_id'],
+      },
+      as: 'bimbingan_reguler',
+    },
+    {
+      model: BimbinganTambahan,
+      attributes: {
+        exclude: ['period_id'],
+      },
+      as: 'bimbingan_tambahan',
+    },
+  ];
+
+  #includeQueryProgressPeserta = [
+    {
+      model: Pengajar,
+      attributes: {
+        exclude: ['user_id'],
+      },
+      as: 'pengajar',
+      include: [
         {
           model: User,
           attributes: {
             exclude: ['password', 'token'],
           },
+          as: 'user',
         },
       ],
     },
