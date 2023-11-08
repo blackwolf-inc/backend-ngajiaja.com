@@ -115,9 +115,6 @@ class DashboardPesertaService extends BaseService {
       // Sekarang Anda dapat menggunakannya dalam `dateWhere`
       dateWhere.tanggal = { [Op.between]: [startDateFormatted, endDateFormatted] };
     }
-
-    console.log(dateWhere);
-
     const includeQuery = [
       {
         model: Pengajar,
@@ -137,24 +134,28 @@ class DashboardPesertaService extends BaseService {
       {
         model: BimbinganReguler,
         // required: true,
+        separate: true,
         as: 'bimbingan_reguler',
         where: dateWhere,
       },
       {
         model: BimbinganTambahan,
+        separate: true,
         // required: true,
         as: 'bimbingan_tambahan',
+        where: dateWhere,
       },
     ];
 
     const result = await this.__findAll(whereClause, includeQuery);
-    const totalPage = Math.ceil(result.total / query.pageSize ? query.pageSize : 1);
+    console.log(result.total);
+    const totalPage = Math.ceil(result.total / parseInt(query.paginate ? query.paginate : 1));
 
     return {
       result,
       page: parseInt(query.page) ? parseInt(query.page) : 1,
       totalPage: parseInt(totalPage),
-      pageSize: parseInt(query.pageSize) ? parseInt(query.pageSize) : 10,
+      paginate: parseInt(query.paginate) ? parseInt(query.paginate) : 10,
       total: parseInt(result.total),
     };
   }
