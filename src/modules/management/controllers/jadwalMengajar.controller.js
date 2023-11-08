@@ -28,9 +28,10 @@ class JadwalMengajar {
   static async getAll(req, res, next) {
     const service = new JadwalMengajarService(req, JadwalMengajarPengajar);
     const user = req.user;
+    const { status, day, time } = req.query;
     try {
       const teacher_id = await service.checkTeacherId(user.id);
-      const result = await service.getAllByPengajarId(teacher_id.dataValues.id);
+      const result = await service.getAllByPengajarId(teacher_id.dataValues.id, status, day, time);
       return responseHandler.succes(res, `Success get all ${service.db.name}s`, result);
     } catch (error) {
       next(error);

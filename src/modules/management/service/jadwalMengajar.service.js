@@ -1,7 +1,14 @@
 const BaseService = require('../../../base/base.service');
-const { JadwalMengajarPengajar, Pengajar } = require('../../../models');
+const {
+  JadwalMengajarPengajar,
+  Pengajar,
+  User,
+  Period,
+  JadwalBimbinganPeserta,
+  Peserta,
+} = require('../../../models');
 const ApiError = require('../../../helpers/errorHandler');
-const { Op } = require('sequelize');
+const { STATUS_BIMBINGAN, STATUS_JADWAL } = require('../../../helpers/constanta');
 const moment = require('moment');
 
 class PengajarService extends BaseService {
@@ -23,12 +30,83 @@ class PengajarService extends BaseService {
     return result;
   }
 
-  async getAllByPengajarId(id) {
-    const query = {
-      pengajar_id: id,
-    };
-    const result = await this.getAll(query);
-    return result;
+  async getAllByPengajarId(id, status, day, time) {
+    const result = await this.__findAll({ where: { pengajar_id: id } }, this.#includeQuery);
+    if (!result) throw ApiError.notFound(`Jadwal with pengajar id ${id} not found`);
+
+    const data = [];
+    for (const jadwal of result.datas) {
+      for (const period of jadwal.pengajar.period) {
+        if (period.status !== STATUS_BIMBINGAN.ACTIVATED) continue;
+
+        // check if jadwal pengajar is same with jadwal bimbingan
+        const fieldDaysToCompare = ['hari_bimbingan_1', 'hari_bimbingan_2'];
+        const fieldHoursToCompare = ['jam_bimbingan_1', 'jam_bimbingan_2'];
+        const timeMengajar = `${jadwal.mulai_mengajar} - ${jadwal.selesai_mengajar}`;
+
+        for (const fieldDay of fieldDaysToCompare) {
+          if (
+            period.peserta.jadwal_bimbingan_peserta[fieldDay] === jadwal.hari_mengajar &&
+            period.peserta.jadwal_bimbingan_peserta[fieldDay] !== null
+          ) {
+            for (const fieldHour of fieldHoursToCompare) {
+              if (
+                period.peserta.jadwal_bimbingan_peserta[fieldHour] === timeMengajar &&
+                period.peserta.jadwal_bimbingan_peserta[fieldHour] !== null
+              ) {
+                const dataJadwalBimbingan = {
+                  jadwal_id: jadwal.id,
+                  peserta_id: period.peserta.id,
+                  user_id: period.peserta.User.id,
+                  name: period.peserta.User.nama,
+                  status: STATUS_JADWAL.BIMBINGAN,
+                  day: jadwal.hari_mengajar,
+                  time: timeMengajar,
+                };
+
+                data.push(dataJadwalBimbingan);
+              }
+            }
+          }
+        }
+
+        const dataJadwalTersedia = {
+          jadwal_id: jadwal.id,
+          peserta_id: null,
+          user_id: null,
+          name: null,
+          status: STATUS_JADWAL.AVAILABLE,
+          day: jadwal.hari_mengajar,
+          time: timeMengajar,
+        };
+
+        data.push(dataJadwalTersedia);
+      }
+    }
+
+    let filteredData;
+    if (status && day && time) {
+      filteredData = data.filter(
+        (item) => item.status === status && item.day === day && item.time === time,
+      );
+    } else if (status && day) {
+      filteredData = data.filter((item) => item.status === status && item.day === day);
+    } else if (status && time) {
+      filteredData = data.filter((item) => item.status === status && item.time === time);
+    } else if (day && time) {
+      filteredData = data.filter((item) => item.day === day && item.time === time);
+    } else if (status) {
+      filteredData = data.filter((item) => item.status === status);
+    } else if (day) {
+      filteredData = data.filter((item) => item.day === day);
+    } else if (time) {
+      filteredData = data.filter((item) => item.time === time);
+    } else {
+      filteredData = data;
+    }
+
+    if (filteredData.length === 0) throw ApiError.notFound(`Jadwal not found`);
+    return filteredData;
   }
 
   async createJadwalMengajar(payload) {
@@ -56,10 +134,41 @@ class PengajarService extends BaseService {
       payload.selesai_mengajar > result.mulai_mengajar
     ) {
       throw ApiError.badRequest(
-        `Jadwal with hari ${result.hari_mengajar} and mulai_mengajar ${result.mulai_mengajar} - selesai_mengajar ${result.selesai_mengajar} already exist`
+        `Jadwal with hari ${result.hari_mengajar} and mulai_mengajar ${result.mulai_mengajar} - selesai_mengajar ${result.selesai_mengajar} already exist`,
       );
     }
   }
+
+  #includeQuery = [
+    {
+      model: Pengajar,
+      as: 'pengajar',
+      include: [
+        {
+          model: Period,
+          as: 'period',
+          include: [
+            {
+              model: Peserta,
+              as: 'peserta',
+              include: [
+                {
+                  model: JadwalBimbinganPeserta,
+                  as: 'jadwal_bimbingan_peserta',
+                },
+                {
+                  model: User,
+                  attributes: {
+                    exclude: ['password', 'token'],
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ];
 
   // async checkJadwalOverlap(payload) {
   //   const existingJadwal = await JadwalMengajarPengajar.findAll({
