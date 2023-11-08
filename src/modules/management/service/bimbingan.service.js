@@ -270,31 +270,31 @@ class BimbinganService extends BaseService {
     for (const period of result.datas) {
       if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
         for (const bimbinganReguler of period.bimbingan_reguler) {
-          if (bimbinganReguler.absensi_peserta === 0 || bimbinganReguler.absensi_pengajar === 0)
-            continue;
-          const dataBimbinganReguler = {
-            pengajar: period.pengajar.user.nama,
-            date: bimbinganReguler.tanggal,
-            time: bimbinganReguler.jam_bimbingan,
-            pengajar_review: bimbinganReguler.catatan_pengajar,
-          };
+          if (bimbinganReguler.absensi_peserta === 1 || bimbinganReguler.absensi_pengajar === 1) {
+            const dataBimbinganReguler = {
+              pengajar: period.pengajar.user.nama,
+              date: bimbinganReguler.tanggal,
+              time: bimbinganReguler.jam_bimbingan,
+              pengajar_review: bimbinganReguler.catatan_pengajar,
+            };
 
-          data.push(dataBimbinganReguler);
+            data.push(dataBimbinganReguler);
+          }
         }
       }
 
       if (period.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
         for (const bimbinganTambahan of period.bimbingan_tambahan) {
-          if (bimbinganTambahan.absensi_peserta === 0 || bimbinganTambahan.absensi_pengajar === 0)
-            continue;
-          const dataBimbinganTambahan = {
-            pengajar: period.pengajar.user.nama,
-            date: bimbinganTambahan.tanggal,
-            time: bimbinganTambahan.jam_bimbingan,
-            pengajar_review: bimbinganTambahan.catatan_pengajar,
-          };
+          if (bimbinganTambahan.absensi_peserta === 1 || bimbinganTambahan.absensi_pengajar === 1) {
+            const dataBimbinganTambahan = {
+              pengajar: period.pengajar.user.nama,
+              date: bimbinganTambahan.tanggal,
+              time: bimbinganTambahan.jam_bimbingan,
+              pengajar_review: bimbinganTambahan.catatan_pengajar,
+            };
 
-          data.push(dataBimbinganTambahan);
+            data.push(dataBimbinganTambahan);
+          }
         }
       }
     }
@@ -308,7 +308,7 @@ class BimbinganService extends BaseService {
         filteredData = data.filter((pengajar) => {
           return (
             pengajar.pengajar.includes(pengajarName) &&
-            moment(pengajar.date) >= moment(statDate) &&
+            moment(pengajar.date) >= moment(startDate) &&
             moment(pengajar.date) <= moment(endDate)
           );
         });
@@ -323,7 +323,7 @@ class BimbinganService extends BaseService {
       filteredData = data.filter((pengajar) => {
         return (
           pengajar.pengajar.includes(pengajarName) &&
-          moment(pengajar.date) >= moment(statDate) &&
+          moment(pengajar.date) >= moment(startDate) &&
           moment(pengajar.date) <= moment(endDate)
         );
       });
