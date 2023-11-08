@@ -47,12 +47,18 @@ class InfaqService extends BaseService {
     return result;
   }
 
-  async getAllInfaqByUserId(user, query) {
+  async getAllInfaqByUserId(id, role, query) {
+    let userWhere = {};
     let whereClause = {};
-    if (user.role == 'PESERTA') {
-      whereClause.peserta_id = user.user.id;
-    } else if (user.role == 'PENGAJAR') {
-      whereClause.pengajar_id = user.user.id;
+    console.log(role);
+
+    if (query.instructorName) {
+      userWhere.nama = { [Op.like]: `%${query.instructorName}%` };
+    }
+    if (role == 'PESERTA') {
+      whereClause.peserta_id = id;
+    } else if (role == 'PENGAJAR') {
+      whereClause.pengajar_id = id;
     }
 
     if (query.status) {
@@ -63,12 +69,10 @@ class InfaqService extends BaseService {
       whereClause.waktu_pembayaran = { [Op.between]: [query.startDate, query.endDate] };
     }
 
-    console.log(whereClause);
-    console.log(query.instructorName ? query.instructorName : 'none');
-
     const includeQuery = [
       {
         model: Pengajar,
+        required: true,
         attributes: {
           exclude: ['user_id'],
         },
@@ -77,15 +81,10 @@ class InfaqService extends BaseService {
         include: [
           {
             model: User,
+            required: true,
             as: 'user',
             attributes: ['nama'],
-            where: query.instructorName
-              ? {
-                  nama: {
-                    [Op.like]: Sequelize.literal(`'%${query.instructorName}%'`),
-                  },
-                }
-              : {},
+            where: userWhere,
           },
         ],
       },
@@ -96,7 +95,14 @@ class InfaqService extends BaseService {
     ];
 
     const result = await this.__findAll({ where: whereClause }, includeQuery);
-    return result;
+    const totalPage = Math.ceil(result.total / parseInt(query.paginate ? query.paginate : 1));
+    return {
+      result,
+      page: parseInt(query.page) ? parseInt(query.page) : 1,
+      totalPage: parseInt(totalPage),
+      paginate: parseInt(query.paginate) ? parseInt(query.paginate) : 10,
+      total: parseInt(result.total),
+    };
   }
 
   async updateImages(req) {
@@ -114,6 +120,22 @@ class InfaqService extends BaseService {
     } else {
       throw ApiError.badRequest('Invalid Date');
     }
+  }
+
+  async getPesertaByUserId(id) {
+    const result = await Peserta.findOne({ where: { user_id: id } });
+
+    if (!result) throw ApiError.notFound("Peserta does't exist");
+
+    return result;
+  }
+
+  async getPengajarByUserId(id) {
+    const result = await Pengajar.findOne({ where: { user_id: id } });
+
+    if (!result) throw ApiError.notFound("Pengajar does't exist");
+
+    return result;
   }
 
   async addToPenghasilanPengajar(req) {
