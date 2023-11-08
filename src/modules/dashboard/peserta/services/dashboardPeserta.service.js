@@ -85,11 +85,12 @@ class DashboardPesertaService extends BaseService {
   }
 
   async getBimbinganPeserta(id, query) {
+    const userWhere = {};
+    const dateWhere = {};
+
     const whereClause = {
       where: { peserta_id: id },
     };
-
-    const userWhere = {};
 
     if (query.instructorName) {
       userWhere.nama = { [Op.like]: `%${query.instructorName}%` };
@@ -97,8 +98,6 @@ class DashboardPesertaService extends BaseService {
     if (query.status) {
       whereClause.where.status = query.status;
     }
-
-    const dateWhere = {};
 
     if (query.startDate && query.endDate) {
       // Parse tanggal dari format "2023-10-21" ke format "21 Nov 2023"
@@ -112,7 +111,6 @@ class DashboardPesertaService extends BaseService {
         endDateParts[0]
       }`;
 
-      // Sekarang Anda dapat menggunakannya dalam `dateWhere`
       dateWhere.tanggal = { [Op.between]: [startDateFormatted, endDateFormatted] };
     }
     const includeQuery = [
@@ -133,7 +131,6 @@ class DashboardPesertaService extends BaseService {
       },
       {
         model: BimbinganReguler,
-        // required: true,
         separate: true,
         as: 'bimbingan_reguler',
         where: dateWhere,
@@ -141,14 +138,12 @@ class DashboardPesertaService extends BaseService {
       {
         model: BimbinganTambahan,
         separate: true,
-        // required: true,
         as: 'bimbingan_tambahan',
         where: dateWhere,
       },
     ];
 
     const result = await this.__findAll(whereClause, includeQuery);
-    console.log(result.total);
     const totalPage = Math.ceil(result.total / parseInt(query.paginate ? query.paginate : 1));
 
     return {

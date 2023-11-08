@@ -1,7 +1,8 @@
 const InfaqService = require('../service/infaq.service');
+const PesertaService = require('../../registration/services/student.service');
 const responseHandler = require('../../../helpers/responseHandler');
 const db = require('../../../models/index');
-const { Infaq, sequelize } = db;
+const { Infaq, Peserta, sequelize } = db;
 
 class InfaqController {
   static async getOne(req, res, next) {
@@ -18,7 +19,18 @@ class InfaqController {
     const service = new InfaqService(req, Infaq);
     const user = req.user;
     try {
-      const result = await service.getAllInfaqByUserId(user, req.query);
+      let userData = {};
+      // const user = {
+      //   id: 23,
+      //   role: 'PENGAJAR',
+      // };
+      if (user.role == 'PESERTA') {
+        userData = await service.getPesertaByUserId(user.id);
+      } else {
+        userData = await service.getPengajarByUserId(user.id);
+      }
+
+      const result = await service.getAllInfaqByUserId(userData.id, user.role, req.query);
       return responseHandler.succes(res, `Success get all ${service.db.name}s`, result);
     } catch (error) {
       next(error);
