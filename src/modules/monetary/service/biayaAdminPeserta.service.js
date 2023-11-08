@@ -12,7 +12,7 @@ class BiayaAdminPesertaService extends BaseService {
   }
 
   async updateUser(req) {
-    const data = await User.update({ status: 'administrasi' }, { where: { id: req.body.user_id } });
+    const data = await User.update({ status: 'ADMINISTRATION' }, { where: { id: req.body.user_id } });
     console.log(data[0]);
     if (data[0] === 0) {
       throw ApiError.badRequest(`failed update status user_id ${req.body.user_id}`);

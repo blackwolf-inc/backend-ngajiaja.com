@@ -75,9 +75,9 @@ class PilihPengajar extends BaseService {
     const records = [];
     const dateNow = moment(new Date()).format('YYYY-MM-DD');
     const dateVerifikasi = moment(dateNow).add('days', 4).format('YYYY-MM-DD');
-    const dateEnd = moment(dateVerifikasi).endOf('month').format('YYYY-MM-DD');
+    // const dateEnd = moment(dateVerifikasi).endOf('month').format('YYYY-MM-DD');
     const dateRemember = moment(tanggal_pengingat_infaq).format('YYYY-MM-DD');
-    const dateDiff = moment(dateEnd).diff(dateVerifikasi, 'days');
+    const dateDiff = 30;
 
     let dateThisMonth = dateVerifikasi;
     for (let i = 1; i <= dateDiff; i++) {

@@ -1,4 +1,5 @@
 const AdminPengajarService = require('../services/adminPengajar.service.js');
+const AdminPesertaService = require('../services/adminPeserta.service.js');
 const responseHandler = require('../../../../helpers/responseHandler');
 
 class AdminDashboardController {
@@ -68,6 +69,64 @@ class AdminDashboardController {
       let result = await service.getPesertaPengajarVerified(query, status, keyword, level);
       result = result.map(item => ({ ...item, bagi_hasil: 50 }));
       return responseHandler.succes(res, 'Success get pengajar Terverifikasi', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getAllDataPeserta(req, res, next) {
+    const service = new AdminPesertaService();
+    try {
+      const result = await service.getDataPeserta();
+      return responseHandler.succes(res, 'Success get all data peserta', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getPesertaRegistered(req, res, next) {
+    const service = new AdminPesertaService();
+    try {
+      const { query } = req;
+      const { status, keyword, startDate, endDate, bankName } = query;
+      const result = await service.getPesertaRegistered(query, status, keyword, startDate, endDate, bankName);
+      return responseHandler.succes(res, 'Success get peserta Terdaftar', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateStatusPeserta(req, res, next) {
+    const service = new AdminPesertaService();
+    try {
+      const { userId } = req.params;
+      const { status_peserta, level_peserta } = req.body;
+      const result = await service.updateStatusPeserta(req, { status_peserta, level_peserta }, userId);
+      return responseHandler.succes(res, 'Success update status peserta', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getPesertaVerified(req, res, next) {
+    const service = new AdminPesertaService();
+    try {
+      const { query } = req;
+      const { status, keyword, level } = query;
+      const result = await service.getPesertaVerified(query, status, keyword, level);
+      return responseHandler.succes(res, 'Success get peserta Terverifikasi', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateStatusPesertaVerified(req, res, next) {
+    const service = new AdminPesertaService();
+    try {
+      const { userId } = req.params;
+      const { status_peserta, level_peserta } = req.body;
+      const result = await service.updateStatusPesertaVerified(req, { status_peserta, level_peserta }, userId);
+      return responseHandler.succes(res, 'Success update status peserta', result);
     } catch (error) {
       next(error);
     }
