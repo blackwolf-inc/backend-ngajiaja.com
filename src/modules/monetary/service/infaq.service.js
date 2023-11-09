@@ -73,9 +73,6 @@ class InfaqService extends BaseService {
       {
         model: Pengajar,
         required: true,
-        attributes: {
-          exclude: ['user_id'],
-        },
         as: 'pengajar',
         attributes: ['id'],
         include: [
