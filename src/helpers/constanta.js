@@ -40,6 +40,12 @@ const STATUS_JADWAL = {
   AVAILABLE: 'TERSEDIA',
 };
 
+const STATUS_PENCAIRAN = {
+  WAITING: 'WAITING',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+};
+
 module.exports = {
   USER_ROLE,
   STATUS_USER,
@@ -47,4 +53,5 @@ module.exports = {
   STATUS_BIMBINGAN,
   LEVEL_PESERTA,
   STATUS_JADWAL,
+  STATUS_PENCAIRAN,
 };
