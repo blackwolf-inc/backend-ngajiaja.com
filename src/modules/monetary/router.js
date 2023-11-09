@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const BankController = require('./controllers/bank.controller');
 const PencairanController = require('./controllers/pencairan.controller');
+const PenghasilanController = require('./controllers/penghasilan.controller');
 const BiayaAdministrasiPesertaController = require('./controllers/biayaAdminPeserta.controller');
 const InfaqController = require('./controllers/infaq.controller');
 const storageImage = require('../../utils/storageImage');
@@ -37,13 +38,13 @@ router.post(
   '/biaya-administrasi-peserta',
   storageImage.image.single('media'),
   validate(cost.createBiayaAdminPesertaValidator),
-  BiayaAdministrasiPesertaController.create
+  BiayaAdministrasiPesertaController.create,
 );
 router.patch(
   '/biaya-administrasi-peserta/:id',
   storageImage.image.single('media'),
   validate(cost.updateBiayaAdminPesertaValidator),
-  BiayaAdministrasiPesertaController.update
+  BiayaAdministrasiPesertaController.update,
 );
 
 // pencairan route
@@ -54,7 +55,7 @@ router.patch(
   '/pencairan/:id',
   storageImage.image.single('media'),
   validate(updatePencairanValidator),
-  PencairanController.update
+  PencairanController.update,
 );
 router.delete('/pencairan/:id', PencairanController.delete);
 
@@ -65,5 +66,9 @@ router.post('/infaq', validate(infaqValidator.createInfaqValidator), InfaqContro
 router.patch('/infaq/images/:id', storageImage.image.single('media'), InfaqController.updateImages);
 router.patch('/infaq/:id', validate(infaqValidator.updateInfaqValidator), InfaqController.update);
 router.delete('/infaq/:id', InfaqController.delete);
+
+// penghasilan route
+router.get('/penghasilan', PenghasilanController.getIncome);
+router.get('/penghasilan/detail', PenghasilanController.dataIncome);
 
 module.exports = router;
