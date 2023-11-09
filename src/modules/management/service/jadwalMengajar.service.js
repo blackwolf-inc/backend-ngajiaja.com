@@ -40,7 +40,9 @@ class PengajarService extends BaseService {
     const data = [];
     for (const jadwal of result.datas) {
       for (const period of jadwal.pengajar.period) {
-        const timeMengajar = `${jadwal.mulai_mengajar}-${jadwal.selesai_mengajar}`;
+        const startTime = jadwal.mulai_mengajar.toString().slice(0, -3);
+        const endTime = jadwal.selesai_mengajar.toString().slice(0, -3);
+        const timeMengajar = `${startTime}-${endTime}`;
         let isSameJadwal = false;
 
         if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
@@ -117,7 +119,6 @@ class PengajarService extends BaseService {
     }
 
     if (filteredData.length === 0) throw ApiError.notFound(`Jadwal not found`);
-    console.log(filteredData.length);
     return filteredData;
   }
 
