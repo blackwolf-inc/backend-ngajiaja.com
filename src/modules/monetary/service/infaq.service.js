@@ -9,7 +9,7 @@ const {
   Pengajar,
   PenghasilanPengajar,
 } = require('../../../models');
-const { Op, Sequelize } = require('sequelize');
+const { Op } = require('sequelize');
 
 class InfaqService extends BaseService {
   async checkUserById(payload) {
@@ -95,14 +95,42 @@ class InfaqService extends BaseService {
     ];
 
     const result = await this.__findAll({ where: whereClause }, includeQuery);
+
     const totalPage = Math.ceil(result.total / parseInt(query.paginate ? query.paginate : 1));
+
+    let modifiedResult;
+
+    modifiedResult = result.datas.map((item) => {
+      return {
+        ...item, // Jika `dataValues` tidak ada, sesuaikan dengan struktur aktual
+        bukti_pembayaran: item.bukti_pembayaran
+          ? `${process.env.BASE_URL}/images/${item.bukti_pembayaran}`
+          : null,
+      };
+    });
+
     return {
-      result,
+      result: modifiedResult,
       page: parseInt(query.page) ? parseInt(query.page) : 1,
       totalPage: parseInt(totalPage),
       paginate: parseInt(query.paginate) ? parseInt(query.paginate) : 10,
       total: parseInt(result.total),
     };
+  }
+
+  async getOneInfaqById(id) {
+    const result = await this.__findOne({ where: { id } });
+
+    let modifiedResult;
+
+    modifiedResult = {
+      ...result,
+      bukti_pembayaran: result.bukti_pembayaran
+        ? `${process.env.BASE_URL}/images/${result.bukti_pembayaran}`
+        : null,
+    };
+
+    return modifiedResult;
   }
 
   async updateImages(req) {
