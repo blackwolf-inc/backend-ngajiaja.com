@@ -2,13 +2,13 @@ const InfaqService = require('../service/infaq.service');
 const PesertaService = require('../../registration/services/student.service');
 const responseHandler = require('../../../helpers/responseHandler');
 const db = require('../../../models/index');
-const { Infaq, Peserta, sequelize } = db;
+const { Infaq } = db;
 
 class InfaqController {
   static async getOne(req, res, next) {
     const service = new InfaqService(req, Infaq);
     try {
-      const result = await service.getOneById(req.params.id);
+      const result = await service.getOneInfaqById(req.params.id);
       return responseHandler.succes(res, `Success get ${service.db.name}`, result);
     } catch (error) {
       next(error);
@@ -19,7 +19,7 @@ class InfaqController {
     const service = new InfaqService(req, Infaq);
     const user = req.user;
     try {
-      let userData = {};
+      // let userData = {};
       // const user = {
       //   id: 23,
       //   role: 'PENGAJAR',
@@ -71,8 +71,10 @@ class InfaqController {
   static async updateImages(req, res, next) {
     const service = new InfaqService(req, Infaq);
     try {
-      await service.checkInfaqById(req.params.id);
-      await service.updateImages(req);
+      await Promise.all([
+        await service.checkInfaqById(req.params.id),
+        await service.updateImages(req),
+      ]);
       const result = await service.updateData(req.body, { id: req.params.id });
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {
