@@ -33,9 +33,9 @@ router.post(
   hasRole([USER_ROLE.PENGAJAR]),
   JadwalMengajar.create,
 );
+router.get('/jadwal-pengajar/jadwal', JadwalMengajar.getDataJadwalMengajar);
 router.get('/jadwal-pengajar', JadwalMengajar.getAll);
 router.get('/jadwal-pengajar/:id', JadwalMengajar.getOne);
-router.get('/jadwal-pengajar/data', JadwalMengajar.getDataJadwalMengajar);
 router.patch(
   '/jadwal-pengajar/:id',
   validate(updateJadwalValidator),

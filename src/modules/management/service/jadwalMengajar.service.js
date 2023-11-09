@@ -6,9 +6,11 @@ const {
   Period,
   JadwalBimbinganPeserta,
   Peserta,
+  BimbinganReguler,
+  BimbinganTambahan,
 } = require('../../../models');
 const ApiError = require('../../../helpers/errorHandler');
-const { STATUS_BIMBINGAN, STATUS_JADWAL } = require('../../../helpers/constanta');
+const { STATUS_BIMBINGAN, STATUS_JADWAL, TYPE_BIMBINGAN } = require('../../../helpers/constanta');
 const moment = require('moment');
 
 class PengajarService extends BaseService {
@@ -34,75 +36,86 @@ class PengajarService extends BaseService {
     const result = await this.__findAll({ where: { pengajar_id: id } }, this.#includeQuery);
     if (!result) throw ApiError.notFound(`Jadwal with pengajar id ${id} not found`);
 
+    // return result;
     const data = [];
     for (const jadwal of result.datas) {
       for (const period of jadwal.pengajar.period) {
-        if (period.status !== STATUS_BIMBINGAN.ACTIVATED) continue;
+        const startTime = jadwal.mulai_mengajar.toString().slice(0, -3);
+        const endTime = jadwal.selesai_mengajar.toString().slice(0, -3);
+        const timeMengajar = `${startTime}-${endTime}`;
+        let isSameJadwal = false;
 
-        // check if jadwal pengajar is same with jadwal bimbingan
-        const fieldDaysToCompare = ['hari_bimbingan_1', 'hari_bimbingan_2'];
-        const fieldHoursToCompare = ['jam_bimbingan_1', 'jam_bimbingan_2'];
-        const timeMengajar = `${jadwal.mulai_mengajar} - ${jadwal.selesai_mengajar}`;
-
-        for (const fieldDay of fieldDaysToCompare) {
-          if (
-            period.peserta.jadwal_bimbingan_peserta[fieldDay] === jadwal.hari_mengajar &&
-            period.peserta.jadwal_bimbingan_peserta[fieldDay] !== null
-          ) {
-            for (const fieldHour of fieldHoursToCompare) {
-              if (
-                period.peserta.jadwal_bimbingan_peserta[fieldHour] === timeMengajar &&
-                period.peserta.jadwal_bimbingan_peserta[fieldHour] !== null
-              ) {
-                const dataJadwalBimbingan = {
-                  jadwal_id: jadwal.id,
-                  peserta_id: period.peserta.id,
-                  user_id: period.peserta.User.id,
-                  name: period.peserta.User.nama,
-                  status: STATUS_JADWAL.BIMBINGAN,
-                  day: jadwal.hari_mengajar,
-                  time: timeMengajar,
-                };
-
-                data.push(dataJadwalBimbingan);
+        if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
+          for (let i = 0; i < 2; i++) {
+            if (period.bimbingan_reguler[i].hari_bimbingan === jadwal.hari_mengajar) {
+              if (period.bimbingan_reguler[i].jam_bimbingan === timeMengajar) {
+                isSameJadwal = true;
               }
             }
           }
         }
 
-        const dataJadwalTersedia = {
-          jadwal_id: jadwal.id,
-          peserta_id: null,
-          user_id: null,
-          name: null,
-          status: STATUS_JADWAL.AVAILABLE,
-          day: jadwal.hari_mengajar,
-          time: timeMengajar,
-        };
+        if (period.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
+          for (let i = 0; i < 2; i++) {
+            if (period.bimbingan_tambahan[i].hari_bimbingan === jadwal.hari_mengajar) {
+              if (period.bimbingan_tambahan[i].jam_bimbingan === timeMengajar) {
+                isSameJadwal = true;
+              }
+            }
+          }
+        }
 
-        data.push(dataJadwalTersedia);
+        let dataJadwalBimbingan;
+        if (isSameJadwal && period.status === STATUS_BIMBINGAN.ACTIVATED) {
+          dataJadwalBimbingan = {
+            jadwal_id: jadwal.id,
+            peserta_id: period.peserta.id,
+            user_id: period.peserta.User.id,
+            name: period.peserta.User.nama,
+            status: STATUS_JADWAL.BIMBINGAN,
+            day: jadwal.hari_mengajar,
+            time: timeMengajar,
+          };
+        } else {
+          dataJadwalBimbingan = {
+            jadwal_id: jadwal.id,
+            peserta_id: null,
+            user_id: null,
+            name: null,
+            status: STATUS_JADWAL.AVAILABLE,
+            day: jadwal.hari_mengajar,
+            time: timeMengajar,
+          };
+        }
+
+        data.push(dataJadwalBimbingan);
       }
     }
 
+    // remove duplicate data from array
+    const uniqueData = data.filter(
+      (thing, index, self) => index === self.findIndex((t) => t.jadwal_id === thing.jadwal_id),
+    );
+
     let filteredData;
     if (status && day && time) {
-      filteredData = data.filter(
+      filteredData = uniqueData.filter(
         (item) => item.status === status && item.day === day && item.time === time,
       );
     } else if (status && day) {
-      filteredData = data.filter((item) => item.status === status && item.day === day);
+      filteredData = uniqueData.filter((item) => item.status === status && item.day === day);
     } else if (status && time) {
-      filteredData = data.filter((item) => item.status === status && item.time === time);
+      filteredData = uniqueData.filter((item) => item.status === status && item.time === time);
     } else if (day && time) {
-      filteredData = data.filter((item) => item.day === day && item.time === time);
+      filteredData = uniqueData.filter((item) => item.day === day && item.time === time);
     } else if (status) {
-      filteredData = data.filter((item) => item.status === status);
+      filteredData = uniqueData.filter((item) => item.status === status);
     } else if (day) {
-      filteredData = data.filter((item) => item.day === day);
+      filteredData = uniqueData.filter((item) => item.day === day);
     } else if (time) {
-      filteredData = data.filter((item) => item.time === time);
+      filteredData = uniqueData.filter((item) => item.time === time);
     } else {
-      filteredData = data;
+      filteredData = uniqueData;
     }
 
     if (filteredData.length === 0) throw ApiError.notFound(`Jadwal not found`);
@@ -176,16 +189,20 @@ class PengajarService extends BaseService {
               as: 'peserta',
               include: [
                 {
-                  model: JadwalBimbinganPeserta,
-                  as: 'jadwal_bimbingan_peserta',
-                },
-                {
                   model: User,
                   attributes: {
                     exclude: ['password', 'token'],
                   },
                 },
               ],
+            },
+            {
+              model: BimbinganReguler,
+              as: 'bimbingan_reguler',
+            },
+            {
+              model: BimbinganTambahan,
+              as: 'bimbingan_tambahan',
             },
           ],
         },
