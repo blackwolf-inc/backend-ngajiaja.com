@@ -60,6 +60,7 @@ class AdminPesertaService {
     async getPesertaRegistered(query, status, keyword, startDate, endDate, bankName) {
         const { page = 1, pageSize = 10 } = query;
         const offset = (page - 1) * pageSize;
+        const base_url = process.env.BASE_URL;
 
         let whereClause = "WHERE u.role = 'PESERTA' AND u.status IN ('REGISTERED', 'REJECTED', 'ADMINISTRATION')";
         if (status) {
@@ -75,13 +76,12 @@ class AdminPesertaService {
             whereClause += ` AND bk.nama_bank = '${bankName}'`;
         }
 
-
         const result = await sequelize.query(
             `
           SELECT 
             u.id AS 'user_id', u.nama, u.role, u.status,
             p.id AS 'peserta_id', p.level,
-            b.bank_id, b.bukti_pembayaran, b.createdAt,
+            b.bank_id, CONCAT('${base_url}/images/', b.bukti_pembayaran) AS bukti_pembayaran, b.createdAt,
             bk.nama_bank
             FROM Pesertas p 
           JOIN Users u ON p.user_id = u.id 

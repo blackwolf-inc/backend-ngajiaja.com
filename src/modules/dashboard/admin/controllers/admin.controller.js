@@ -1,5 +1,6 @@
 const AdminPengajarService = require('../services/adminPengajar.service.js');
 const AdminPesertaService = require('../services/adminPeserta.service.js');
+const AdminDashboard = require('../services/adminDashboard.service.js');
 const responseHandler = require('../../../../helpers/responseHandler');
 
 class AdminDashboardController {
@@ -127,6 +128,27 @@ class AdminDashboardController {
       const { status_peserta, level_peserta } = req.body;
       const result = await service.updateStatusPesertaVerified(req, { status_peserta, level_peserta }, userId);
       return responseHandler.succes(res, 'Success update status peserta', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getDataDashboardAdmin(req, res, next) {
+    const service = new AdminDashboard();
+    try {
+      const result = await service.getDataAdminDashboard();
+      return responseHandler.succes(res, 'Success get data dashboard admin', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getAllBimbingan(req, res, next) {
+    const service = new AdminDashboard();
+    try {
+      const { month } = req.query;
+      const result = await service.getAllBimbingan(month);
+      return responseHandler.succes(res, 'Success get all bimbingan', result);
     } catch (error) {
       next(error);
     }
