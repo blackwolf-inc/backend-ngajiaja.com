@@ -93,7 +93,21 @@ class AdminPesertaService {
             { type: QueryTypes.SELECT }
         );
 
-        return result;
+        const totalCount = await sequelize.query(
+            `
+          SELECT COUNT(*) AS total
+          FROM Pesertas p 
+          JOIN Users u ON p.user_id = u.id 
+          LEFT JOIN BiayaAdministrasis b ON p.user_id = b.user_id
+          LEFT JOIN Banks bk ON b.bank_id = bk.id
+          ${whereClause}
+          `,
+            { type: QueryTypes.SELECT }
+        );
+
+        const totalPages = Math.ceil(totalCount[0].total / pageSize);
+
+        return { result, totalPages };
     }
 
     async updateStatusPeserta(req, payload, userId) {
@@ -151,7 +165,25 @@ class AdminPesertaService {
             { type: QueryTypes.SELECT }
         );
 
-        return result;
+        const totalCount = await sequelize.query(
+            `
+          SELECT COUNT(*) AS total
+          FROM (
+            SELECT 1
+            FROM Pesertas p 
+            JOIN Users u ON p.user_id = u.id 
+            LEFT JOIN Periods pr ON p.id = pr.peserta_id
+            LEFT JOIN BimbinganRegulers br ON pr.id = br.period_id
+            ${whereClause}
+            GROUP BY u.id, p.id, pr.id
+          ) AS subquery
+          `,
+            { type: QueryTypes.SELECT }
+        );
+
+        const totalPages = Math.ceil(totalCount[0].total / pageSize);
+
+        return { result, totalPages };
     }
 
     async updateStatusPesertaVerified(req, payload, userId) {

@@ -171,7 +171,22 @@ class AdminPengajarService {
       { type: QueryTypes.SELECT }
     );
 
-    return result;
+    const totalCount = await sequelize.query(
+      `
+    SELECT COUNT(*) AS total
+    FROM (
+      SELECT 1
+      FROM Pengajars p 
+      JOIN Users u ON p.user_id = u.id 
+      ${whereClause}
+    ) AS subquery
+    `,
+      { type: QueryTypes.SELECT }
+    );
+
+    const totalPages = Math.ceil(totalCount[0].total / pageSize);
+
+    return { result, totalPages };
   }
 
   async getPesertaPengajarVerified(query, status, keyword, level) {
@@ -203,7 +218,22 @@ class AdminPengajarService {
       { type: QueryTypes.SELECT }
     );
 
-    return result;
+    const totalCount = await sequelize.query(
+      `
+    SELECT COUNT(*) AS total
+    FROM (
+      SELECT 1
+      FROM Pengajars p 
+      JOIN Users u ON p.user_id = u.id 
+      ${whereClause}
+    ) AS subquery
+    `,
+      { type: QueryTypes.SELECT }
+    );
+
+    const totalPages = Math.ceil(totalCount[0].total / pageSize);
+
+    return { result, totalPages };
   }
 
 }
