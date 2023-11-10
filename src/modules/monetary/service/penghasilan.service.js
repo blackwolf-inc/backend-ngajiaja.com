@@ -12,9 +12,9 @@ class PenghasilanService extends BaseService {
     for (const item of result.datas) {
       const dataPenghasilan = {
         id: item.id,
-        peserta: item.peserta.user.nama,
+        peserta: item.peserta.User.nama,
         peserta_id: item.peserta.id,
-        user_id: item.peserta.user.id,
+        user_id: item.peserta.User.id,
         payed: item.pembayaran,
         income: item.penghasilan,
         percent: item.persentase_bagi_hasil,
@@ -26,6 +26,7 @@ class PenghasilanService extends BaseService {
     let filteredData;
     if (startDate && endDate) {
       if (pesertaName) {
+        if (pesertaName.length < 3) throw ApiError.badRequest('Peserta name must be 3 character');
         if (persen) {
           filteredData = data.filter(
             (item) =>
@@ -57,6 +58,7 @@ class PenghasilanService extends BaseService {
     }
 
     if (pesertaName) {
+      if (pesertaName.length < 3) throw ApiError.badRequest('Peserta name must be 3 character');
       if (persen) {
         filteredData = data.filter(
           (item) =>
