@@ -36,6 +36,13 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
+
+      Pengajar.hasMany(models.PenghasilanPengajar, {
+        foreignKey: 'pengajar_id',
+        as: 'penghasilan_pengajar',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
     }
   }
   Pengajar.init(
@@ -107,7 +114,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       tableName: 'Pengajars',
       modelName: 'Pengajar',
-    }
+    },
   );
   return Pengajar;
 };

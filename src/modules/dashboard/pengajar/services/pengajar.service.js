@@ -84,7 +84,7 @@ class PengajarService extends BaseService {
         throw ApiError.badRequest('Peserta name must be at least 3 characters');
 
       const filteredPeserta = data.filter((peserta) => {
-        return peserta.name.includes(pesertaName);
+        return peserta.name.toLowerCase().includes(pesertaName.toLowerCase());
       });
       if (filteredPeserta) {
         if (filteredPeserta.length === 0)
@@ -159,11 +159,14 @@ class PengajarService extends BaseService {
 
       if (status) {
         filteredPeserta = sortedData.filter((peserta) => {
-          return peserta.name.includes(pesertaName) && peserta.status === status;
+          return (
+            peserta.name.toLowerCase().includes(pesertaName.toLowerCase()) &&
+            peserta.status === status
+          );
         });
       } else {
         filteredPeserta = sortedData.filter((peserta) => {
-          return peserta.name.includes(pesertaName);
+          return peserta.toLowerCase().name.includes(pesertaName.toLowerCase());
         });
       }
     }

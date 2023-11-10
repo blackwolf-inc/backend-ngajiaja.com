@@ -73,11 +73,14 @@ class BimbinganService extends BaseService {
 
       if (level) {
         filteredPeserta = data.filter((peserta) => {
-          return peserta.name.includes(pesertaName) && peserta.level === level;
+          return (
+            peserta.toLowerCase().name.includes(pesertaName.toLowerCase()) &&
+            peserta.level === level
+          );
         });
       } else {
         filteredPeserta = data.filter((peserta) => {
-          return peserta.name.includes(pesertaName);
+          return peserta.toLowerCase().name.includes(pesertaName.toLowerCase());
         });
       }
     }
@@ -157,11 +160,14 @@ class BimbinganService extends BaseService {
 
       if (periodDate) {
         filteredPeserta = data.filter((peserta) => {
-          return peserta.name.includes(pesertaName) && peserta.period === periodDate;
+          return (
+            peserta.name.toLowerCase().includes(pesertaName.toLowerCase()) &&
+            peserta.period === periodDate
+          );
         });
       } else {
         filteredPeserta = data.filter((peserta) => {
-          return peserta.name.includes(pesertaName);
+          return peserta.name.toLowerCase().includes(pesertaName.toLowerCase());
         });
       }
     }
@@ -307,14 +313,14 @@ class BimbinganService extends BaseService {
       if (startDate && endDate) {
         filteredData = data.filter((pengajar) => {
           return (
-            pengajar.pengajar.includes(pengajarName) &&
+            pengajar.pengajar.toLowerCase().includes(pengajarName.toLowerCase()) &&
             moment(pengajar.date) >= moment(startDate) &&
             moment(pengajar.date) <= moment(endDate)
           );
         });
       } else {
         filteredData = data.filter((pengajar) => {
-          return pengajar.pengajar.includes(pengajarName);
+          return pengajar.pengajar.toLowerCase().includes(pengajarName.toLowerCase());
         });
       }
     }
