@@ -29,14 +29,14 @@ class PencairanService extends BaseService {
     let filteredData;
     if (startDate && endDate) {
       if (status) {
-        filteredData = result.filter(
+        filteredData = result.datas.filter(
           (item) =>
             moment(item.waktu_pembayaran) >= moment(startDate) &&
             moment(item.waktu_pembayaran) <= moment(endDate) &&
             item.status === status,
         );
       } else {
-        filteredData = result.filter(
+        filteredData = result.datas.filter(
           (item) =>
             moment(item.waktu_pembayaran) >= moment(startDate) &&
             moment(item.waktu_pembayaran) <= moment(endDate),
@@ -45,7 +45,7 @@ class PencairanService extends BaseService {
     }
 
     if (status) {
-      filteredData = result.filter((item) => item.status === status);
+      filteredData = result.datas.filter((item) => item.status === status);
     }
 
     if (filteredData) {
@@ -81,6 +81,8 @@ class PencairanService extends BaseService {
     for (const item of result.datas) {
       total += item.nominal;
     }
+
+    return total;
   }
 }
 
