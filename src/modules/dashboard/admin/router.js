@@ -43,4 +43,7 @@ router.patch(
   AdminDashboardController.updateStatusPesertaVerified
 );
 
+router.get('/data/dashboard-admin', AdminDashboardController.getDataDashboardAdmin);
+router.get('/data/dashboard-admin/bimbingan', AdminDashboardController.getAllBimbingan);
+
 module.exports = router;
