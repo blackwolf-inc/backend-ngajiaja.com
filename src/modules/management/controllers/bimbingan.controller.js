@@ -46,7 +46,7 @@ class BimbinganPeserta {
       const result = await service.bimbinganOnGoing(
         user.pengajar.id,
         req.query.name,
-        req.query.level
+        req.query.level,
       );
       return responseHandler.succes(res, `Success get bimbingan akan datang`, result);
     } catch (error) {
@@ -62,7 +62,8 @@ class BimbinganPeserta {
       const result = await service.bimbinganDone(
         user.pengajar.id,
         req.query.name,
-        req.query.period
+        req.query.startDate,
+        req.query.endDate,
       );
       return responseHandler.succes(res, `Success get bimbingan selesai`, result);
     } catch (error) {
@@ -100,8 +101,8 @@ class BimbinganPeserta {
       const result = await service.progressPeserta(
         req.params.id,
         req.query.name,
-        req.query.start_date,
-        req.query.end_date,
+        req.query.startDate,
+        req.query.endDate,
       );
       return responseHandler.succes(res, `Success get progress peserta`, result);
     } catch (error) {
