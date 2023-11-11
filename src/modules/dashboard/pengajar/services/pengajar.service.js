@@ -166,7 +166,7 @@ class PengajarService extends BaseService {
         });
       } else {
         filteredPeserta = sortedData.filter((peserta) => {
-          return peserta.toLowerCase().name.includes(pesertaName.toLowerCase());
+          return peserta.name.toLowerCase().includes(pesertaName.toLowerCase());
         });
       }
     }

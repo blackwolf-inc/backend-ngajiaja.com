@@ -100,7 +100,7 @@ class BimbinganService extends BaseService {
     return data;
   }
 
-  async bimbinganDone(id, pesertaName, periodDate) {
+  async bimbinganDone(id, pesertaName, startDate, endDate) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: STATUS_BIMBINGAN.FINISHED } },
       this.#includeQuery,
@@ -158,11 +158,12 @@ class BimbinganService extends BaseService {
       if (pesertaName.length < 3)
         throw ApiError.badRequest('Peserta name must be at least 3 characters');
 
-      if (periodDate) {
+      if (startDate && endDate) {
         filteredPeserta = data.filter((peserta) => {
           return (
             peserta.name.toLowerCase().includes(pesertaName.toLowerCase()) &&
-            peserta.period === periodDate
+            moment(peserta.period.split(' - ')[0]) >= moment(startDate) &&
+            moment(peserta.period.split(' - ')[1]) <= moment(endDate)
           );
         });
       } else {
@@ -172,9 +173,13 @@ class BimbinganService extends BaseService {
       }
     }
 
-    if (periodDate) {
+    if (startDate && endDate) {
       filteredPeserta = data.filter((peserta) => {
-        return peserta.period === periodDate;
+        return (
+          peserta.name.includes(pesertaName) &&
+          moment(peserta.period.split(' - ')[0]) >= moment(startDate) &&
+          moment(peserta.period.split(' - ')[1]) <= moment(endDate)
+        );
       });
     }
 

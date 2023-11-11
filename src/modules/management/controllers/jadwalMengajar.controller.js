@@ -54,7 +54,7 @@ class JadwalMengajar {
   }
 
   static async delete(req, res, next) {
-    const service = new JadwalMengajarService(req, JadwalMengajar);
+    const service = new JadwalMengajarService(req, JadwalMengajarPengajar);
     try {
       await service.checkJadwalId(req.params.id);
       await service.deleteData(req.params.id);
