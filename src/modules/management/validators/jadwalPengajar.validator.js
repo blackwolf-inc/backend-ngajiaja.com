@@ -98,6 +98,16 @@ const updateJadwalValidator = [
     .bail()
     .isIn([0, 1])
     .withMessage('User status_libur must be 0 / 1'),
+  check('status')
+    .if(body('status').exists())
+    .notEmpty()
+    .withMessage('Can not be empty')
+    .bail()
+    .isString()
+    .withMessage('Must be string')
+    .bail()
+    .isIn(['ACTIVE', 'INACTIVE'])
+    .withMessage('Jadwal status must be ACTIVE / INACTIVE'),
 ];
 
 module.exports = {
