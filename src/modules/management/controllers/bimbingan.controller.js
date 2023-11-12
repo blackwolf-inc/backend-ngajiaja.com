@@ -3,7 +3,7 @@ const PengajarService = require('../../dashboard/pengajar/services/pengajar.serv
 const UserService = require('../../registration/services/user.service');
 const responseHandler = require('../../../helpers/responseHandler');
 const db = require('../../../models/index');
-const { Period, BimbinganReguler, User } = db;
+const { Period, BimbinganReguler, User, BimbinganTambahan } = db;
 
 class BimbinganPeserta {
   static async getDataBimbingan(req, res, next) {
@@ -84,6 +84,16 @@ class BimbinganPeserta {
 
   static async updateReguler(req, res, next) {
     const service = new BimbinganService(req, BimbinganReguler);
+    try {
+      const result = await service.updateData(req.body, { id: req.params.id });
+      return responseHandler.succes(res, `Success update data ${service.db.name}s`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateTambahan(req, res, next) {
+    const service = new BimbinganService(req, BimbinganTambahan);
     try {
       const result = await service.updateData(req.body, { id: req.params.id });
       return responseHandler.succes(res, `Success update data ${service.db.name}s`, result);
