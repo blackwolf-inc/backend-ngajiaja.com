@@ -2,6 +2,7 @@ const BaseService = require('../../../base/base.service');
 const { JadwalMengajarPengajar, Pengajar } = require('../../../models');
 const ApiError = require('../../../helpers/errorHandler');
 const { Op } = require('sequelize');
+const { STATUS_JADWAL_PENGAJAR } = require('../../../helpers/constanta');
 const moment = require('moment');
 
 class PengajarService extends BaseService {
@@ -32,12 +33,9 @@ class PengajarService extends BaseService {
   }
 
   async createJadwalMengajar(payload) {
-    const timeString = payload.jam_mengajar;
-    const timeObject = moment(timeString, 'HH:mm').format('HH:mm:ss');
+    payload.status = STATUS_JADWAL_PENGAJAR.ACTIVE;
 
-    payload.jam_wawancara = timeObject;
-
-    const createdJadwalMengajar = await this.createData(payload);
+    const createdJadwalMengajar = await JadwalMengajarPengajar.create(payload);
     return createdJadwalMengajar;
   }
 
