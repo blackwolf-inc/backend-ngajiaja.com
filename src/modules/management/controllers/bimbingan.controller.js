@@ -101,6 +101,28 @@ class BimbinganPeserta {
       next(error);
     }
   }
+
+  static async getAllPeriodByPesertaId(req, res, next) {
+    const service = new BimbinganService(req, Period);
+    const user = req.user;
+    try {
+      const result = await service.getAllPeriod(user.id, req.query);
+      return responseHandler.succes(res, `Success get all ${service.db.name}s`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getOnePeriodByPesertaId(req, res, next) {
+    const service = new BimbinganService(req, Period);
+    const user = req.user;
+    try {
+      const result = await service.getOnePeriod(user.id, req.params.id);
+      return responseHandler.succes(res, `Success get data ${service.db.name}s`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = BimbinganPeserta;
