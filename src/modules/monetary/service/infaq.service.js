@@ -119,7 +119,7 @@ class InfaqService extends BaseService {
   }
 
   async getOneInfaqById(id) {
-    const result = await this.__findOne({ where: { id } });
+    const result = await this.__findOne({ where: { id } }, this.#includeQuery);
 
     let modifiedResult;
 
@@ -179,6 +179,30 @@ class InfaqService extends BaseService {
     };
     const result = await PenghasilanPengajar.create(data);
   }
+
+  #includeQuery = [
+    {
+      model: Pengajar,
+      required: true,
+      attributes: {
+        exclude: ['user_id'],
+      },
+      as: 'pengajar',
+      attributes: ['id'],
+      include: [
+        {
+          model: User,
+          required: true,
+          as: 'user',
+          attributes: ['nama'],
+        },
+      ],
+    },
+    {
+      model: Bank,
+      as: 'bank',
+    },
+  ];
 }
 
 module.exports = InfaqService;

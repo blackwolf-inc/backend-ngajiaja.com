@@ -46,6 +46,12 @@ const STATUS_PENCAIRAN = {
   REJECTED: 'REJECTED',
 };
 
+const STATUS_INFAQ = {
+  WAITING: 'WAITING',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+};
+
 module.exports = {
   USER_ROLE,
   STATUS_USER,
@@ -54,4 +60,5 @@ module.exports = {
   LEVEL_PESERTA,
   STATUS_JADWAL,
   STATUS_PENCAIRAN,
+  STATUS_INFAQ,
 };
