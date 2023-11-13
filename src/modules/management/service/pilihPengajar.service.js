@@ -1,8 +1,18 @@
 var moment = require('moment');
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
-const { Period, BimbinganReguler, BimbinganTambahan, Pengajar } = require('../../../models');
-
+const {
+  Period,
+  BimbinganReguler,
+  BimbinganTambahan,
+  Pengajar,
+  JadwalMengajarPengajar,
+  User,
+  sequelize,
+} = require('../../../models');
+const { Op } = require('sequelize');
+const { STATUS_JADWAL_PENGAJAR } = require('../../../helpers/constanta');
+const { QueryTypes } = require('sequelize');
 class PilihPengajar extends BaseService {
   async checkDays(hari_1, hari_2) {
     const arrayDays = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'];
@@ -32,36 +42,37 @@ class PilihPengajar extends BaseService {
   }
 
   async getAllPengajar(hari_1, jam_1, hari_2, jam_2) {
-    let query1 = {};
-    let query2 = {};
+    const pengajarList = await Pengajar.findAll({
+      include: [
+        {
+          model: User,
+          as: 'user',
+        },
+        {
+          model: JadwalMengajarPengajar,
+          required: true,
+          as: 'jadwal_mengajar',
+          where: {
+            [Op.and]: [
+              { hari_mengajar: { [Op.in]: [hari_1, hari_2] } },
+              { mulai_mengajar: { [Op.in]: [jam_1, jam_2] } },
+              { status: STATUS_JADWAL_PENGAJAR.ACTIVE },
+            ],
+          },
+        },
+      ],
+    });
 
-    if (hari_1 && jam_1) {
-      query1 = {
-        hari_mengajar: hari_1,
-        mulai_mengajar: jam_1,
+    const result = pengajarList.map((pengajar) => {
+      return {
+        id_pengajar: pengajar.id,
+        nama: pengajar.user.nama, // Sesuaikan dengan atribut yang ingin ditampilkan di frontend
+        jenis_kelamin: pengajar.user.jenis_kelamin,
+        jadwalActive: pengajar.jadwal_mengajar ? pengajar.jadwal_mengajar.length : 0,
       };
-    }
+    });
 
-    if (hari_2 && jam_2) {
-      query2 = {
-        hari_mengajar: hari_2,
-        mulai_mengajar: jam_2,
-      };
-    }
-
-    if (Object.keys(query1).length == 0 && Object.keys(query2).length == 0) {
-      const allData = await this.__findAll({}, this.#includeQuery);
-
-      return allData;
-    }
-
-    const [result1, result2] = await Promise.all([
-      this.__findAll({ where: query1 }, this.#includeQuery),
-      this.__findAll({ where: query2 }, this.#includeQuery),
-    ]);
-    const data = [result1, result2];
-
-    return data;
+    return result;
   }
 
   async createPeriode(payload) {
@@ -123,6 +134,180 @@ class PilihPengajar extends BaseService {
     return result;
   }
 
+  async checkJadwalDuplicate(user_id, period_id) {
+    const idPengajar = await sequelize.query(
+      `
+      SELECT id
+      FROM Pengajars
+      WHERE user_id = :userId
+    `,
+      {
+        replacements: { userId: user_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    const getPeriod = await sequelize.query(
+      `
+      SELECT *
+      FROM Periods
+      WHERE id = :periodId
+      `,
+      {
+        replacements: { periodId: period_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    // Get hari & jam pada period
+    let [hari_1, jam_1, hari_2, jam_2] = await Promise.all([
+      getPeriod[0].hari_1,
+      `${getPeriod[0].jam_1.split('-')[0]}:00`,
+      getPeriod[0].hari_2,
+      `${getPeriod[0].jam_2.split('-')[0]}:00`,
+    ]);
+
+    const checkHariJam1Exist = await JadwalMengajarPengajar.findOne({
+      where: {
+        pengajar_id: idPengajar[0].id,
+        hari_mengajar: hari_1,
+        mulai_mengajar: jam_1,
+        status: STATUS_JADWAL_PENGAJAR.INACTIVE,
+      },
+    });
+
+    if (checkHariJam1Exist) {
+      throw ApiError.badRequest(`Jadwal hari ${hari_1} / ${getPeriod[0].jam_1} sudah terisi!`);
+    }
+
+    const checkHariJam2Exist = await JadwalMengajarPengajar.findOne({
+      where: {
+        pengajar_id: idPengajar[0].id,
+        hari_mengajar: hari_2,
+        mulai_mengajar: jam_2,
+        status: STATUS_JADWAL_PENGAJAR.INACTIVE,
+      },
+    });
+
+    if (checkHariJam2Exist) {
+      throw ApiError.badRequest(`Jadwal hari ${hari_2} / ${getPeriod[0].jam_2} sudah terisi!`);
+    }
+    console.log(jam_1);
+    console.log(hari_2);
+    console.log(jam_2);
+  }
+
+  async autoUpdate(user_id, period_id, status) {
+    const idPengajar = await sequelize.query(
+      `
+      SELECT id
+      FROM Pengajars
+      WHERE user_id = :userId
+    `,
+      {
+        replacements: { userId: user_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    const getPeriod = await sequelize.query(
+      `
+      SELECT *
+      FROM Periods
+      WHERE id = :periodId
+      `,
+      {
+        replacements: { periodId: period_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    // Get hari & jam pada period
+    let [hari_1, jam_1, hari_2, jam_2] = await Promise.all([
+      getPeriod[0].hari_1,
+      `${getPeriod[0].jam_1.split('-')[0]}:00`,
+      getPeriod[0].hari_2,
+      `${getPeriod[0].jam_2.split('-')[0]}:00`,
+    ]);
+
+    //Get id jadwal mengajar
+    let [idJadwalMengajar1, idJadwalMengajar2] = await Promise.all([
+      sequelize.query(
+        `
+        SELECT *
+        FROM JadwalMengajarPengajars
+        WHERE pengajar_id = :pengajarId AND hari_mengajar = :hari1 AND mulai_mengajar = :jam1 
+        `,
+        {
+          replacements: { pengajarId: idPengajar[0].id, hari1: hari_1, jam1: jam_1 },
+          type: QueryTypes.SELECT,
+        }
+      ),
+      sequelize.query(
+        `
+        SELECT *
+        FROM JadwalMengajarPengajars
+        WHERE pengajar_id = :pengajarId AND hari_mengajar = :hari2 AND mulai_mengajar = :jam2
+        `,
+        {
+          replacements: { pengajarId: idPengajar[0].id, hari2: hari_2, jam2: jam_2 },
+          type: QueryTypes.SELECT,
+        }
+      ),
+    ]);
+
+    console.log(idJadwalMengajar1[0].id);
+    console.log(idJadwalMengajar2[0].id);
+
+    const updateHari1 = await sequelize.transaction(async (t) => {
+      const data = await JadwalMengajarPengajar.update(
+        { status: status },
+        {
+          where: {
+            pengajar_id: idPengajar[0].id,
+            hari_mengajar: hari_1,
+            mulai_mengajar: jam_1,
+          },
+        },
+        { transaction: t }
+      );
+
+      if (data.length > 0) {
+        const afterUpdateData = await JadwalMengajarPengajar.findOne({
+          where: { id: idJadwalMengajar1[0].id },
+        });
+        return afterUpdateData;
+      } else {
+        throw new Error(`Failed update`);
+      }
+    });
+
+    const updateHari2 = await sequelize.transaction(async (t) => {
+      const data = await JadwalMengajarPengajar.update(
+        { status: status },
+        {
+          where: {
+            pengajar_id: idPengajar[0].id,
+            hari_mengajar: hari_2,
+            mulai_mengajar: jam_2,
+          },
+        },
+        { transaction: t }
+      );
+
+      if (data.length > 0) {
+        const afterUpdateData = await JadwalMengajarPengajar.findOne({
+          where: { id: idJadwalMengajar2[0].id },
+        });
+        return afterUpdateData;
+      } else {
+        throw new Error(`Failed update`);
+      }
+    });
+
+    return { updateHari1, updateHari2 };
+  }
+
   // async updateTanggal(id) {
   //   const prefDaysSet = new Set();
   //   const userPrefDays = await Period.findOne({
@@ -152,6 +337,19 @@ class PilihPengajar extends BaseService {
   // }
 
   #includeQuery = [
+    {
+      model: Pengajar,
+      as: 'pengajar',
+      include: [
+        {
+          model: JadwalMengajarPengajar,
+          as: 'jadwal_mengajar',
+        },
+      ],
+    },
+  ];
+
+  #includeQueryFilter = [
     {
       model: Pengajar,
       as: 'pengajar',
