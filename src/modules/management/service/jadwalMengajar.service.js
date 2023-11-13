@@ -4,7 +4,6 @@ const {
   Pengajar,
   User,
   Period,
-  JadwalBimbinganPeserta,
   Peserta,
   BimbinganReguler,
   BimbinganTambahan,
@@ -36,7 +35,6 @@ class PengajarService extends BaseService {
     const result = await this.__findAll({ where: { pengajar_id: id } }, this.#includeQuery);
     if (!result) throw ApiError.notFound(`Jadwal with pengajar id ${id} not found`);
 
-    // return result;
     const data = [];
     for (const jadwal of result.datas) {
       for (const period of jadwal.pengajar.period) {
@@ -44,8 +42,21 @@ class PengajarService extends BaseService {
         const endTime = jadwal.selesai_mengajar.toString().slice(0, -3);
         const timeMengajar = `${startTime}-${endTime}`;
         let isSameJadwal = false;
+        let dataJadwalBimbingan;
+
+        if (period.length === 0) {
+          dataJadwalBimbingan = this.#dataJadwalBimbinganAvailable(jadwal, timeMengajar);
+          data.push(dataJadwalBimbingan);
+          continue;
+        }
 
         if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
+          if (period.bimbingan_reguler.length === 0) {
+            dataJadwalBimbingan = this.#dataJadwalBimbinganAvailable(jadwal, timeMengajar);
+            data.push(dataJadwalBimbingan);
+            continue;
+          }
+
           for (let i = 0; i < 2; i++) {
             if (period.bimbingan_reguler[i].hari_bimbingan === jadwal.hari_mengajar) {
               if (period.bimbingan_reguler[i].jam_bimbingan === timeMengajar) {
@@ -56,6 +67,12 @@ class PengajarService extends BaseService {
         }
 
         if (period.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
+          if (period.bimbingan_tambahan.length === 0) {
+            dataJadwalBimbingan = this.#dataJadwalBimbinganAvailable(jadwal, timeMengajar);
+            data.push(dataJadwalBimbingan);
+            continue;
+          }
+
           for (let i = 0; i < 2; i++) {
             if (period.bimbingan_tambahan[i].hari_bimbingan === jadwal.hari_mengajar) {
               if (period.bimbingan_tambahan[i].jam_bimbingan === timeMengajar) {
@@ -65,27 +82,10 @@ class PengajarService extends BaseService {
           }
         }
 
-        let dataJadwalBimbingan;
         if (isSameJadwal && period.status === STATUS_BIMBINGAN.ACTIVATED) {
-          dataJadwalBimbingan = {
-            jadwal_id: jadwal.id,
-            peserta_id: period.peserta.id,
-            user_id: period.peserta.User.id,
-            name: period.peserta.User.nama,
-            status: STATUS_JADWAL.BIMBINGAN,
-            day: jadwal.hari_mengajar,
-            time: timeMengajar,
-          };
+          dataJadwalBimbingan = this.#dataJadwalBimbingan(jadwal, period, timeMengajar);
         } else {
-          dataJadwalBimbingan = {
-            jadwal_id: jadwal.id,
-            peserta_id: null,
-            user_id: null,
-            name: null,
-            status: STATUS_JADWAL.AVAILABLE,
-            day: jadwal.hari_mengajar,
-            time: timeMengajar,
-          };
+          dataJadwalBimbingan = this.#dataJadwalBimbinganAvailable(jadwal, timeMengajar);
         }
 
         data.push(dataJadwalBimbingan);
@@ -172,6 +172,30 @@ class PengajarService extends BaseService {
       total_available: jadwalAvailable,
       total_bimbingan: jadwalBimbingan,
       total_jadwal: result.length,
+    };
+  }
+
+  #dataJadwalBimbingan(jadwal, period, timeMengajar) {
+    return {
+      jadwal_id: jadwal.id,
+      peserta_id: period.peserta.id,
+      user_id: period.peserta.User.id,
+      name: period.peserta.User.nama,
+      status: STATUS_JADWAL.BIMBINGAN,
+      day: jadwal.hari_mengajar,
+      time: timeMengajar,
+    };
+  }
+
+  #dataJadwalBimbinganAvailable(jadwal, timeMengajar) {
+    return {
+      jadwal_id: jadwal.id,
+      peserta_id: null,
+      user_id: null,
+      name: null,
+      status: STATUS_JADWAL.AVAILABLE,
+      day: jadwal.hari_mengajar,
+      time: timeMengajar,
     };
   }
 
