@@ -45,7 +45,6 @@ class PengajarService extends BaseService {
       if (jadwal.pengajar.period.length === 0) {
         dataJadwalBimbingan = this.#dataJadwalBimbinganAvailable(jadwal, timeMengajar);
         data.push(dataJadwalBimbingan);
-        continue;
       } else {
         for (const period of jadwal.pengajar.period) {
           let isSameJadwal = false;
