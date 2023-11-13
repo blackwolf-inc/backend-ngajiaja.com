@@ -5,15 +5,19 @@ const {
   JadwalBimbinganPeserta,
   User,
   Peserta,
+  Pengajar,
   BimbinganReguler,
   BimbinganTambahan,
+  Period,
+  sequelize,
 } = require('../../../models');
+const { QueryTypes, Op } = require('sequelize');
 
 class BimbinganService extends BaseService {
   async bimbinganOnGoing(id, pesertaName, level) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: STATUS_BIMBINGAN.ACTIVATED } },
-      this.#includeQuery,
+      this.#includeQuery
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
@@ -105,7 +109,7 @@ class BimbinganService extends BaseService {
   async bimbinganDone(id, pesertaName, periodDate) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: STATUS_BIMBINGAN.FINISHED } },
-      this.#includeQuery,
+      this.#includeQuery
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
@@ -189,7 +193,7 @@ class BimbinganService extends BaseService {
   async detailBimbingan(id, pengajarId) {
     const result = await this.__findOne(
       { where: { id, pengajar_id: pengajarId } },
-      this.#includeQuery,
+      this.#includeQuery
     );
     if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
 
@@ -249,6 +253,91 @@ class BimbinganService extends BaseService {
       level: result.peserta.level,
       data,
     };
+  }
+
+  async getAllPeriod(user_id, req) {
+    const pesertaId = await sequelize.query(
+      `
+      SELECT *
+      FROM Pesertas
+      WHERE user_id = :userId
+      `,
+      {
+        replacements: { userId: user_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    const period = await Period.findAll({
+      where: { peserta_id: pesertaId[0].id, status: req.status },
+      include: [
+        {
+          model: Pengajar,
+          as: 'pengajar',
+          include: [
+            {
+              model: User,
+              as: 'user',
+            },
+          ],
+        },
+        {
+          model: BimbinganReguler,
+          as: 'bimbingan_reguler',
+          where: {
+            absensi_peserta: 1,
+            absensi_pengajar: 1,
+          },
+          required: false,
+        },
+      ],
+    });
+
+    const result = period.map((data) => {
+      const totalBimbinganReguler = data.bimbingan_reguler.length;
+      return {
+        nama: data.pengajar.user.nama,
+        jenis_kelamin: data.pengajar.user.jenis_kelamin,
+        hari_1: data.hari_1,
+        jam_1: data.jam_1,
+        hari_2: data.hari_2,
+        jam_2: data.jam_2,
+        jumlah_bimbingan: totalBimbinganReguler,
+        status: data.status,
+      };
+    });
+
+    return result;
+  }
+
+  async getOnePeriod(user_id, period_id) {
+    const pesertaId = await sequelize.query(
+      `
+      SELECT *
+      FROM Pesertas
+      WHERE user_id = :userId
+      `,
+      {
+        replacements: { userId: user_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    const bimbingan = await Period.findOne({
+      where: { peserta_id: pesertaId[0].id, id: period_id },
+      include: [
+        {
+          model: BimbinganReguler,
+          as: 'bimbingan_reguler',
+        },
+        {
+          model: BimbinganTambahan,
+          as: 'bimbingan_tambahan',
+        },
+      ],
+    });
+
+    return bimbingan;
   }
 
   #includeQuery = [
