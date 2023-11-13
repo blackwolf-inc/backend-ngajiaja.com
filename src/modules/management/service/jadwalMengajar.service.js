@@ -37,58 +37,59 @@ class PengajarService extends BaseService {
 
     const data = [];
     for (const jadwal of result.datas) {
-      for (const period of jadwal.pengajar.period) {
-        const startTime = jadwal.mulai_mengajar.toString().slice(0, -3);
-        const endTime = jadwal.selesai_mengajar.toString().slice(0, -3);
-        const timeMengajar = `${startTime}-${endTime}`;
-        let isSameJadwal = false;
-        let dataJadwalBimbingan;
+      const startTime = jadwal.mulai_mengajar.toString().slice(0, -3);
+      const endTime = jadwal.selesai_mengajar.toString().slice(0, -3);
+      const timeMengajar = `${startTime}-${endTime}`;
+      let dataJadwalBimbingan;
 
-        if (period.length === 0) {
-          dataJadwalBimbingan = this.#dataJadwalBimbinganAvailable(jadwal, timeMengajar);
-          data.push(dataJadwalBimbingan);
-          continue;
-        }
-
-        if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
-          if (period.bimbingan_reguler.length === 0) {
-            dataJadwalBimbingan = this.#dataJadwalBimbinganAvailable(jadwal, timeMengajar);
-            data.push(dataJadwalBimbingan);
-            continue;
-          }
-
-          for (let i = 0; i < 2; i++) {
-            if (period.bimbingan_reguler[i].hari_bimbingan === jadwal.hari_mengajar) {
-              if (period.bimbingan_reguler[i].jam_bimbingan === timeMengajar) {
-                isSameJadwal = true;
-              }
-            }
-          }
-        }
-
-        if (period.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
-          if (period.bimbingan_tambahan.length === 0) {
-            dataJadwalBimbingan = this.#dataJadwalBimbinganAvailable(jadwal, timeMengajar);
-            data.push(dataJadwalBimbingan);
-            continue;
-          }
-
-          for (let i = 0; i < 2; i++) {
-            if (period.bimbingan_tambahan[i].hari_bimbingan === jadwal.hari_mengajar) {
-              if (period.bimbingan_tambahan[i].jam_bimbingan === timeMengajar) {
-                isSameJadwal = true;
-              }
-            }
-          }
-        }
-
-        if (isSameJadwal && period.status === STATUS_BIMBINGAN.ACTIVATED) {
-          dataJadwalBimbingan = this.#dataJadwalBimbingan(jadwal, period, timeMengajar);
-        } else {
-          dataJadwalBimbingan = this.#dataJadwalBimbinganAvailable(jadwal, timeMengajar);
-        }
-
+      if (jadwal.pengajar.period.length === 0) {
+        dataJadwalBimbingan = this.#dataJadwalBimbinganAvailable(jadwal, timeMengajar);
         data.push(dataJadwalBimbingan);
+        continue;
+      } else {
+        for (const period of jadwal.pengajar.period) {
+          let isSameJadwal = false;
+
+          if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
+            if (period.bimbingan_reguler.length === 0) {
+              dataJadwalBimbingan = this.#dataJadwalBimbinganAvailable(jadwal, timeMengajar);
+              data.push(dataJadwalBimbingan);
+              continue;
+            }
+
+            for (let i = 0; i < 2; i++) {
+              if (period.bimbingan_reguler[i].hari_bimbingan === jadwal.hari_mengajar) {
+                if (period.bimbingan_reguler[i].jam_bimbingan === timeMengajar) {
+                  isSameJadwal = true;
+                }
+              }
+            }
+          }
+
+          if (period.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
+            if (period.bimbingan_tambahan.length === 0) {
+              dataJadwalBimbingan = this.#dataJadwalBimbinganAvailable(jadwal, timeMengajar);
+              data.push(dataJadwalBimbingan);
+              continue;
+            }
+
+            for (let i = 0; i < 2; i++) {
+              if (period.bimbingan_tambahan[i].hari_bimbingan === jadwal.hari_mengajar) {
+                if (period.bimbingan_tambahan[i].jam_bimbingan === timeMengajar) {
+                  isSameJadwal = true;
+                }
+              }
+            }
+          }
+
+          if (isSameJadwal && period.status === STATUS_BIMBINGAN.ACTIVATED) {
+            dataJadwalBimbingan = this.#dataJadwalBimbingan(jadwal, period, timeMengajar);
+          } else {
+            dataJadwalBimbingan = this.#dataJadwalBimbinganAvailable(jadwal, timeMengajar);
+          }
+
+          data.push(dataJadwalBimbingan);
+        }
       }
     }
 
