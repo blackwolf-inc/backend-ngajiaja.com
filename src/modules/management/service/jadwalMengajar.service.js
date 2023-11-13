@@ -118,7 +118,6 @@ class PengajarService extends BaseService {
       filteredData = uniqueData;
     }
 
-    if (filteredData.length === 0) throw ApiError.notFound(`Jadwal not found`);
     return filteredData;
   }
 
