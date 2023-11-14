@@ -195,7 +195,8 @@ class AdminPengajarService {
   }
 
   async getPesertaPengajarVerified(query, status, keyword, level) {
-    const { page = 1, pageSize = 10 } = query;
+    const { pageSize = 10 } = query;
+    let page = query.page ? parseInt(query.page) : 1;
     const offset = (page - 1) * pageSize;
 
     let whereClause = "WHERE u.role = 'PENGAJAR' AND u.status IN ('ACTIVE', 'NONACTIVE')";
