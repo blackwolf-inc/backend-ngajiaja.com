@@ -126,18 +126,18 @@ class PengajarService extends BaseService {
             level: period.peserta.level,
           };
 
-          if (!period.link_meet) {
+          if (!bimbinganReguler.link_meet) {
             bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.NOT_SET;
           }
 
-          if (period.link_meet && moment().isBefore(bimbinganOnGoing.date)) {
+          if (bimbinganReguler.link_meet && moment().isBefore(bimbinganOnGoing.date)) {
             bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.WAITING;
           }
 
           if (
-            period.link_meet &&
+            bimbinganReguler.link_meet &&
             !bimbinganReguler.catatan_pengajar &&
-            moment().isAfter(bimbinganOnGoing.date)
+            moment().isAfter(moment(bimbinganOnGoing.date))
           ) {
             bimbinganOnGoing.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
           }
@@ -162,18 +162,18 @@ class PengajarService extends BaseService {
             level: period.peserta.level,
           };
 
-          if (!period.link_meet) {
+          if (!bimbinganTambahan.link_meet) {
             bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.NOT_SET;
           }
 
-          if (period.link_meet && moment().isBefore(bimbinganOnGoing.date)) {
+          if (bimbinganTambahan.link_meet && moment().isBefore(bimbinganOnGoing.date)) {
             bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.WAITING;
           }
 
           if (
-            period.link_meet &&
+            bimbinganTambahan.link_meet &&
             !bimbinganTambahan.catatan_pengajar &&
-            moment().isAfter(bimbinganOnGoing.date)
+            moment().isAfter(moment(bimbinganOnGoing.date))
           ) {
             bimbinganOnGoing.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
           }
