@@ -2,7 +2,6 @@ const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
 const { TYPE_BIMBINGAN, STATUS_BIMBINGAN } = require('../../../helpers/constanta');
 const {
-  JadwalBimbinganPeserta,
   User,
   Peserta,
   Pengajar,
@@ -11,8 +10,7 @@ const {
   Period,
   sequelize,
 } = require('../../../models');
-const { QueryTypes, Op } = require('sequelize');
-const { User, Peserta, Pengajar, BimbinganReguler, BimbinganTambahan } = require('../../../models');
+const { QueryTypes } = require('sequelize');
 const moment = require('moment');
 
 class BimbinganService extends BaseService {
