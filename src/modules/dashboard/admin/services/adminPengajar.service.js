@@ -107,6 +107,8 @@ class AdminPengajarService {
         link_wawancara: payload.link_wawancara,
         tanggal_wawancara: payload.tanggal_wawancara,
         jam_wawancara: payload.jam_wawancara,
+        isVerifiedByAdmin: payload.isVerifiedByAdmin,
+        level: payload.level_pengajar,
       },
       { id: user.pengajar.id }
     );
@@ -116,6 +118,8 @@ class AdminPengajarService {
       link_wawancara: afterUpdateJadwal.link_wawancara,
       tanggal_wawancara: afterUpdateJadwal.tanggal_wawancara,
       jam_wawancara: afterUpdateJadwal.jam_wawancara,
+      isVerifiedByAdmin: afterUpdateJadwal.isVerifiedByAdmin,
+      level: afterUpdateJadwal.level,
     };
   }
 
@@ -191,7 +195,8 @@ class AdminPengajarService {
   }
 
   async getPesertaPengajarVerified(query, status, keyword, level) {
-    const { page = 1, pageSize = 10 } = query;
+    const { pageSize = 10 } = query;
+    let page = query.page ? parseInt(query.page) : 1;
     const offset = (page - 1) * pageSize;
 
     let whereClause = "WHERE u.role = 'PENGAJAR' AND u.status IN ('ACTIVE', 'NONACTIVE')";

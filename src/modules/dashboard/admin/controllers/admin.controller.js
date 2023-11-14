@@ -18,7 +18,7 @@ class AdminDashboardController {
     const service = new AdminPengajarService();
     try {
       const { userId } = req.params;
-      const { link_wawancara, tanggal_wawancara, jam_wawancara, status_pengajar } = req.body;
+      const { link_wawancara, tanggal_wawancara, jam_wawancara, status_pengajar, isVerifiedByAdmin, level_pengajar } = req.body;
       const result = await service.updateJadwalWawancara(
         req,
         {
@@ -26,6 +26,8 @@ class AdminDashboardController {
           tanggal_wawancara,
           jam_wawancara,
           status_pengajar,
+          isVerifiedByAdmin,
+          level_pengajar
         },
         userId
       );
