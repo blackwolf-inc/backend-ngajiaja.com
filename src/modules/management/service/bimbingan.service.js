@@ -290,20 +290,29 @@ class BimbinganService extends BaseService {
           },
           required: false,
         },
+        {
+          model: BimbinganTambahan,
+          as: 'bimbingan_tambahan',
+          required: false,
+        },
       ],
     });
 
     const result = period.map((data) => {
       const totalBimbinganReguler = data.bimbingan_reguler.length;
       return {
+        id: data.id,
         nama: data.pengajar.user.nama,
         jenis_kelamin: data.pengajar.user.jenis_kelamin,
         hari_1: data.hari_1,
         jam_1: data.jam_1,
         hari_2: data.hari_2,
         jam_2: data.jam_2,
-        jumlah_bimbingan: totalBimbinganReguler,
+        jumlah_attedance_bimbingan_regular: totalBimbinganReguler ? totalBimbinganReguler : 0,
+        tipe_bimbingan: data.tipe_bimbingan,
         status: data.status,
+        infaq_bimbingan_tambahan_sebelum:
+          data.bimbingan_tambahan.length > 0 ? data.bimbingan_tambahan[0].tanggal : null,
       };
     });
 
