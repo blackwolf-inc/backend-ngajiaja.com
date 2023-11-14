@@ -46,10 +46,10 @@ class TeacherController {
 
   static async update(req, res, next) {
     const service = new TeacherService(req, Pengajar);
-    console.log('req.params.id');
-    console.log(req.params.id);
     try {
-      // const result = await service.updateTeacherByUserId(req.body, req.params.id);
+      if (req.body.tanggal_wawancara) {
+        await service.updateStatusUserWhenInterviewSet(req.params.id);
+      }
       const result = await service.updateTeacherByUserId(req.body, req.params.id);
       return responseHandler.succes(res, `Success update ${service.db.name}`, result);
     } catch (error) {
