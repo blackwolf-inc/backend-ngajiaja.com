@@ -3,6 +3,7 @@ const ApiError = require('../../../helpers/errorHandler');
 const SendEmailNotification = require('../../../utils/nodemailer');
 const moment = require('moment');
 const { User, Pengajar } = require('../../../models');
+const { STATUS_USER } = require('../../../helpers/constanta');
 
 class TeacherService extends BaseService {
   async createTeacher(payload) {
@@ -85,6 +86,12 @@ class TeacherService extends BaseService {
       name,
     });
     return SendEmailNotification.sendMail(email, 'Register Pengajar Notification', getHtml);
+  }
+
+  async updateStatusUserWhenInterviewSet(user_id) {
+    const result = await User.update({ status: STATUS_USER.WAITING }, { where: { id: user_id } });
+
+    return result;
   }
 }
 
