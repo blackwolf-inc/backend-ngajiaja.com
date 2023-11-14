@@ -107,6 +107,8 @@ class AdminPengajarService {
         link_wawancara: payload.link_wawancara,
         tanggal_wawancara: payload.tanggal_wawancara,
         jam_wawancara: payload.jam_wawancara,
+        isVerifiedByAdmin: payload.isVerifiedByAdmin,
+        level: payload.level_pengajar,
       },
       { id: user.pengajar.id }
     );
@@ -116,6 +118,8 @@ class AdminPengajarService {
       link_wawancara: afterUpdateJadwal.link_wawancara,
       tanggal_wawancara: afterUpdateJadwal.tanggal_wawancara,
       jam_wawancara: afterUpdateJadwal.jam_wawancara,
+      isVerifiedByAdmin: afterUpdateJadwal.isVerifiedByAdmin,
+      level: afterUpdateJadwal.level,
     };
   }
 
