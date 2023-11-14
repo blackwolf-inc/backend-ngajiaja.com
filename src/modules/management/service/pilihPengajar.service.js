@@ -122,16 +122,48 @@ class PilihPengajar extends BaseService {
     return records;
   }
 
-  async createBimbinganTambahan(id, hari_bimbingan, jam_bimbingan) {
-    const query = {
-      period_id: id,
-      hari_bimbingan,
-      jam_bimbingan,
-    };
+  async createBimbinganTambahan(id, hari_1, jam_1, hari_2, jam_2) {
+    const records = [];
+    const dateNow = moment(new Date()).format('YYYY-MM-DD');
+    const dateVerifikasi = moment(dateNow).add('days', 4).format('YYYY-MM-DD');
+    const dateDiff = 30;
 
-    const result = await BimbinganTambahan.create(query);
+    let dateThisMonth = dateVerifikasi;
+    let createdHari1 = false; // Flag to track whether a record is created for hari_1
+    let createdHari2 = false; // Flag to track whether a record is created for hari_2
 
-    return result;
+    for (let i = 1; i <= dateDiff; i++) {
+      if (!createdHari1 && hari_1 == moment(dateThisMonth).format('dddd')?.toUpperCase()) {
+        const query = {
+          period_id: id,
+          tanggal: moment(dateThisMonth).format('YYYY-MM-DD'),
+          hari_bimbingan: hari_1,
+          jam_bimbingan: jam_1,
+        };
+        const result = await BimbinganTambahan.create(query);
+        records.push(result);
+        createdHari1 = true; // Set the flag to true after creating a record for hari_1
+      } else if (!createdHari2 && hari_2 == moment(dateThisMonth).format('dddd')?.toUpperCase()) {
+        const query = {
+          period_id: id,
+          tanggal: moment(dateThisMonth).format('YYYY-MM-DD'),
+          hari_bimbingan: hari_2,
+          jam_bimbingan: jam_2,
+        };
+        const result = await BimbinganTambahan.create(query);
+        records.push(result);
+        createdHari2 = true; // Set the flag to true after creating a record for hari_2
+      }
+
+      // If both records are created, exit the loop
+      if (createdHari1 && createdHari2) {
+        break;
+      }
+
+      dateThisMonth = moment(dateThisMonth).add('days', 1).format('YYYY-MM-DD');
+    }
+
+    return records;
   }
 
   async checkJadwalDuplicate(user_id, period_id) {
@@ -307,54 +339,6 @@ class PilihPengajar extends BaseService {
 
     return { updateHari1, updateHari2 };
   }
-
-  // async updateTanggal(id) {
-  //   const prefDaysSet = new Set();
-  //   const userPrefDays = await Period.findOne({
-  //     where: { id },
-  //     include: [
-  //       {
-  //         model: BimbinganReguler,
-  //         as: 'bimbingan_reguler',
-  //       },
-  //     ],
-  //   });
-
-  //   userPrefDays.bimbingan_reguler.forEach((element) => {
-  //     prefDaysSet.add(element.hari_bimbingan);
-  //   });
-
-  //   const arrayDaysSet = Array.from(prefDaysSet);
-
-  //   const userPrefDay1 = arrayDaysSet[0];
-  //   const userPrefDay2 = arrayDaysSet[1];
-
-  //   // return {
-  //   //   userPrefDay1,
-  //   //   userPrefDay2,
-  //   // };
-  //   // const mentorAcceptanceDay = new Date();
-  // }
-
-  #includeQuery = [
-    {
-      model: Pengajar,
-      as: 'pengajar',
-      include: [
-        {
-          model: JadwalMengajarPengajar,
-          as: 'jadwal_mengajar',
-        },
-      ],
-    },
-  ];
-
-  #includeQueryFilter = [
-    {
-      model: Pengajar,
-      as: 'pengajar',
-    },
-  ];
 }
 
 module.exports = PilihPengajar;
