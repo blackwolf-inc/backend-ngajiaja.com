@@ -1,6 +1,10 @@
 const BaseService = require('../../../../base/base.service');
 const ApiError = require('../../../../helpers/errorHandler');
-const { TYPE_BIMBINGAN, STATUS_BIMBINGAN } = require('../../../../helpers/constanta');
+const {
+  TYPE_BIMBINGAN,
+  STATUS_BIMBINGAN,
+  STATUS_BIMBINGAN_ACTIVE,
+} = require('../../../../helpers/constanta');
 const { BimbinganReguler, BimbinganTambahan, Peserta, User } = require('../../../../models');
 const moment = require('moment');
 
@@ -122,6 +126,22 @@ class PengajarService extends BaseService {
             level: period.peserta.level,
           };
 
+          if (!period.link_meet) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.NOT_SET;
+          }
+
+          if (period.link_meet && moment().isBefore(bimbinganOnGoing.date)) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.WAITING;
+          }
+
+          if (
+            period.link_meet &&
+            !bimbinganReguler.catatan_pengajar &&
+            moment().isAfter(bimbinganOnGoing.date)
+          ) {
+            bimbinganOnGoing.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
+          }
+
           data.push(bimbinganOnGoing);
         }
       }
@@ -141,6 +161,22 @@ class PengajarService extends BaseService {
             time: bimbinganTambahan.jam_bimbingan,
             level: period.peserta.level,
           };
+
+          if (!period.link_meet) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.NOT_SET;
+          }
+
+          if (period.link_meet && moment().isBefore(bimbinganOnGoing.date)) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.WAITING;
+          }
+
+          if (
+            period.link_meet &&
+            !bimbinganTambahan.catatan_pengajar &&
+            moment().isAfter(bimbinganOnGoing.date)
+          ) {
+            bimbinganOnGoing.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
+          }
 
           data.push(bimbinganOnGoing);
         }
