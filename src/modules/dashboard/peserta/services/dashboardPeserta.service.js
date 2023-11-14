@@ -1,7 +1,8 @@
 const { QueryTypes, where } = require('sequelize');
 // const ApiError = require('../../../helpers/errorHandler');
 const db = require('../../../../models/index');
-const { User, BimbinganReguler, BimbinganTambahan, Pengajar, Period, sequelize } = db;
+const { User, BimbinganReguler, BimbinganTambahan, Pengajar, JadwalMengajarPengajar, sequelize } =
+  db;
 const BaseService = require('./../../../../base/base.service');
 const { Op } = require('sequelize');
 
@@ -124,8 +125,12 @@ class DashboardPesertaService extends BaseService {
             model: User,
             as: 'user',
             required: true,
-            attributes: ['nama'],
+            attributes: ['nama', 'jenis_kelamin'],
             where: userWhere,
+          },
+          {
+            model: JadwalMengajarPengajar,
+            as: 'jadwal_mengajar',
           },
         ],
       },

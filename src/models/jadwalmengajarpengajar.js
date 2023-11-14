@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       mulai_mengajar: DataTypes.TIME,
       selesai_mengajar: DataTypes.TIME,
       status_libur: DataTypes.INTEGER,
+      status: DataTypes.STRING,
     },
     {
       sequelize,

@@ -31,7 +31,7 @@ router.post(
   '/jadwal-pengajar',
   validate(createJadwalMengajarValidator),
   hasRole([USER_ROLE.PENGAJAR]),
-  JadwalMengajar.create,
+  JadwalMengajar.create
 );
 router.get('/jadwal-pengajar/jadwal', JadwalMengajar.getDataJadwalMengajar);
 router.get('/jadwal-pengajar', JadwalMengajar.getAll);
@@ -39,13 +39,13 @@ router.get('/jadwal-pengajar/:id', JadwalMengajar.getOne);
 router.patch(
   '/jadwal-pengajar/:id',
   validate(updateJadwalValidator),
-  hasRole([USER_ROLE.PENGAJAR]),
-  JadwalMengajar.update,
+  // hasRole([USER_ROLE.PENGAJAR]),
+  JadwalMengajar.update
 );
 router.delete(
   '/jadwal-pengajar/:id',
   hasRole([USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN, USER_ROLE.PENGAJAR]),
-  JadwalMengajar.delete,
+  JadwalMengajar.delete
 );
 
 // pilih pengajar
@@ -56,7 +56,7 @@ router.post('/bimbingan-pengajar', validate(createPilihPengajarValidator), Pilih
 router.patch(
   '/bimbingan-pengajar/:id',
   validate(updatePilihPengajarValidator),
-  PilihPengajar.update,
+  PilihPengajar.update
 );
 router.delete('/bimbingan-pengajar/:id', PilihPengajar.delete);
 
@@ -64,12 +64,12 @@ router.delete('/bimbingan-pengajar/:id', PilihPengajar.delete);
 router.post(
   '/bimbingan-tambahan-pengajar',
   validate(createTambahanValidator),
-  PilihPengajar.createTambahan,
+  PilihPengajar.createTambahan
 );
 router.patch(
   '/bimbingan-tambahan-pengajar/:id',
   validate(createTambahanValidator),
-  PilihPengajar.createTambahan,
+  PilihPengajar.createTambahan
 );
 
 // Management Bimbingan Peserta & Pengajar
@@ -82,6 +82,18 @@ router.get('/bimbingan/detail/bimbingan-saya/:id', Bimbingan.getOneBimbingan);
 router.get('/bimbingan/detail/progress-peserta/:id', Bimbingan.getProgressPeserta);
 
 // Management Bimbingan Peserta & Pengajar
-router.patch('/bimbingan/:id', validate(updateBimbinganValidator), Bimbingan.updateReguler);
+router.patch('/bimbingan-reguler/:id', validate(updateBimbinganValidator), Bimbingan.updateReguler);
+router.patch(
+  '/bimbingan-tambahan/:id',
+  validate(updateBimbinganValidator),
+  Bimbingan.updateTambahan
+);
+
+// Read Bimbingan Peserta
+router.get('/bimbingan-peserta', Bimbingan.getAllPeriodByPesertaId);
+router.get('/bimbingan-peserta/:id', Bimbingan.getOnePeriodByPesertaId);
+
+//Testendpoint
+router.get('/testing-test/:id', PilihPengajar.update);
 
 module.exports = router;
