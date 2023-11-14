@@ -42,7 +42,6 @@ module.exports = (sequelize, DataTypes) => {
       pengajar_id: DataTypes.INTEGER,
       status: DataTypes.STRING,
       catatan_peserta: DataTypes.TEXT,
-      link_meet: DataTypes.STRING,
       tanggal_pengingat_infaq: DataTypes.DATEONLY,
       ingatkan_infaq_tiap_2_kali_bimbingan: DataTypes.INTEGER,
       hari_1: DataTypes.STRING,

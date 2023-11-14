@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
       catatan_pengajar: DataTypes.TEXT,
       keterangan_izin_peserta: DataTypes.TEXT,
       tanggal_pengingat_infaq: DataTypes.DATEONLY,
+      link_meet: DataTypes.STRING,
     },
     {
       sequelize,
