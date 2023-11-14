@@ -19,11 +19,8 @@ class InfaqController {
     const service = new InfaqService(req, Infaq);
     const user = req.user;
     try {
-      // let userData = {};
-      // const user = {
-      //   id: 23,
-      //   role: 'PENGAJAR',
-      // };
+      let userData = {};
+
       if (user.role == 'PESERTA') {
         userData = await service.getPesertaByUserId(user.id);
       } else {
@@ -46,6 +43,7 @@ class InfaqController {
         service.checkPeriodById(req.body),
         service.checkBankById(req.body),
         service.updateDateNow(req),
+        service.updateImages(req),
       ]);
       const result = await service.createData(req.body);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);

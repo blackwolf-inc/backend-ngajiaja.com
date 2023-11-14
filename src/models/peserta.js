@@ -22,6 +22,12 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
+      Peserta.hasMany(models.PenghasilanPengajar, {
+        foreignKey: 'peserta_id',
+        as: 'penghasilan_pengajar',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
     }
   }
   Peserta.init(
@@ -51,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       tableName: 'Pesertas',
       modelName: 'Peserta',
-    }
+    },
   );
   return Peserta;
 };

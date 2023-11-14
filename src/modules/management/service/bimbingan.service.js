@@ -12,6 +12,8 @@ const {
   sequelize,
 } = require('../../../models');
 const { QueryTypes, Op } = require('sequelize');
+const { User, Peserta, Pengajar, BimbinganReguler, BimbinganTambahan } = require('../../../models');
+const moment = require('moment');
 
 class BimbinganService extends BaseService {
   async bimbinganOnGoing(id, pesertaName, level) {
@@ -35,10 +37,10 @@ class BimbinganService extends BaseService {
           user_id: period.peserta.User.id,
           name: period.peserta.User.nama,
           schedule: {
-            day1: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_1,
-            hour1: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_1,
-            day2: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_2,
-            hour2: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_2,
+            day1: period.bimbingan_reguler[0].hari_bimbingan,
+            hour1: period.bimbingan_reguler[0].jam_bimbingan,
+            day2: period.bimbingan_reguler[1].hari_bimbingan,
+            hour2: period.bimbingan_reguler[1].jam_bimbingan,
           },
           attendance,
           meet: `${attendance}/8`,
@@ -60,10 +62,10 @@ class BimbinganService extends BaseService {
           user_id: period.peserta.User.id,
           name: period.peserta.User.nama,
           schedule: {
-            day1: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_1,
-            hour1: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_1,
-            day2: period.peserta.jadwal_bimbingan_peserta.hari_bimbingan_2,
-            hour2: period.peserta.jadwal_bimbingan_peserta.jam_bimbingan_2,
+            day1: period.bimbingan_tambahan[0].hari_bimbingan,
+            hour1: period.bimbingan_tambahan[0].jam_bimbingan,
+            day2: period.bimbingan_tambahan[1].hari_bimbingan,
+            hour2: period.bimbingan_tambahan[1].jam_bimbingan,
           },
           attendance,
           meet: `${attendance}/2`,
@@ -82,11 +84,14 @@ class BimbinganService extends BaseService {
 
       if (level) {
         filteredPeserta = data.filter((peserta) => {
-          return peserta.name.includes(pesertaName) && peserta.level === level;
+          return (
+            peserta.toLowerCase().name.includes(pesertaName.toLowerCase()) &&
+            peserta.level === level
+          );
         });
       } else {
         filteredPeserta = data.filter((peserta) => {
-          return peserta.name.includes(pesertaName);
+          return peserta.toLowerCase().name.includes(pesertaName.toLowerCase());
         });
       }
     }
@@ -106,7 +111,7 @@ class BimbinganService extends BaseService {
     return data;
   }
 
-  async bimbinganDone(id, pesertaName, periodDate) {
+  async bimbinganDone(id, pesertaName, startDate, endDate) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: STATUS_BIMBINGAN.FINISHED } },
       this.#includeQuery
@@ -164,20 +169,28 @@ class BimbinganService extends BaseService {
       if (pesertaName.length < 3)
         throw ApiError.badRequest('Peserta name must be at least 3 characters');
 
-      if (periodDate) {
+      if (startDate && endDate) {
         filteredPeserta = data.filter((peserta) => {
-          return peserta.name.includes(pesertaName) && peserta.period === periodDate;
+          return (
+            peserta.name.toLowerCase().includes(pesertaName.toLowerCase()) &&
+            moment(peserta.period.split(' - ')[0]) >= moment(startDate) &&
+            moment(peserta.period.split(' - ')[1]) <= moment(endDate)
+          );
         });
       } else {
         filteredPeserta = data.filter((peserta) => {
-          return peserta.name.includes(pesertaName);
+          return peserta.name.toLowerCase().includes(pesertaName.toLowerCase());
         });
       }
     }
 
-    if (periodDate) {
+    if (startDate && endDate) {
       filteredPeserta = data.filter((peserta) => {
-        return peserta.period === periodDate;
+        return (
+          peserta.name.includes(pesertaName) &&
+          moment(peserta.period.split(' - ')[0]) >= moment(startDate) &&
+          moment(peserta.period.split(' - ')[1]) <= moment(endDate)
+        );
       });
     }
 
@@ -188,6 +201,68 @@ class BimbinganService extends BaseService {
     }
 
     return data;
+  }
+
+  async dataDetailBimbingan(id, pengajarId) {
+    const result = await this.__findOne(
+      { where: { id, pengajar_id: pengajarId } },
+      this.#includeQuery
+    );
+    if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
+
+    let age = 0;
+    if (result.peserta.User.tgl_lahir) {
+      const birthdate = moment(result.peserta.User.tgl_lahir, 'YYYY-MM-DD').toDate();
+      const birthYear = birthdate.getFullYear();
+      const birthMonth = birthdate.getMonth();
+      const birthDay = birthdate.getDate();
+
+      const today = moment().toDate();
+      const todayYear = today.getFullYear();
+      const todayMonth = today.getMonth();
+      const todayDay = today.getDate();
+
+      age = todayYear - birthYear;
+      if (todayMonth < birthMonth || (todayMonth === birthMonth && todayDay < birthDay)) age--;
+    }
+
+    return {
+      name: result.peserta.User.nama,
+      gender: result.peserta.User.jenis_kelamin,
+      age,
+      level: result.peserta.level,
+    };
+  }
+
+  async dataDetailBimbingan(id, pengajarId) {
+    const result = await this.__findOne(
+      { where: { id, pengajar_id: pengajarId } },
+      this.#includeQuery
+    );
+    if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
+
+    let age = 0;
+    if (result.peserta.User.tgl_lahir) {
+      const birthdate = moment(result.peserta.User.tgl_lahir, 'YYYY-MM-DD').toDate();
+      const birthYear = birthdate.getFullYear();
+      const birthMonth = birthdate.getMonth();
+      const birthDay = birthdate.getDate();
+
+      const today = moment().toDate();
+      const todayYear = today.getFullYear();
+      const todayMonth = today.getMonth();
+      const todayDay = today.getDate();
+
+      age = todayYear - birthYear;
+      if (todayMonth < birthMonth || (todayMonth === birthMonth && todayDay < birthDay)) age--;
+    }
+
+    return {
+      name: result.peserta.User.nama,
+      gender: result.peserta.User.jenis_kelamin,
+      age,
+      level: result.peserta.level,
+    };
   }
 
   async detailBimbingan(id, pengajarId) {
@@ -201,7 +276,11 @@ class BimbinganService extends BaseService {
     if (result.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
       for (const bimbinganReguler of result.bimbingan_reguler) {
         const dataBimbinganReguler = {
-          status: bimbinganReguler.status,
+          period_id: result.id,
+          peserta_id: result.peserta.id,
+          user_id: result.peserta.User.id,
+          bimbingan_reguler_id: bimbinganReguler.id,
+          status: null,
           date: bimbinganReguler.tanggal,
           time: bimbinganReguler.jam_bimbingan,
           attendance: bimbinganReguler.absensi_peserta,
@@ -215,7 +294,11 @@ class BimbinganService extends BaseService {
     if (result.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
       for (const bimbinganTambahan of result.bimbingan_tambahan) {
         const dataBimbinganTambahan = {
-          status: bimbinganTambahan.status,
+          period_id: result.id,
+          peserta_id: result.peserta.id,
+          user_id: result.peserta.User.id,
+          bimbingan_tambahan_id: bimbinganTambahan.id,
+          status: null,
           date: bimbinganTambahan.tanggal,
           time: bimbinganTambahan.jam_bimbingan,
           attendance: bimbinganTambahan.absensi_peserta,
@@ -226,33 +309,180 @@ class BimbinganService extends BaseService {
       }
     }
 
-    // determine peserta age based on birthdate
-    let age = 0;
-    if (result.peserta.User.tgl_lahir) {
-      const birthdate = result.peserta.User.tgl_lahir;
-      const birthYear = birthdate.getFullYear();
-      const birthMonth = birthdate.getMonth();
-      const birthDay = birthdate.getDate();
+    return data;
+  }
 
-      const today = new Date();
-      const todayYear = today.getFullYear();
-      const todayMonth = today.getMonth();
-      const todayDay = today.getDate();
+  async progressPeserta(id, pengajarName, startDate, endDate) {
+    const result = await this.__findAll(
+      { where: { peserta_id: id } },
+      this.#includeQueryProgressPeserta
+    );
+    if (!result) throw ApiError.notFound(`Peserta with id ${id} not found`);
 
-      age = todayYear - birthYear;
-      if (todayMonth < birthMonth || (todayMonth === birthMonth && todayDay < birthDay)) age--;
+    const data = [];
+    for (const period of result.datas) {
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
+        for (const bimbinganReguler of period.bimbingan_reguler) {
+          if (bimbinganReguler.absensi_peserta === 1 || bimbinganReguler.absensi_pengajar === 1) {
+            const dataBimbinganReguler = {
+              pengajar: period.pengajar.user.nama,
+              date: bimbinganReguler.tanggal,
+              time: bimbinganReguler.jam_bimbingan,
+              pengajar_review: bimbinganReguler.catatan_pengajar,
+            };
+
+            data.push(dataBimbinganReguler);
+          }
+        }
+      }
+
+      if (period.tipe_bimbingan === TYPE_BIMBINGAN.TAMBAHAN) {
+        for (const bimbinganTambahan of period.bimbingan_tambahan) {
+          if (bimbinganTambahan.absensi_peserta === 1 || bimbinganTambahan.absensi_pengajar === 1) {
+            const dataBimbinganTambahan = {
+              pengajar: period.pengajar.user.nama,
+              date: bimbinganTambahan.tanggal,
+              time: bimbinganTambahan.jam_bimbingan,
+              pengajar_review: bimbinganTambahan.catatan_pengajar,
+            };
+
+            data.push(dataBimbinganTambahan);
+          }
+        }
+      }
     }
 
-    return {
-      period_id: result.id,
-      peserta_id: result.peserta.id,
-      user_id: result.peserta.User.id,
-      name: result.peserta.User.nama,
-      gender: result.peserta.User.jenis_kelamin,
-      age,
-      level: result.peserta.level,
-      data,
-    };
+    let filteredData;
+    if (pengajarName) {
+      if (pengajarName.length < 3)
+        throw ApiError.badRequest('Pengajar name must be at least 3 characters');
+
+      if (startDate && endDate) {
+        filteredData = data.filter((pengajar) => {
+          return (
+            pengajar.pengajar.toLowerCase().includes(pengajarName.toLowerCase()) &&
+            moment(pengajar.date) >= moment(startDate) &&
+            moment(pengajar.date) <= moment(endDate)
+          );
+        });
+      } else {
+        filteredData = data.filter((pengajar) => {
+          return pengajar.pengajar.toLowerCase().includes(pengajarName.toLowerCase());
+        });
+      }
+    }
+
+    if (startDate && endDate) {
+      filteredData = data.filter((pengajar) => {
+        return (
+          pengajar.pengajar.includes(pengajarName) &&
+          moment(pengajar.date) >= moment(startDate) &&
+          moment(pengajar.date) <= moment(endDate)
+        );
+      });
+    }
+
+    if (filteredData) {
+      if (filteredData.length === 0) throw ApiError.notFound(`Pengajar not found`);
+
+      return filteredData;
+    }
+
+    return data;
+  }
+
+  async getAllPeriod(user_id, req) {
+    const pesertaId = await sequelize.query(
+      `
+      SELECT *
+      FROM Pesertas
+      WHERE user_id = :userId
+      `,
+      {
+        replacements: { userId: user_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    const period = await Period.findAll({
+      where: { peserta_id: pesertaId[0].id, status: req.status },
+      include: [
+        {
+          model: Pengajar,
+          as: 'pengajar',
+          include: [
+            {
+              model: User,
+              as: 'user',
+            },
+          ],
+        },
+        {
+          model: BimbinganReguler,
+          as: 'bimbingan_reguler',
+          where: {
+            absensi_peserta: 1,
+            absensi_pengajar: 1,
+          },
+          required: false,
+        },
+        {
+          model: BimbinganTambahan,
+          as: 'bimbingan_tambahan',
+          required: false,
+        },
+      ],
+    });
+
+    const result = period.map((data) => {
+      const totalBimbinganReguler = data.bimbingan_reguler.length;
+      return {
+        id: data.id,
+        nama: data.pengajar.user.nama,
+        jenis_kelamin: data.pengajar.user.jenis_kelamin,
+        hari_1: data.hari_1,
+        jam_1: data.jam_1,
+        hari_2: data.hari_2,
+        jam_2: data.jam_2,
+        jumlah_attedance_bimbingan_regular: totalBimbinganReguler ? totalBimbinganReguler : 0,
+        tipe_bimbingan: data.tipe_bimbingan,
+        status: data.status,
+        infaq_bimbingan_tambahan_sebelum:
+          data.bimbingan_tambahan.length > 0 ? data.bimbingan_tambahan[0].tanggal : null,
+      };
+    });
+
+    return result;
+  }
+
+  async getOnePeriod(user_id, period_id) {
+    const pesertaId = await sequelize.query(
+      `
+      SELECT *
+      FROM Pesertas
+      WHERE user_id = :userId
+      `,
+      {
+        replacements: { userId: user_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    const bimbingan = await Period.findOne({
+      where: { peserta_id: pesertaId[0].id, id: period_id },
+      include: [
+        {
+          model: BimbinganReguler,
+          as: 'bimbingan_reguler',
+        },
+        {
+          model: BimbinganTambahan,
+          as: 'bimbingan_tambahan',
+        },
+      ],
+    });
+
+    return bimbingan;
   }
 
   async getAllPeriod(user_id, req) {
@@ -358,17 +588,43 @@ class BimbinganService extends BaseService {
       as: 'peserta',
       include: [
         {
-          model: JadwalBimbinganPeserta,
+          model: User,
           attributes: {
-            exclude: ['peserta_id'],
+            exclude: ['password', 'token'],
           },
-          as: 'jadwal_bimbingan_peserta',
         },
+      ],
+    },
+    {
+      model: BimbinganReguler,
+      attributes: {
+        exclude: ['period_id'],
+      },
+      as: 'bimbingan_reguler',
+    },
+    {
+      model: BimbinganTambahan,
+      attributes: {
+        exclude: ['period_id'],
+      },
+      as: 'bimbingan_tambahan',
+    },
+  ];
+
+  #includeQueryProgressPeserta = [
+    {
+      model: Pengajar,
+      attributes: {
+        exclude: ['user_id'],
+      },
+      as: 'pengajar',
+      include: [
         {
           model: User,
           attributes: {
             exclude: ['password', 'token'],
           },
+          as: 'user',
         },
       ],
     },

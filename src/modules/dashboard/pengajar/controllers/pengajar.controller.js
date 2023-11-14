@@ -1,19 +1,20 @@
 const PengajarService = require('../services/pengajar.service');
 const UserService = require('../../../registration/services/user.service');
+const PenghasilanPengajarService = require('../../../monetary/service/penghasilan.service');
 const responseHandler = require('../../../../helpers/responseHandler');
-const { Pengajar, Period, User, Infaq } = require('../../../../models');
+const { Pengajar, Period, User, PenghasilanPengajar } = require('../../../../models');
 
 class PengajarController {
   static async getOne(req, res, next) {
     const service = new PengajarService(req, Pengajar);
     const periodService = new PengajarService(req, Period);
-    const infaqService = new PengajarService(req, Infaq);
+    const penghasilanService = new PenghasilanPengajarService(req, PenghasilanPengajar);
     try {
       const pengajar = await service.getPengajarByUserId(req.user.id);
       const [totalBimbingan, totalAbsent, totalIncome] = await Promise.all([
         periodService.getBimbinganActivated(pengajar.id),
         periodService.getAbsent(pengajar.id),
-        infaqService.getIncome(pengajar.id),
+        penghasilanService.totalIncome(pengajar.id),
       ]);
       return responseHandler.succes(res, `Success get ${service.db.name}`, {
         pengajar,

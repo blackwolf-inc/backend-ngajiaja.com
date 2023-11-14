@@ -116,7 +116,7 @@ class AdminPengajarService {
       link_wawancara: afterUpdateJadwal.link_wawancara,
       tanggal_wawancara: afterUpdateJadwal.tanggal_wawancara,
       jam_wawancara: afterUpdateJadwal.jam_wawancara,
-    }
+    };
   }
 
   async updateStatusPengajar(req, payload, userId) {
@@ -145,7 +145,8 @@ class AdminPengajarService {
     const { page = 1, pageSize = 10 } = query;
     const offset = (page - 1) * pageSize;
 
-    let whereClause = "WHERE u.role = 'PENGAJAR' AND u.status IN ('REGISTERED', 'WAITING', 'INTERVIEWED', 'REJECTED')";
+    let whereClause =
+      "WHERE u.role = 'PENGAJAR' AND u.status IN ('REGISTERED', 'WAITING', 'INTERVIEWED', 'REJECTED')";
     if (status) {
       whereClause += ` AND u.status = '${status}'`;
     }
@@ -171,7 +172,22 @@ class AdminPengajarService {
       { type: QueryTypes.SELECT }
     );
 
-    return result;
+    const totalCount = await sequelize.query(
+      `
+    SELECT COUNT(*) AS total
+    FROM (
+      SELECT 1
+      FROM Pengajars p 
+      JOIN Users u ON p.user_id = u.id 
+      ${whereClause}
+    ) AS subquery
+    `,
+      { type: QueryTypes.SELECT }
+    );
+
+    const totalPages = Math.ceil(totalCount[0].total / pageSize);
+
+    return { result, totalPages };
   }
 
   async getPesertaPengajarVerified(query, status, keyword, level) {
@@ -189,7 +205,6 @@ class AdminPengajarService {
       whereClause += ` AND p.level = '${level}'`;
     }
 
-
     const result = await sequelize.query(
       `
       SELECT 
@@ -203,9 +218,22 @@ class AdminPengajarService {
       { type: QueryTypes.SELECT }
     );
 
-    return result;
+    const totalCount = await sequelize.query(
+      `
+    SELECT COUNT(*) AS total
+    FROM (
+      SELECT 1
+      FROM Pengajars p 
+      JOIN Users u ON p.user_id = u.id 
+      ${whereClause}
+    ) AS subquery
+    `,
+      { type: QueryTypes.SELECT }
+    );
+    let data = result?.map((item) => ({ ...item, bagi_hasil: 50 }));
+    const totalPages = Math.ceil(totalCount[0].total / pageSize);
+    return { data, page, totalPages };
   }
-
 }
 
 module.exports = AdminPengajarService;

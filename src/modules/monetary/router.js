@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const BankController = require('./controllers/bank.controller');
 const PencairanController = require('./controllers/pencairan.controller');
+const PenghasilanController = require('./controllers/penghasilan.controller');
 const BiayaAdministrasiPesertaController = require('./controllers/biayaAdminPeserta.controller');
 const InfaqController = require('./controllers/infaq.controller');
 const storageImage = require('../../utils/storageImage');
@@ -61,9 +62,18 @@ router.delete('/pencairan/:id', PencairanController.delete);
 // infaq route
 router.get('/infaq', InfaqController.getAll);
 router.get('/infaq/:id', InfaqController.getOne);
-router.post('/infaq', validate(infaqValidator.createInfaqValidator), InfaqController.create);
+router.post(
+  '/infaq',
+  storageImage.image.single('media'),
+  validate(infaqValidator.createInfaqValidator),
+  InfaqController.create
+);
 router.patch('/infaq/images/:id', storageImage.image.single('media'), InfaqController.updateImages);
 router.patch('/infaq/:id', validate(infaqValidator.updateInfaqValidator), InfaqController.update);
 router.delete('/infaq/:id', InfaqController.delete);
+
+// penghasilan route
+router.get('/penghasilan', PenghasilanController.getIncome);
+router.get('/penghasilan/detail', PenghasilanController.dataIncome);
 
 module.exports = router;
