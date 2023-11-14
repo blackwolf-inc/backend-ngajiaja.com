@@ -25,9 +25,10 @@ class AdminDashboardController {
           link_wawancara,
           tanggal_wawancara,
           jam_wawancara,
-          status_pengajar
+          status_pengajar,
         },
-        userId);
+        userId
+      );
       return responseHandler.succes(res, 'Success update pengajar registered', result);
     } catch (error) {
       next(error);
@@ -55,7 +56,13 @@ class AdminDashboardController {
     try {
       const { query } = req;
       const { status, keyword, startDate, endDate } = query;
-      const result = await service.getPesertaPengajarRegistered(query, status, keyword, startDate, endDate);
+      const result = await service.getPesertaPengajarRegistered(
+        query,
+        status,
+        keyword,
+        startDate,
+        endDate
+      );
       return responseHandler.succes(res, 'Success get pengajar Terdaftar', result);
     } catch (error) {
       next(error);
@@ -68,7 +75,7 @@ class AdminDashboardController {
       const { query } = req;
       const { status, keyword, level } = query;
       let result = await service.getPesertaPengajarVerified(query, status, keyword, level);
-      result = result.map(item => ({ ...item, bagi_hasil: 50 }));
+      // result = result?.result?.map((item) => ({ ...item, bagi_hasil: 50 }));
       return responseHandler.succes(res, 'Success get pengajar Terverifikasi', result);
     } catch (error) {
       next(error);
@@ -90,7 +97,14 @@ class AdminDashboardController {
     try {
       const { query } = req;
       const { status, keyword, startDate, endDate, bankName } = query;
-      const result = await service.getPesertaRegistered(query, status, keyword, startDate, endDate, bankName);
+      const result = await service.getPesertaRegistered(
+        query,
+        status,
+        keyword,
+        startDate,
+        endDate,
+        bankName
+      );
       return responseHandler.succes(res, 'Success get peserta Terdaftar', result);
     } catch (error) {
       next(error);
@@ -102,7 +116,11 @@ class AdminDashboardController {
     try {
       const { userId } = req.params;
       const { status_peserta, level_peserta } = req.body;
-      const result = await service.updateStatusPeserta(req, { status_peserta, level_peserta }, userId);
+      const result = await service.updateStatusPeserta(
+        req,
+        { status_peserta, level_peserta },
+        userId
+      );
       return responseHandler.succes(res, 'Success update status peserta', result);
     } catch (error) {
       next(error);
@@ -126,7 +144,11 @@ class AdminDashboardController {
     try {
       const { userId } = req.params;
       const { status_peserta, level_peserta } = req.body;
-      const result = await service.updateStatusPesertaVerified(req, { status_peserta, level_peserta }, userId);
+      const result = await service.updateStatusPesertaVerified(
+        req,
+        { status_peserta, level_peserta },
+        userId
+      );
       return responseHandler.succes(res, 'Success update status peserta', result);
     } catch (error) {
       next(error);
@@ -153,7 +175,6 @@ class AdminDashboardController {
       next(error);
     }
   }
-
 }
 
 module.exports = AdminDashboardController;
