@@ -119,7 +119,7 @@ class PengajarService extends BaseService {
             peserta_id: period.peserta.id,
             user_id: period.peserta.User.id,
             bimbingan_reguler_id: bimbinganReguler.id,
-            status: null, // no data in db, waiting for db update
+            status: null,
             name: period.peserta.User.nama,
             date: bimbinganReguler.tanggal,
             time: bimbinganReguler.jam_bimbingan,
@@ -142,6 +142,14 @@ class PengajarService extends BaseService {
             bimbinganOnGoing.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
           }
 
+          if (bimbinganReguler.tanggal_baru && bimbinganReguler.jam_bimbingan_baru) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
+          }
+
+          if (bimbinganReguler.persetujuan_peserta === 0) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.CANCELED;
+          }
+
           data.push(bimbinganOnGoing);
         }
       }
@@ -155,7 +163,7 @@ class PengajarService extends BaseService {
             peserta_id: period.peserta.id,
             user_id: period.peserta.User.id,
             bimbingan_tambahan_id: bimbinganTambahan.id,
-            status: null, // no data in db, waiting for db update
+            status: null,
             name: period.peserta.User.nama,
             date: bimbinganTambahan.tanggal,
             time: bimbinganTambahan.jam_bimbingan,
@@ -176,6 +184,14 @@ class PengajarService extends BaseService {
             moment().isAfter(moment(bimbinganOnGoing.date))
           ) {
             bimbinganOnGoing.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
+          }
+
+          if (bimbinganTambahan.tanggal_baru && bimbinganTambahan.jam_bimbingan_baru) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
+          }
+
+          if (bimbinganTambahan.persetujuan_peserta === 0) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.CANCELED;
           }
 
           data.push(bimbinganOnGoing);

@@ -274,6 +274,14 @@ class BimbinganService extends BaseService {
           dataBimbinganReguler.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
         }
 
+        if (bimbinganReguler.tanggal_baru && bimbinganReguler.jam_bimbingan_baru) {
+          dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
+        }
+
+        if (bimbinganReguler.persetujuan_peserta === 0) {
+          dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.CANCELED;
+        }
+
         if (bimbinganReguler.absensi_peserta === 1 || bimbinganReguler.absensi_pengajar === 1) {
           dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.FINISHED;
         }
@@ -310,6 +318,14 @@ class BimbinganService extends BaseService {
           moment().isAfter(moment(dataBimbinganTambahan.date))
         ) {
           dataBimbinganTambahan.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
+        }
+
+        if (bimbinganTambahan.tanggal_baru && bimbinganTambahan.jam_bimbingan_baru) {
+          dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
+        }
+
+        if (bimbinganTambahan.persetujuan_peserta === 0) {
+          dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.CANCELED;
         }
 
         if (bimbinganTambahan.absensi_peserta === 1 || bimbinganTambahan.absensi_pengajar === 1) {
