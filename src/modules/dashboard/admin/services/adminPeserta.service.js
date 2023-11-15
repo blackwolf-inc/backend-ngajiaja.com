@@ -58,7 +58,8 @@ class AdminPesertaService {
     }
 
     async getPesertaRegistered(query, status, keyword, startDate, endDate, bankName) {
-        const { page = 1, pageSize = 10 } = query;
+        const { pageSize = 10 } = query;
+        let page = query.page ? parseInt(query.page) : 1;
         const offset = (page - 1) * pageSize;
         const base_url = process.env.BASE_URL;
 
@@ -107,7 +108,7 @@ class AdminPesertaService {
 
         const totalPages = Math.ceil(totalCount[0].total / pageSize);
 
-        return { result, totalPages };
+        return { result, page, totalPages };
     }
 
     async updateStatusPeserta(req, payload, userId) {
@@ -133,7 +134,8 @@ class AdminPesertaService {
     }
 
     async getPesertaVerified(query, status, keyword, level) {
-        const { page = 1, pageSize = 10 } = query;
+        const { pageSize = 10 } = query;
+        let page = query.page ? parseInt(query.page) : 1;
         const offset = (page - 1) * pageSize;
 
         let whereClause = "WHERE u.role = 'PESERTA' AND u.status IN ('ACTIVE', 'NONACTIVE')";
@@ -183,7 +185,7 @@ class AdminPesertaService {
 
         const totalPages = Math.ceil(totalCount[0].total / pageSize);
 
-        return { result, totalPages };
+        return { result, page, totalPages };
     }
 
     async updateStatusPesertaVerified(req, payload, userId) {

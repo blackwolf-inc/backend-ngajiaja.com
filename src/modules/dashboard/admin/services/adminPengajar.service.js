@@ -146,7 +146,8 @@ class AdminPengajarService {
   }
 
   async getPesertaPengajarRegistered(query, status, keyword, startDate, endDate) {
-    const { page = 1, pageSize = 10 } = query;
+    const { pageSize = 10 } = query;
+    let page = query.page ? parseInt(query.page) : 1;
     const offset = (page - 1) * pageSize;
 
     let whereClause =
@@ -191,7 +192,7 @@ class AdminPengajarService {
 
     const totalPages = Math.ceil(totalCount[0].total / pageSize);
 
-    return { result, totalPages };
+    return { result, page, totalPages };
   }
 
   async getPesertaPengajarVerified(query, status, keyword, level) {
