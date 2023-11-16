@@ -269,12 +269,12 @@ class BimbinganService extends BaseService {
         if (
           bimbinganReguler.link_meet &&
           !bimbinganReguler.catatan_pengajar &&
-          moment().isAfter(moment(dataBimbinganReguler.date))
+          moment().isAfter(moment(dataBimbinganReguler.date).add(1, 'hours'))
         ) {
           dataBimbinganReguler.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
         }
 
-        if (bimbinganReguler.tanggal_baru && bimbinganReguler.jam_bimbingan_baru) {
+        if (bimbinganReguler.tanggal_baru && bimbinganReguler.jam_baru) {
           dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
         }
 
@@ -315,12 +315,12 @@ class BimbinganService extends BaseService {
         if (
           bimbinganTambahan.link_meet &&
           !bimbinganTambahan.catatan_pengajar &&
-          moment().isAfter(moment(dataBimbinganTambahan.date))
+          moment().isAfter(moment(dataBimbinganTambahan.date).add(1, 'hours'))
         ) {
           dataBimbinganTambahan.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
         }
 
-        if (bimbinganTambahan.tanggal_baru && bimbinganTambahan.jam_bimbingan_baru) {
+        if (bimbinganTambahan.tanggal_baru && bimbinganTambahan.jam_baru) {
           dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
         }
 

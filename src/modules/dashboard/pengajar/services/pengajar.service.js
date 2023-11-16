@@ -137,12 +137,12 @@ class PengajarService extends BaseService {
           if (
             bimbinganReguler.link_meet &&
             !bimbinganReguler.catatan_pengajar &&
-            moment().isAfter(moment(bimbinganOnGoing.date))
+            moment().isAfter(moment(bimbinganOnGoing.date).add(1, 'hours'))
           ) {
             bimbinganOnGoing.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
           }
 
-          if (bimbinganReguler.tanggal_baru && bimbinganReguler.jam_bimbingan_baru) {
+          if (bimbinganReguler.tanggal_baru && bimbinganReguler.jam_baru) {
             bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
           }
 
@@ -181,12 +181,12 @@ class PengajarService extends BaseService {
           if (
             bimbinganTambahan.link_meet &&
             !bimbinganTambahan.catatan_pengajar &&
-            moment().isAfter(moment(bimbinganOnGoing.date))
+            moment().isAfter(moment(bimbinganOnGoing.date).add(1, 'hours'))
           ) {
             bimbinganOnGoing.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
           }
 
-          if (bimbinganTambahan.tanggal_baru && bimbinganTambahan.jam_bimbingan_baru) {
+          if (bimbinganTambahan.tanggal_baru && bimbinganTambahan.jam_baru) {
             bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
           }
 

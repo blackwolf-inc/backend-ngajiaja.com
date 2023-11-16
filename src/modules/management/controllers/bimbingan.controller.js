@@ -3,6 +3,7 @@ const PengajarService = require('../../dashboard/pengajar/services/pengajar.serv
 const UserService = require('../../registration/services/user.service');
 const responseHandler = require('../../../helpers/responseHandler');
 const db = require('../../../models/index');
+const moment = require('moment');
 const { Period, BimbinganReguler, User, BimbinganTambahan } = db;
 
 class BimbinganPeserta {
@@ -116,12 +117,16 @@ class BimbinganPeserta {
       let result;
       if (req.body.persetujuan_peserta) {
         const bimbingan = await service.getOneById(req.params.id);
-        if (req.body.persetujuan_peserta === '1') {
+        if (req.body.persetujuan_peserta === 1) {
           result = await service.updateData(
             {
               persetujuan_peserta: req.body.persetujuan_peserta,
               tanggal: bimbingan.tanggal_baru,
-              jam_bimbingan: bimbingan.jam_bimbingan_baru,
+              jam_bimbingan: bimbingan.jam_baru,
+              hari_bimbingan: moment(bimbingan.tanggal_baru)
+                .locale('id')
+                .format('dddd')
+                .toUpperCase(),
             },
             { id: req.params.id },
           );
@@ -146,12 +151,16 @@ class BimbinganPeserta {
       let result;
       if (req.body.persetujuan_peserta) {
         const bimbingan = await service.getOneById(req.params.id);
-        if (req.body.persetujuan_peserta === '1') {
+        if (req.body.persetujuan_peserta === 1) {
           result = await service.updateData(
             {
               persetujuan_peserta: req.body.persetujuan_peserta,
               tanggal: bimbingan.tanggal_baru,
-              jam_bimbingan: bimbingan.jam_bimbingan_baru,
+              jam_bimbingan: bimbingan.jam_baru,
+              hari_bimbingan: moment(bimbingan.tanggal_baru)
+                .locale('id')
+                .format('dddd')
+                .toUpperCase(),
             },
             { id: req.params.id },
           );
