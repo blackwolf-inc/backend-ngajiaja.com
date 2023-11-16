@@ -46,4 +46,10 @@ router.patch(
 router.get('/data/dashboard-admin', AdminDashboardController.getDataDashboardAdmin);
 router.get('/data/dashboard-admin/bimbingan', AdminDashboardController.getAllBimbingan);
 
+router.get('/data/period', AdminDashboardController.getAllCourse);
+router.get('/data/period/ongoing', AdminDashboardController.getCourseOngoing);
+router.get('/data/period/finished', AdminDashboardController.getCourseFinished);
+router.get('/data/period/ongoing/:periodId', AdminDashboardController.getCourseOngoingById);
+router.get('/data/period/finished/:periodId', AdminDashboardController.getCourseFinishedById);
+
 module.exports = router;
