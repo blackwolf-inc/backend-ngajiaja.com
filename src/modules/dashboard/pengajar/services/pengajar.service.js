@@ -1,6 +1,10 @@
 const BaseService = require('../../../../base/base.service');
 const ApiError = require('../../../../helpers/errorHandler');
-const { TYPE_BIMBINGAN, STATUS_BIMBINGAN } = require('../../../../helpers/constanta');
+const {
+  TYPE_BIMBINGAN,
+  STATUS_BIMBINGAN,
+  STATUS_BIMBINGAN_ACTIVE,
+} = require('../../../../helpers/constanta');
 const { BimbinganReguler, BimbinganTambahan, Peserta, User } = require('../../../../models');
 const moment = require('moment');
 
@@ -115,12 +119,36 @@ class PengajarService extends BaseService {
             peserta_id: period.peserta.id,
             user_id: period.peserta.User.id,
             bimbingan_reguler_id: bimbinganReguler.id,
-            status: null, // no data in db, waiting for db update
+            status: null,
             name: period.peserta.User.nama,
             date: bimbinganReguler.tanggal,
             time: bimbinganReguler.jam_bimbingan,
             level: period.peserta.level,
           };
+
+          if (!bimbinganReguler.link_meet) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.NOT_SET;
+          }
+
+          if (bimbinganReguler.link_meet && moment().isBefore(bimbinganOnGoing.date)) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.WAITING;
+          }
+
+          if (
+            bimbinganReguler.link_meet &&
+            !bimbinganReguler.catatan_pengajar &&
+            moment().isAfter(moment(bimbinganOnGoing.date).add(1, 'hours'))
+          ) {
+            bimbinganOnGoing.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
+          }
+
+          if (bimbinganReguler.tanggal_baru && bimbinganReguler.jam_baru) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
+          }
+
+          if (bimbinganReguler.persetujuan_peserta === 0) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.CANCELED;
+          }
 
           data.push(bimbinganOnGoing);
         }
@@ -135,12 +163,36 @@ class PengajarService extends BaseService {
             peserta_id: period.peserta.id,
             user_id: period.peserta.User.id,
             bimbingan_tambahan_id: bimbinganTambahan.id,
-            status: null, // no data in db, waiting for db update
+            status: null,
             name: period.peserta.User.nama,
             date: bimbinganTambahan.tanggal,
             time: bimbinganTambahan.jam_bimbingan,
             level: period.peserta.level,
           };
+
+          if (!bimbinganTambahan.link_meet) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.NOT_SET;
+          }
+
+          if (bimbinganTambahan.link_meet && moment().isBefore(bimbinganOnGoing.date)) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.WAITING;
+          }
+
+          if (
+            bimbinganTambahan.link_meet &&
+            !bimbinganTambahan.catatan_pengajar &&
+            moment().isAfter(moment(bimbinganOnGoing.date).add(1, 'hours'))
+          ) {
+            bimbinganOnGoing.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
+          }
+
+          if (bimbinganTambahan.tanggal_baru && bimbinganTambahan.jam_baru) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
+          }
+
+          if (bimbinganTambahan.persetujuan_peserta === 0) {
+            bimbinganOnGoing.status = STATUS_BIMBINGAN_ACTIVE.CANCELED;
+          }
 
           data.push(bimbinganOnGoing);
         }

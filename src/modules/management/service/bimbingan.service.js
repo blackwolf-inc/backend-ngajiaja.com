@@ -1,6 +1,10 @@
 const BaseService = require('../../../base/base.service');
 const ApiError = require('../../../helpers/errorHandler');
-const { TYPE_BIMBINGAN, STATUS_BIMBINGAN } = require('../../../helpers/constanta');
+const {
+  TYPE_BIMBINGAN,
+  STATUS_BIMBINGAN,
+  STATUS_BIMBINGAN_ACTIVE,
+} = require('../../../helpers/constanta');
 const {
   User,
   Peserta,
@@ -17,7 +21,7 @@ class BimbinganService extends BaseService {
   async bimbinganOnGoing(id, pesertaName, level) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: STATUS_BIMBINGAN.ACTIVATED } },
-      this.#includeQuery
+      this.#includeQuery,
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
@@ -112,7 +116,7 @@ class BimbinganService extends BaseService {
   async bimbinganDone(id, pesertaName, startDate, endDate) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: STATUS_BIMBINGAN.FINISHED } },
-      this.#includeQuery
+      this.#includeQuery,
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
@@ -204,38 +208,7 @@ class BimbinganService extends BaseService {
   async dataDetailBimbingan(id, pengajarId) {
     const result = await this.__findOne(
       { where: { id, pengajar_id: pengajarId } },
-      this.#includeQuery
-    );
-    if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
-
-    let age = 0;
-    if (result.peserta.User.tgl_lahir) {
-      const birthdate = moment(result.peserta.User.tgl_lahir, 'YYYY-MM-DD').toDate();
-      const birthYear = birthdate.getFullYear();
-      const birthMonth = birthdate.getMonth();
-      const birthDay = birthdate.getDate();
-
-      const today = moment().toDate();
-      const todayYear = today.getFullYear();
-      const todayMonth = today.getMonth();
-      const todayDay = today.getDate();
-
-      age = todayYear - birthYear;
-      if (todayMonth < birthMonth || (todayMonth === birthMonth && todayDay < birthDay)) age--;
-    }
-
-    return {
-      name: result.peserta.User.nama,
-      gender: result.peserta.User.jenis_kelamin,
-      age,
-      level: result.peserta.level,
-    };
-  }
-
-  async dataDetailBimbingan(id, pengajarId) {
-    const result = await this.__findOne(
-      { where: { id, pengajar_id: pengajarId } },
-      this.#includeQuery
+      this.#includeQuery,
     );
     if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
 
@@ -266,7 +239,7 @@ class BimbinganService extends BaseService {
   async detailBimbingan(id, pengajarId) {
     const result = await this.__findOne(
       { where: { id, pengajar_id: pengajarId } },
-      this.#includeQuery
+      this.#includeQuery,
     );
     if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
 
@@ -284,6 +257,34 @@ class BimbinganService extends BaseService {
           attendance: bimbinganReguler.absensi_peserta,
           pengajar_review: bimbinganReguler.catatan_pengajar,
         };
+
+        if (!bimbinganReguler.link_meet) {
+          dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.NOT_SET;
+        }
+
+        if (bimbinganReguler.link_meet && moment().isBefore(dataBimbinganReguler.date)) {
+          dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.WAITING;
+        }
+
+        if (
+          bimbinganReguler.link_meet &&
+          !bimbinganReguler.catatan_pengajar &&
+          moment().isAfter(moment(dataBimbinganReguler.date).add(1, 'hours'))
+        ) {
+          dataBimbinganReguler.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
+        }
+
+        if (bimbinganReguler.tanggal_baru && bimbinganReguler.jam_baru) {
+          dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
+        }
+
+        if (bimbinganReguler.persetujuan_peserta === 0) {
+          dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.CANCELED;
+        }
+
+        if (bimbinganReguler.absensi_peserta === 1 || bimbinganReguler.absensi_pengajar === 1) {
+          dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.FINISHED;
+        }
 
         data.push(dataBimbinganReguler);
       }
@@ -303,6 +304,34 @@ class BimbinganService extends BaseService {
           pengajar_review: bimbinganTambahan.catatan_pengajar,
         };
 
+        if (!bimbinganTambahan.link_meet) {
+          dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.NOT_SET;
+        }
+
+        if (bimbinganTambahan.link_meet && moment().isBefore(dataBimbinganTambahan.date)) {
+          dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.WAITING;
+        }
+
+        if (
+          bimbinganTambahan.link_meet &&
+          !bimbinganTambahan.catatan_pengajar &&
+          moment().isAfter(moment(dataBimbinganTambahan.date).add(1, 'hours'))
+        ) {
+          dataBimbinganTambahan.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
+        }
+
+        if (bimbinganTambahan.tanggal_baru && bimbinganTambahan.jam_baru) {
+          dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
+        }
+
+        if (bimbinganTambahan.persetujuan_peserta === 0) {
+          dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.CANCELED;
+        }
+
+        if (bimbinganTambahan.absensi_peserta === 1 || bimbinganTambahan.absensi_pengajar === 1) {
+          dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.FINISHED;
+        }
+
         data.push(dataBimbinganTambahan);
       }
     }
@@ -313,7 +342,7 @@ class BimbinganService extends BaseService {
   async progressPeserta(id, pengajarName, startDate, endDate) {
     const result = await this.__findAll(
       { where: { peserta_id: id } },
-      this.#includeQueryProgressPeserta
+      this.#includeQueryProgressPeserta,
     );
     if (!result) throw ApiError.notFound(`Peserta with id ${id} not found`);
 
@@ -399,7 +428,7 @@ class BimbinganService extends BaseService {
       {
         replacements: { userId: user_id },
         type: QueryTypes.SELECT,
-      }
+      },
     );
 
     const period = await Period.findAll({
@@ -463,101 +492,7 @@ class BimbinganService extends BaseService {
       {
         replacements: { userId: user_id },
         type: QueryTypes.SELECT,
-      }
-    );
-
-    const bimbingan = await Period.findOne({
-      where: { peserta_id: pesertaId[0].id, id: period_id },
-      include: [
-        {
-          model: BimbinganReguler,
-          as: 'bimbingan_reguler',
-        },
-        {
-          model: BimbinganTambahan,
-          as: 'bimbingan_tambahan',
-        },
-      ],
-    });
-
-    return bimbingan;
-  }
-
-  async getAllPeriod(user_id, req) {
-    const pesertaId = await sequelize.query(
-      `
-      SELECT *
-      FROM Pesertas
-      WHERE user_id = :userId
-      `,
-      {
-        replacements: { userId: user_id },
-        type: QueryTypes.SELECT,
-      }
-    );
-
-    const period = await Period.findAll({
-      where: { peserta_id: pesertaId[0].id, status: req.status },
-      include: [
-        {
-          model: Pengajar,
-          as: 'pengajar',
-          include: [
-            {
-              model: User,
-              as: 'user',
-            },
-          ],
-        },
-        {
-          model: BimbinganReguler,
-          as: 'bimbingan_reguler',
-          where: {
-            absensi_peserta: 1,
-            absensi_pengajar: 1,
-          },
-          required: false,
-        },
-        {
-          model: BimbinganTambahan,
-          as: 'bimbingan_tambahan',
-          required: false,
-        },
-      ],
-    });
-
-    const result = period.map((data) => {
-      const totalBimbinganReguler = data.bimbingan_reguler.length;
-      return {
-        id: data.id,
-        nama: data.pengajar.user.nama,
-        jenis_kelamin: data.pengajar.user.jenis_kelamin,
-        hari_1: data.hari_1,
-        jam_1: data.jam_1,
-        hari_2: data.hari_2,
-        jam_2: data.jam_2,
-        jumlah_attedance_bimbingan_regular: totalBimbinganReguler ? totalBimbinganReguler : 0,
-        tipe_bimbingan: data.tipe_bimbingan,
-        status: data.status,
-        infaq_bimbingan_tambahan_sebelum:
-          data.bimbingan_tambahan.length > 0 ? data.bimbingan_tambahan[0].tanggal : null,
-      };
-    });
-
-    return result;
-  }
-
-  async getOnePeriod(user_id, period_id) {
-    const pesertaId = await sequelize.query(
-      `
-      SELECT *
-      FROM Pesertas
-      WHERE user_id = :userId
-      `,
-      {
-        replacements: { userId: user_id },
-        type: QueryTypes.SELECT,
-      }
+      },
     );
 
     const bimbingan = await Period.findOne({
