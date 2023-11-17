@@ -21,6 +21,16 @@ class PilihPengajar {
     }
   }
 
+  static async getOne(req, res, next) {
+    const service = new PilihPengajarService(req, Pengajar);
+    try {
+      const result = await service.getOnepengajarByTeacherId(req.params.id);
+      return responseHandler.succes(res, `Success get all ${service.db.name}s`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async create(req, res, next) {
     const service = new PilihPengajarService(req, Period);
     try {

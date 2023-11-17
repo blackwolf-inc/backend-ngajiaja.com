@@ -69,7 +69,30 @@ class PilihPengajar extends BaseService {
         nama: pengajar.user.nama, // Sesuaikan dengan atribut yang ingin ditampilkan di frontend
         jenis_kelamin: pengajar.user.jenis_kelamin,
         jadwalActive: pengajar.jadwal_mengajar ? pengajar.jadwal_mengajar.length : 0,
+        jadwal_mengajar: pengajar.jadwal_mengajar,
       };
+    });
+
+    return result;
+  }
+
+  async getOnepengajarByTeacherId(id) {
+    const result = await Pengajar.findOne({
+      where: { id },
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['nama', 'jenis_kelamin'],
+        },
+        {
+          model: JadwalMengajarPengajar,
+          required: true,
+          as: 'jadwal_mengajar',
+          where: { status: STATUS_JADWAL_PENGAJAR.ACTIVE },
+        },
+      ],
+      attributes: ['id', 'user_id'],
     });
 
     return result;
