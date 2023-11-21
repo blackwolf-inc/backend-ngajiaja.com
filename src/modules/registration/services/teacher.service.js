@@ -67,7 +67,20 @@ class TeacherService extends BaseService {
   }
 
   async getTeacherByUserId(id) {
-    const result = await Pengajar.findOne({ where: { user_id: id } });
+    const result = await User.findOne({
+      where: { id: id },
+      attributes: ['id', 'nama', 'email', 'telp_wa', 'jenis_kelamin', 'alamat', 'tgl_lahir'],
+      include: [{
+        model: Pengajar,
+        as: 'pengajar',
+        attributes: [
+          ['id', 'pengajar_id'], 'level', 'pendidikan_terakhir', 'punya_sertifikasi_guru_quran', 'pengalaman_mengajar',
+          'pernah_mengajar_online', 'paham_aplikasi_meet', 'siap_komitmen', 'mengajar_hari_libur', 'bagi_hasil_50persen',
+          'isVerifiedByAdmin', 'link_video_membaca_quran', 'link_video_simulasi_mengajar', 'tanggal_wawancara', 'jam_wawancara',
+          'nama_bank', 'no_bank', 'link_wawancara'
+        ]
+      }]
+    });
     if (!result) throw ApiError.notFound(`Pengajar with id ${id} not found`);
 
     return result;
