@@ -13,7 +13,15 @@ class StudentService extends BaseService {
   }
 
   async getStudentByUserId(req) {
-    const result = await Peserta.findOne({ where: { user_id: req.params.id } });
+    const result = await User.findOne({
+      where: { id: req.params.id },
+      attributes: ['id', 'nama', 'email', 'telp_wa', 'jenis_kelamin', 'alamat', 'tgl_lahir'],
+      include: [{
+        model: Peserta,
+        as: 'peserta',
+        attributes: [['id', 'peserta_id'], 'profesi', 'level', 'menguasai_ilmu_tajwid', 'paham_aplikasi_meet', 'siap_komitmen_mengaji', 'siap_komitmen_infak', 'bersedia_bayar_20K']
+      }]
+    });
     if (!result) throw ApiError.notFound(`Peserta with id ${req.params.id} not found`);
 
     return result;
