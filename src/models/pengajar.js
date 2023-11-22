@@ -108,9 +108,10 @@ module.exports = (sequelize, DataTypes) => {
       link_video_simulasi_mengajar: DataTypes.STRING,
       tanggal_wawancara: DataTypes.DATEONLY,
       jam_wawancara: DataTypes.TIME,
-      nama_bank: DataTypes.STRING,
-      no_bank: DataTypes.STRING,
       link_wawancara: DataTypes.STRING,
+      nama_bank: DataTypes.STRING,
+      no_rekening: DataTypes.STRING,
+      nama_rekening: DataTypes.STRING,
     },
     {
       sequelize,
