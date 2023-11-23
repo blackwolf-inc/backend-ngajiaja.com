@@ -81,6 +81,47 @@ class PilihPengajar extends BaseService {
       return result;
     }
 
+    if (hari_1 && jam_1) {
+      const whereClause = {
+        [Op.and]: [
+          { hari_mengajar: hari_1 },
+          { mulai_mengajar: jam_1 },
+          { status: STATUS_JADWAL_PENGAJAR.ACTIVE },
+        ],
+      };
+
+      const pengajarList = await Pengajar.findAll({
+        include: [
+          {
+            model: User,
+            as: 'user',
+          },
+          {
+            model: JadwalMengajarPengajar,
+            required: true,
+            as: 'jadwal_mengajar',
+            where: whereClause,
+          },
+        ],
+      });
+
+      const filteredPengajarList = pengajarList.filter((pengajar) => {
+        return pengajar.jadwal_mengajar && pengajar.jadwal_mengajar.length >= 2;
+      });
+
+      const result = filteredPengajarList.map((pengajar) => {
+        return {
+          id_pengajar: pengajar.id,
+          nama: pengajar.user.nama,
+          jenis_kelamin: pengajar.user.jenis_kelamin,
+          jadwalActive: pengajar.jadwal_mengajar ? pengajar.jadwal_mengajar.length : 0,
+          jadwal_mengajar: pengajar.jadwal_mengajar,
+        };
+      });
+
+      return result;
+    }
+
     const pengajarList = await Pengajar.findAll({
       include: [
         {
@@ -107,45 +148,6 @@ class PilihPengajar extends BaseService {
 
     return result;
   }
-
-  // async getAllPengajar(hari_1, jam_1, hari_2, jam_2) {
-  //   // let whereClause = {};
-
-  //   // if (hari_1 && hari_2 && jam_1 && jam_2) {
-  //   //   whereClause = {
-  //   //     [Op.and]: [
-  //   //       { hari_mengajar: { [Op.in]: [hari_1, hari_2] } },
-  //   //       { mulai_mengajar: { [Op.in]: [jam_1, jam_2] } },
-  //   //       { status: STATUS_JADWAL_PENGAJAR.ACTIVE },
-  //   //     ],
-  //   //   };
-  //   // } else {
-  //   //   whereClause = { status: STATUS_JADWAL_PENGAJAR.ACTIVE };
-  //   // }
-
-  //   const result = await JadwalMengajarPengajar.findAll({
-  //     where: {
-  //       [Op.and]: [
-  //         { hari_mengajar: { [Op.in]: [hari_1, hari_2] } },
-  //         { mulai_mengajar: { [Op.in]: [jam_1, jam_2] } },
-  //         { status: STATUS_JADWAL_PENGAJAR.ACTIVE },
-  //       ],
-  //     },
-  //     group: ['pengajar_id'],
-  //   });
-
-  //   // const result = pengajarList.map((pengajar) => {
-  //   //   return {
-  //   //     id_pengajar: pengajar.id,
-  //   //     nama: pengajar.user.nama,
-  //   //     jenis_kelamin: pengajar.user.jenis_kelamin,
-  //   //     jadwalActive: pengajar.jadwal_mengajar ? pengajar.jadwal_mengajar.length : 0,
-  //   //     jadwal_mengajar: pengajar.jadwal_mengajar,
-  //   //   };
-  //   // });
-
-  //   return result;
-  // }
 
   async getOnepengajarByTeacherId(id) {
     const result = await Pengajar.findOne({

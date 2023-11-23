@@ -472,12 +472,15 @@ class BimbinganService extends BaseService {
         {
           model: BimbinganReguler,
           as: 'bimbingan_reguler',
+          attributes: ['id', 'tanggal', 'hari_bimbingan', 'jam_bimbingan'],
         },
         {
           model: BimbinganTambahan,
           as: 'bimbingan_tambahan',
+          attributes: ['id', 'tanggal', 'hari_bimbingan', 'jam_bimbingan'],
         },
       ],
+      attributes: ['id'],
     });
 
     return bimbingan;
@@ -545,36 +548,6 @@ class BimbinganService extends BaseService {
     });
 
     return result;
-  }
-
-  async getOnePeriod(user_id, period_id) {
-    const pesertaId = await sequelize.query(
-      `
-      SELECT *
-      FROM Pesertas
-      WHERE user_id = :userId
-      `,
-      {
-        replacements: { userId: user_id },
-        type: QueryTypes.SELECT,
-      }
-    );
-
-    const bimbingan = await Period.findOne({
-      where: { peserta_id: pesertaId[0].id, id: period_id },
-      include: [
-        {
-          model: BimbinganReguler,
-          as: 'bimbingan_reguler',
-        },
-        {
-          model: BimbinganTambahan,
-          as: 'bimbingan_tambahan',
-        },
-      ],
-    });
-
-    return bimbingan;
   }
 
   #includeQuery = [
