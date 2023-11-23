@@ -13,6 +13,9 @@ const students = require('./validators/student.validator');
 const isAuthenticate = require('./../../middlewares/authentication');
 const { hasRole } = require('../../middlewares/roleAuth');
 const { USER_ROLE } = require('../../helpers/constanta');
+const multer = require('multer');
+const upload = multer({ dest: 'public/profile-picture/' }); // adjust this to your needs
+
 
 router.get('/test', (req, res) => {
   res.send('test registration');
@@ -28,6 +31,7 @@ router.use(isAuthenticate);
 router.get('/user', UserController.getAll);
 router.get('/user/:id', UserController.getOne);
 router.patch('/user/:id', validate(updateUserValidator), UserController.update);
+router.patch('/users/:id', upload.single('profile_picture'), UserController.updateUser);
 router.delete(
   '/user/:id',
   hasRole([USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN]),

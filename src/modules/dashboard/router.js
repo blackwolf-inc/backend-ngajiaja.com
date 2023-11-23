@@ -7,6 +7,7 @@ const { hasRole } = require('../../middlewares/roleAuth');
 const adminRouter = require('./admin/router');
 const pesertaRouter = require('./peserta/router');
 const pengajarRouter = require('./pengajar/router');
+const superAdminRouter = require('./superadmin/router')
 
 router.get('/test', (req, res) => {
   res.status(200).json({
@@ -18,5 +19,6 @@ router.use(isAuthenticate);
 router.use('/admin', adminRouter);
 router.use('/peserta', pesertaRouter);
 router.use('/pengajar', pengajarRouter);
+router.use('/superadmin', superAdminRouter);
 
 module.exports = router;
