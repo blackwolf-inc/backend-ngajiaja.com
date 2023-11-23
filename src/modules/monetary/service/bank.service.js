@@ -43,6 +43,18 @@ class BankService extends BaseService {
       throw new Error(`Failed update ${this.db.name}`);
     }
   }
+
+  async getPengajarBank(id) {
+    console.log(id);
+    const result = await this.getOneById(id);
+    if (!result) throw ApiError.badRequest(`Penganjar with id ${id} not found`);
+
+    return {
+      bank_name: result.nama_bank,
+      account_number: result.no_rekening,
+      owner_name: result.nama_rekening,
+    };
+  }
 }
 
 module.exports = BankService;

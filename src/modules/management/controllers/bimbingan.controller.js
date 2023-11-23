@@ -3,6 +3,7 @@ const PengajarService = require('../../dashboard/pengajar/services/pengajar.serv
 const UserService = require('../../registration/services/user.service');
 const responseHandler = require('../../../helpers/responseHandler');
 const db = require('../../../models/index');
+const moment = require('moment');
 const { Period, BimbinganReguler, User, BimbinganTambahan } = db;
 
 class BimbinganPeserta {
@@ -46,7 +47,7 @@ class BimbinganPeserta {
       const result = await service.bimbinganOnGoing(
         user.pengajar.id,
         req.query.name,
-        req.query.level,
+        req.query.level
       );
       return responseHandler.succes(res, `Success get bimbingan akan datang`, result);
     } catch (error) {
@@ -63,7 +64,7 @@ class BimbinganPeserta {
         user.pengajar.id,
         req.query.name,
         req.query.startDate,
-        req.query.endDate,
+        req.query.endDate
       );
       return responseHandler.succes(res, `Success get bimbingan selesai`, result);
     } catch (error) {
@@ -102,7 +103,7 @@ class BimbinganPeserta {
         req.params.id,
         req.query.name,
         req.query.startDate,
-        req.query.endDate,
+        req.query.endDate
       );
       return responseHandler.succes(res, `Success get progress peserta`, result);
     } catch (error) {
@@ -113,7 +114,31 @@ class BimbinganPeserta {
   static async updateReguler(req, res, next) {
     const service = new BimbinganService(req, BimbinganReguler);
     try {
-      const result = await service.updateData(req.body, { id: req.params.id });
+      let result;
+      if (req.body.persetujuan_peserta) {
+        const bimbingan = await service.getOneById(req.params.id);
+        if (req.body.persetujuan_peserta === 1) {
+          result = await service.updateData(
+            {
+              persetujuan_peserta: req.body.persetujuan_peserta,
+              tanggal: bimbingan.tanggal_baru,
+              jam_bimbingan: bimbingan.jam_baru,
+              hari_bimbingan: moment(bimbingan.tanggal_baru)
+                .locale('id')
+                .format('dddd')
+                .toUpperCase(),
+            },
+            { id: req.params.id }
+          );
+        } else {
+          result = await service.updateData(
+            { persetujuan_peserta: req.body.persetujuan_peserta },
+            { id: req.params.id }
+          );
+        }
+      } else {
+        result = await service.updateData(req.body, { id: req.params.id });
+      }
       return responseHandler.succes(res, `Success update data ${service.db.name}s`, result);
     } catch (error) {
       next(error);
@@ -123,7 +148,31 @@ class BimbinganPeserta {
   static async updateTambahan(req, res, next) {
     const service = new BimbinganService(req, BimbinganTambahan);
     try {
-      const result = await service.updateData(req.body, { id: req.params.id });
+      let result;
+      if (req.body.persetujuan_peserta) {
+        const bimbingan = await service.getOneById(req.params.id);
+        if (req.body.persetujuan_peserta === 1) {
+          result = await service.updateData(
+            {
+              persetujuan_peserta: req.body.persetujuan_peserta,
+              tanggal: bimbingan.tanggal_baru,
+              jam_bimbingan: bimbingan.jam_baru,
+              hari_bimbingan: moment(bimbingan.tanggal_baru)
+                .locale('id')
+                .format('dddd')
+                .toUpperCase(),
+            },
+            { id: req.params.id }
+          );
+        } else {
+          result = await service.updateData(
+            { persetujuan_peserta: req.body.persetujuan_peserta },
+            { id: req.params.id }
+          );
+        }
+      } else {
+        result = await service.updateData(req.body, { id: req.params.id });
+      }
       return responseHandler.succes(res, `Success update data ${service.db.name}s`, result);
     } catch (error) {
       next(error);

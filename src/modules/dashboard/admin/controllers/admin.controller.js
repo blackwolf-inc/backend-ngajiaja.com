@@ -1,6 +1,7 @@
 const AdminPengajarService = require('../services/adminPengajar.service.js');
 const AdminPesertaService = require('../services/adminPeserta.service.js');
 const AdminDashboard = require('../services/adminDashboard.service.js');
+const AdminManageCourseService = require('../services/adminKelolaBimbingan.js');
 const responseHandler = require('../../../../helpers/responseHandler');
 
 class AdminDashboardController {
@@ -18,7 +19,7 @@ class AdminDashboardController {
     const service = new AdminPengajarService();
     try {
       const { userId } = req.params;
-      const { link_wawancara, tanggal_wawancara, jam_wawancara, status_pengajar } = req.body;
+      const { link_wawancara, tanggal_wawancara, jam_wawancara, status_pengajar, isVerifiedByAdmin, level_pengajar } = req.body;
       const result = await service.updateJadwalWawancara(
         req,
         {
@@ -26,6 +27,8 @@ class AdminDashboardController {
           tanggal_wawancara,
           jam_wawancara,
           status_pengajar,
+          isVerifiedByAdmin,
+          level_pengajar
         },
         userId
       );
@@ -171,6 +174,62 @@ class AdminDashboardController {
       const { month } = req.query;
       const result = await service.getAllBimbingan(month);
       return responseHandler.succes(res, 'Success get all bimbingan', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getAllCourse(req, res, next) {
+    const service = new AdminManageCourseService();
+    try {
+      const result = await service.getAllDataCourse();
+      return responseHandler.succes(res, 'Success get all course', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getCourseOngoing(req, res, next) {
+    const service = new AdminManageCourseService();
+    try {
+      const { query } = req;
+      const { keywordStudent, keywordTeacher } = query;
+      const result = await service.getCourseOngoing(query, keywordStudent, keywordTeacher);
+      return responseHandler.succes(res, 'Success get course ongoing', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getCourseFinished(req, res, next) {
+    const service = new AdminManageCourseService();
+    try {
+      const { query } = req;
+      const { keywordStudent, keywordTeacher, startDate, endDate } = query;
+      const result = await service.getCourseFinished(query, keywordStudent, keywordTeacher, startDate, endDate);
+      return responseHandler.succes(res, 'Success get course finished', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getCourseOngoingById(req, res, next) {
+    const service = new AdminManageCourseService();
+    try {
+      const { periodId } = req.params;
+      const result = await service.getCourseOngoingById(periodId);
+      return responseHandler.succes(res, 'Success get course ongoing by id', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getCourseFinishedById(req, res, next) {
+    const service = new AdminManageCourseService();
+    try {
+      const { periodId } = req.params;
+      const result = await service.getCourseFinishedById(periodId);
+      return responseHandler.succes(res, 'Success get course finished by id', result);
     } catch (error) {
       next(error);
     }
