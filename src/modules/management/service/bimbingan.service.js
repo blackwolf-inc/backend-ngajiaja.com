@@ -21,7 +21,7 @@ class BimbinganService extends BaseService {
   async bimbinganOnGoing(id, pesertaName, level) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: STATUS_BIMBINGAN.ACTIVATED } },
-      this.#includeQuery,
+      this.#includeQuery
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
@@ -116,7 +116,7 @@ class BimbinganService extends BaseService {
   async bimbinganDone(id, pesertaName, startDate, endDate) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: STATUS_BIMBINGAN.FINISHED } },
-      this.#includeQuery,
+      this.#includeQuery
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
@@ -208,7 +208,7 @@ class BimbinganService extends BaseService {
   async dataDetailBimbingan(id, pengajarId) {
     const result = await this.__findOne(
       { where: { id, pengajar_id: pengajarId } },
-      this.#includeQuery,
+      this.#includeQuery
     );
     if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
 
@@ -239,7 +239,7 @@ class BimbinganService extends BaseService {
   async detailBimbingan(id, pengajarId) {
     const result = await this.__findOne(
       { where: { id, pengajar_id: pengajarId } },
-      this.#includeQuery,
+      this.#includeQuery
     );
     if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
 
@@ -342,7 +342,7 @@ class BimbinganService extends BaseService {
   async progressPeserta(id, pengajarName, startDate, endDate) {
     const result = await this.__findAll(
       { where: { peserta_id: id } },
-      this.#includeQueryProgressPeserta,
+      this.#includeQueryProgressPeserta
     );
     if (!result) throw ApiError.notFound(`Peserta with id ${id} not found`);
 
@@ -428,7 +428,7 @@ class BimbinganService extends BaseService {
       {
         replacements: { userId: user_id },
         type: QueryTypes.SELECT,
-      },
+      }
     );
 
     const period = await Period.findAll({
@@ -461,42 +461,8 @@ class BimbinganService extends BaseService {
       ],
     });
 
-    const result = period.map((data) => {
-      const totalBimbinganReguler = data.bimbingan_reguler.length;
-      return {
-        id: data.id,
-        nama: data.pengajar.user.nama,
-        jenis_kelamin: data.pengajar.user.jenis_kelamin,
-        hari_1: data.hari_1,
-        jam_1: data.jam_1,
-        hari_2: data.hari_2,
-        jam_2: data.jam_2,
-        jumlah_attedance_bimbingan_regular: totalBimbinganReguler ? totalBimbinganReguler : 0,
-        tipe_bimbingan: data.tipe_bimbingan,
-        status: data.status,
-        infaq_bimbingan_tambahan_sebelum:
-          data.bimbingan_tambahan.length > 0 ? data.bimbingan_tambahan[0].tanggal : null,
-      };
-    });
-
-    return result;
-  }
-
-  async getOnePeriod(user_id, period_id) {
-    const pesertaId = await sequelize.query(
-      `
-      SELECT *
-      FROM Pesertas
-      WHERE user_id = :userId
-      `,
-      {
-        replacements: { userId: user_id },
-        type: QueryTypes.SELECT,
-      },
-    );
-
-    const bimbingan = await Period.findOne({
-      where: { peserta_id: pesertaId[0].id, id: period_id },
+    const periodeBimbingan = await Period.findAll({
+      where: { peserta_id: pesertaId[0].id, status: req.status },
       include: [
         {
           model: BimbinganReguler,
@@ -509,8 +475,169 @@ class BimbinganService extends BaseService {
       ],
     });
 
-    return bimbingan;
+    let arrayPeriodeBimbingan = [];
+
+    if ((periodeBimbingan.status = TYPE_BIMBINGAN.REGULER)) {
+      periodeBimbingan.map((data) => {
+        data.bimbingan_reguler.map((dataTanggal) => {
+          arrayPeriodeBimbingan.push(dataTanggal.tanggal);
+        });
+      });
+    }
+
+    if ((periodeBimbingan.status = TYPE_BIMBINGAN.TAMBAHAN)) {
+      periodeBimbingan.map((data) => {
+        data.bimbingan_tambahan.map((dataTanggal) => {
+          arrayPeriodeBimbingan.push(dataTanggal.tanggal);
+        });
+      });
+    }
+
+    const result = period.map((data) => {
+      const totalBimbinganReguler = data.bimbingan_reguler.length;
+      return {
+        id: data.id,
+        nama: data.pengajar.user.nama,
+        jenis_kelamin: data.pengajar.user.jenis_kelamin,
+        hari_1: data.hari_1,
+        jam_1: data.jam_1,
+        hari_2: data.hari_2,
+        jam_2: data.jam_2,
+        tanggal_mulai: arrayPeriodeBimbingan ? arrayPeriodeBimbingan[0] : null,
+        tanggal_selesai: arrayPeriodeBimbingan
+          ? arrayPeriodeBimbingan[arrayPeriodeBimbingan.length - 1]
+          : null,
+        jumlah_attedance_bimbingan_regular: totalBimbinganReguler ? totalBimbinganReguler : 0,
+        tipe_bimbingan: data.tipe_bimbingan,
+        status: data.status,
+        infaq_bimbingan_tambahan_sebelum:
+          data.bimbingan_tambahan.length > 0 ? data.bimbingan_tambahan[0].tanggal : null,
+      };
+    });
+
+    return result;
   }
+
+  // async getOnePeriod(user_id, period_id) {
+  //   const pesertaId = await sequelize.query(
+  //     `
+  //     SELECT *
+  //     FROM Pesertas
+  //     WHERE user_id = :userId
+  //     `,
+  //     {
+  //       replacements: { userId: user_id },
+  //       type: QueryTypes.SELECT,
+  //     }
+  //   );
+
+  //   const bimbingan = await Period.findOne({
+  //     where: { peserta_id: pesertaId[0].id, id: period_id },
+  //     include: [
+  //       {
+  //         model: BimbinganReguler,
+  //         as: 'bimbingan_reguler',
+  //         attributes: ['id', 'tanggal', 'hari_bimbingan', 'jam_bimbingan'],
+  //       },
+  //       {
+  //         model: BimbinganTambahan,
+  //         as: 'bimbingan_tambahan',
+  //         attributes: ['id', 'tanggal', 'hari_bimbingan', 'jam_bimbingan'],
+  //       },
+  //     ],
+  //     attributes: ['id', 'tipe_bimbingan', 'status', 'tanggal_pengingat_infaq'],
+  //   });
+
+  //   if(bimbingan.status = )
+
+  //   console.log('bimbingan.bimbingan_tambahan');
+  //   // console.log();
+  //   const result = bimbingan.bimbingan_reguler.map((data) => {
+  //     return data;
+  //   });
+
+  //   return result;
+  // }
+
+  async getOnePeriod(user_id, period_id) {
+    const pesertaId = await sequelize.query(
+      `
+      SELECT *
+      FROM Pesertas
+      WHERE user_id = :userId
+      `,
+      {
+        replacements: { userId: user_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    const period = await Period.findOne({
+      where: { peserta_id: pesertaId[0].id, id: period_id },
+      include: [
+        {
+          model: Pengajar,
+          as: 'pengajar',
+          include: [
+            {
+              model: User,
+              as: 'user',
+            },
+          ],
+        },
+        {
+          model: BimbinganReguler,
+          as: 'bimbingan_reguler',
+          attributes: ['id', 'tanggal', 'hari_bimbingan', 'jam_bimbingan'],
+        },
+        {
+          model: BimbinganTambahan,
+          as: 'bimbingan_tambahan',
+          attributes: ['id', 'tanggal', 'hari_bimbingan', 'jam_bimbingan'],
+        },
+      ],
+      attributes: ['id', 'tipe_bimbingan', 'status', 'tanggal_pengingat_infaq'],
+    });
+
+    let arrayPeriodeBimbingan = [];
+
+    if ((period.status = TYPE_BIMBINGAN.REGULER)) {
+      period.bimbingan_reguler.map((data) => {
+        arrayPeriodeBimbingan.push(data.tanggal);
+      });
+    }
+
+    if ((period.status = TYPE_BIMBINGAN.TAMBAHAN)) {
+      period.bimbingan_tambahan.map((data) => {
+        arrayPeriodeBimbingan.push(data.tanggal);
+      });
+    }
+
+    const totalBimbinganReguler = period.bimbingan_reguler.length;
+    return {
+      id: period.id,
+      nama: period.pengajar.user.nama,
+      jenis_kelamin: period.pengajar.user.jenis_kelamin,
+      hari_1: period.hari_1,
+      jam_1: period.jam_1,
+      hari_2: period.hari_2,
+      jam_2: period.jam_2,
+      tanggal_mulai: arrayPeriodeBimbingan ? arrayPeriodeBimbingan[0] : null,
+      tanggal_selesai: arrayPeriodeBimbingan
+        ? arrayPeriodeBimbingan[arrayPeriodeBimbingan.length - 1]
+        : null,
+      jumlah_attedance_bimbingan_regular: totalBimbinganReguler ? totalBimbinganReguler : 0,
+      tipe_bimbingan: period.tipe_bimbingan,
+      status: period.status,
+      infaq_bimbingan_tambahan_sebelum:
+        period.bimbingan_tambahan.length > 0 ? period.bimbingan_tambahan[0].tanggal : null,
+      detail_bimbingan: period.bimbingan_reguler
+        ? period.bimbingan_reguler
+        : period.bimbingan_tambahan,
+    };
+  }
+
+  // return result;
 
   #includeQuery = [
     {

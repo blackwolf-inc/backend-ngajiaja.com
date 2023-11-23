@@ -47,7 +47,7 @@ class BimbinganPeserta {
       const result = await service.bimbinganOnGoing(
         user.pengajar.id,
         req.query.name,
-        req.query.level,
+        req.query.level
       );
       return responseHandler.succes(res, `Success get bimbingan akan datang`, result);
     } catch (error) {
@@ -64,7 +64,7 @@ class BimbinganPeserta {
         user.pengajar.id,
         req.query.name,
         req.query.startDate,
-        req.query.endDate,
+        req.query.endDate
       );
       return responseHandler.succes(res, `Success get bimbingan selesai`, result);
     } catch (error) {
@@ -103,7 +103,7 @@ class BimbinganPeserta {
         req.params.id,
         req.query.name,
         req.query.startDate,
-        req.query.endDate,
+        req.query.endDate
       );
       return responseHandler.succes(res, `Success get progress peserta`, result);
     } catch (error) {
@@ -128,12 +128,12 @@ class BimbinganPeserta {
                 .format('dddd')
                 .toUpperCase(),
             },
-            { id: req.params.id },
+            { id: req.params.id }
           );
         } else {
           result = await service.updateData(
             { persetujuan_peserta: req.body.persetujuan_peserta },
-            { id: req.params.id },
+            { id: req.params.id }
           );
         }
       } else {
@@ -162,12 +162,12 @@ class BimbinganPeserta {
                 .format('dddd')
                 .toUpperCase(),
             },
-            { id: req.params.id },
+            { id: req.params.id }
           );
         } else {
           result = await service.updateData(
             { persetujuan_peserta: req.body.persetujuan_peserta },
-            { id: req.params.id },
+            { id: req.params.id }
           );
         }
       } else {
