@@ -4,6 +4,9 @@ const SendEmailNotification = require('../../../utils/nodemailer');
 const moment = require('moment');
 const { User, Pengajar } = require('../../../models');
 const { STATUS_USER } = require('../../../helpers/constanta');
+const jwt = require('jsonwebtoken');
+const path = require('path');
+const fs = require('fs');
 
 class TeacherService extends BaseService {
   async createTeacher(payload) {
@@ -135,17 +138,35 @@ class TeacherService extends BaseService {
       address: result.user.alamat,
       birthdate: result.user.tgl_lahir,
       last_education: result.pendidikan_terakhir,
+      profile_picture: result.user.profile_picture,
     };
   }
 
-  async updatePengajarProfile(payload, id) {
+  async updatePengajarProfile(req, payload, id) {
     const pengajar = await this.__findOne({ where: id }, this.#includeQuery);
+    if (!pengajar) throw ApiError.notFound(`Pengajar with id ${id} not found`);
+
+    let profile_picture;
+    if (req.file) {
+      let { nama } = jwt.decode(req.headers.authorization.split(' ')[1]);
+      console.log(nama);
+      nama = nama.replace(/\s/g, '-');
+      const extension = path.extname(req.file.originalname);
+      profile_picture = `public/profile-picture/pp-${nama}${extension}`;
+
+      if (!req.file.mimetype.startsWith('image/')) {
+        throw ApiError.badRequest('File must be an image');
+      }
+
+      fs.renameSync(req.file.path, profile_picture);
+    }
+
+    payload.profile_picture = profile_picture;
 
     await User.update(payload, { where: { id: pengajar.user.id } });
     await Pengajar.update(payload, { where: { id } });
 
     const result = await this.__findOne({ where: id }, this.#includeQuery);
-    if (!result) throw ApiError.notFound(`Pengajar with id ${id} not found`);
 
     return {
       name: result.user.nama,
@@ -155,6 +176,7 @@ class TeacherService extends BaseService {
       address: result.user.alamat,
       birthdate: result.user.tgl_lahir,
       last_education: result.pendidikan_terakhir,
+      profile_picture: result.user.profile_picture,
     };
   }
 

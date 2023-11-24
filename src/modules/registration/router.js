@@ -16,7 +16,6 @@ const { USER_ROLE } = require('../../helpers/constanta');
 const multer = require('multer');
 const upload = multer({ dest: 'public/profile-picture/' }); // adjust this to your needs
 
-
 router.get('/test', (req, res) => {
   res.send('test registration');
 });
@@ -45,7 +44,11 @@ router.post('/pengajar', validate(createTeacherValidator), PengajarController.cr
 router.patch('/pengajar/:id', validate(updateTeacherValidator), PengajarController.update);
 router.delete('/pengajar/:id', PengajarController.delete);
 router.get('/profile/pengajar', PengajarController.getPengajarProfile);
-router.patch('/profile/pengajar', PengajarController.updatePengajarProfile);
+router.patch(
+  '/profile/pengajar',
+  upload.single('profile_picture'),
+  PengajarController.updatePengajarProfile,
+);
 
 // students route
 router.get('/student', StudentController.getAll);

@@ -85,7 +85,7 @@ class TeacherController {
     const userService = new UserService(req, User);
     try {
       const user = await userService.getOneUser(req.user.id);
-      const result = await service.updatePengajarProfile(req.body, user.pengajar.id);
+      const result = await service.updatePengajarProfile(req, req.body, user.pengajar.id);
       return responseHandler.succes(res, `Success update ${service.db.name}`, result);
     } catch (error) {
       next(error);
