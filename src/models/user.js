@@ -50,6 +50,7 @@ module.exports = (sequelize, DataTypes) => {
       status: DataTypes.STRING,
       password: DataTypes.STRING,
       token: DataTypes.TEXT,
+      profile_picture: DataTypes.STRING,
     },
     {
       sequelize,

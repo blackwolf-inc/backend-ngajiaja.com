@@ -7,6 +7,7 @@
     "dev": "nodemon ./src/app.js",
     "server-test": "NODE_ENV=test nodemon ./src/app.js",
     "start": "node ./src/app.js",
+    "create:db": "npx sequelize-cli db:create",
     "migrate:up": "npx sequelize-cli db:migrate",
     "migrate:down": "npx sequelize-cli db:migrate:undo:all",
     "migrate:status": "npx sequelize-cli db:migrate:status",

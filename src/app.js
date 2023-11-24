@@ -29,6 +29,7 @@ class Application {
     this.app.use(morgan('dev'));
     this.app.use(compression());
     this.app.use('/images', express.static('../images'));
+    this.app.use('/public', express.static(path.join(__dirname, '../public')));
   }
 
   async routers() {

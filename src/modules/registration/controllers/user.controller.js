@@ -3,8 +3,11 @@ const { getHash } = require('../../../helpers/passwordHash');
 const UserService = require('../services/user.service');
 const responseHandler = require('./../../../helpers/responseHandler');
 const db = require('./../../../models/index');
-const { User, sequelize } = db;
+const { User, Peserta, Pengajar, sequelize } = db;
 const nodemailer = require('nodemailer');
+const fs = require('fs');
+const path = require('path');
+const jwt = require('jsonwebtoken');
 
 class UserController {
   static async getOne(req, res, next) {
@@ -88,7 +91,76 @@ class UserController {
       status: body.status,
       password: getHash(body.password),
       token: body.token,
+      profile_picture: body.profile_picture || 'public/profile-picture/default_pp.png',
     };
+  }
+
+  static async updateUser(req, res) {
+    const { id } = req.params;
+
+    const user = await User.findOne({ where: { id } });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    let profile_picture;
+    if (req.file) {
+      let { nama } = jwt.decode(req.headers.authorization.split(' ')[1]);
+      nama = nama.replace(/\s/g, '-');
+      const extension = path.extname(req.file.originalname);
+      profile_picture = `public/profile-picture/pp-${nama}${extension}`;
+
+      if (!req.file.mimetype.startsWith('image/')) {
+        return res.status(400).json({ message: 'File must be an image' });
+      }
+
+      fs.renameSync(req.file.path, profile_picture);
+    }
+    if (req.body.password) {
+      req.body.password = getHash(req.body.password);
+    }
+    if (req.body.tgl_lahir) {
+      req.body.tgl_lahir = formatDateLocal(req.body.tgl_lahir);
+    }
+
+    const { nama, email, telp_wa, jenis_kelamin, alamat, status, password, tgl_lahir, profesi, pendidikan_terakhir } = req.body;
+
+    const updatePayload = {
+      nama,
+      email,
+      telp_wa,
+      jenis_kelamin,
+      alamat,
+      status,
+      password,
+      tgl_lahir,
+      profile_picture,
+      profesi,
+      pendidikan_terakhir
+    };
+
+    const updatedUser = await User.update(updatePayload, {
+      where: { id }
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.role === 'PESERTA') {
+      await Peserta.update({ profesi }, {
+        where: { user_id: id }
+      });
+    }
+
+    if (user.role === 'PENGAJAR') {
+      await Pengajar.update({ pendidikan_terakhir }, {
+        where: { user_id: id }
+      });
+    }
+
+    return responseHandler.succes(res, `Success update user id ${id}`, updatePayload);
   }
 }
 
