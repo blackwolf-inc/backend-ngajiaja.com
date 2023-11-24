@@ -1,7 +1,8 @@
 const TeacherService = require('../services/teacher.service');
+const UserService = require('../services/user.service');
 const responseHandler = require('./../../../helpers/responseHandler');
 const db = require('./../../../models/index');
-const { Pengajar, sequelize } = db;
+const { Pengajar, User, sequelize } = db;
 const { USER_ROLE } = require('./../../../helpers/constanta');
 const ApiError = require('../../../helpers/errorHandler');
 class TeacherController {
@@ -62,6 +63,30 @@ class TeacherController {
     try {
       const result = await service.deleteTeacherByUserId(req.params.id);
       return responseHandler.succes(res, `Success delete ${service.db.name}`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getPengajarProfile(req, res, next) {
+    const service = new TeacherService(req, Pengajar);
+    const userService = new UserService(req, User);
+    try {
+      const user = await userService.getOneUser(req.user.id);
+      const result = await service.getPengajarProfile(user.pengajar.id);
+      return responseHandler.succes(res, `Success get ${service.db.name}`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updatePengajarProfile(req, res, next) {
+    const service = new TeacherService(req, Pengajar);
+    const userService = new UserService(req, User);
+    try {
+      const user = await userService.getOneUser(req.user.id);
+      const result = await service.updatePengajarProfile(req, req.body, user.pengajar.id);
+      return responseHandler.succes(res, `Success update ${service.db.name}`, result);
     } catch (error) {
       next(error);
     }

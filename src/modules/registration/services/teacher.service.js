@@ -4,6 +4,9 @@ const SendEmailNotification = require('../../../utils/nodemailer');
 const moment = require('moment');
 const { User, Pengajar } = require('../../../models');
 const { STATUS_USER } = require('../../../helpers/constanta');
+const jwt = require('jsonwebtoken');
+const path = require('path');
+const fs = require('fs');
 
 class TeacherService extends BaseService {
   async createTeacher(payload) {
@@ -37,7 +40,7 @@ class TeacherService extends BaseService {
       const dateOnly = new Date(
         dateObject.getFullYear(),
         dateObject.getMonth(),
-        dateObject.getDate()
+        dateObject.getDate(),
       );
       payload.tanggal_wawancara = dateOnly;
     }
@@ -70,16 +73,32 @@ class TeacherService extends BaseService {
     const result = await User.findOne({
       where: { id: id },
       attributes: ['id', 'nama', 'email', 'telp_wa', 'jenis_kelamin', 'alamat', 'tgl_lahir'],
-      include: [{
-        model: Pengajar,
-        as: 'pengajar',
-        attributes: [
-          ['id', 'pengajar_id'], 'level', 'pendidikan_terakhir', 'punya_sertifikasi_guru_quran', 'pengalaman_mengajar',
-          'pernah_mengajar_online', 'paham_aplikasi_meet', 'siap_komitmen', 'mengajar_hari_libur', 'bagi_hasil_50persen',
-          'isVerifiedByAdmin', 'link_video_membaca_quran', 'link_video_simulasi_mengajar', 'tanggal_wawancara', 'jam_wawancara',
-          'nama_bank', 'no_bank', 'link_wawancara'
-        ]
-      }]
+      include: [
+        {
+          model: Pengajar,
+          as: 'pengajar',
+          attributes: [
+            ['id', 'pengajar_id'],
+            'level',
+            'pendidikan_terakhir',
+            'punya_sertifikasi_guru_quran',
+            'pengalaman_mengajar',
+            'pernah_mengajar_online',
+            'paham_aplikasi_meet',
+            'siap_komitmen',
+            'mengajar_hari_libur',
+            'bagi_hasil_50persen',
+            'isVerifiedByAdmin',
+            'link_video_membaca_quran',
+            'link_video_simulasi_mengajar',
+            'tanggal_wawancara',
+            'jam_wawancara',
+            'nama_bank',
+            'no_bank',
+            'link_wawancara',
+          ],
+        },
+      ],
     });
     if (!result) throw ApiError.notFound(`Pengajar with id ${id} not found`);
 
@@ -106,6 +125,70 @@ class TeacherService extends BaseService {
 
     return result;
   }
+
+  async getPengajarProfile(id) {
+    const result = await this.__findOne({ where: id }, this.#includeQuery);
+    if (!result) throw ApiError.notFound(`Pengajar with id ${id} not found`);
+
+    return {
+      name: result.user.nama,
+      email: result.user.email,
+      telp_wa: result.user.telp_wa,
+      gender: result.user.jenis_kelamin,
+      address: result.user.alamat,
+      birthdate: result.user.tgl_lahir,
+      last_education: result.pendidikan_terakhir,
+      profile_picture: result.user.profile_picture,
+    };
+  }
+
+  async updatePengajarProfile(req, payload, id) {
+    const pengajar = await this.__findOne({ where: id }, this.#includeQuery);
+    if (!pengajar) throw ApiError.notFound(`Pengajar with id ${id} not found`);
+
+    let profile_picture;
+    if (req.file) {
+      let { nama } = jwt.decode(req.headers.authorization.split(' ')[1]);
+      console.log(nama);
+      nama = nama.replace(/\s/g, '-');
+      const extension = path.extname(req.file.originalname);
+      profile_picture = `public/profile-picture/pp-${nama}${extension}`;
+
+      if (!req.file.mimetype.startsWith('image/')) {
+        throw ApiError.badRequest('File must be an image');
+      }
+
+      fs.renameSync(req.file.path, profile_picture);
+    }
+
+    payload.profile_picture = profile_picture;
+
+    await User.update(payload, { where: { id: pengajar.user.id } });
+    await Pengajar.update(payload, { where: { id } });
+
+    const result = await this.__findOne({ where: id }, this.#includeQuery);
+
+    return {
+      name: result.user.nama,
+      email: result.user.email,
+      telp_wa: result.user.telp_wa,
+      gender: result.user.jenis_kelamin,
+      address: result.user.alamat,
+      birthdate: result.user.tgl_lahir,
+      last_education: result.pendidikan_terakhir,
+      profile_picture: result.user.profile_picture,
+    };
+  }
+
+  #includeQuery = [
+    {
+      model: User,
+      as: 'user',
+      attributesL: {
+        exclude: ['password', 'token'],
+      },
+    },
+  ];
 }
 
 module.exports = TeacherService;
