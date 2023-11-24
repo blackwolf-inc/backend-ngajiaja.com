@@ -5,8 +5,8 @@ class SuperAdminController {
     static async getAllDataSuperAdminDashboard(req, res, next) {
         const service = new SuperAdminDashboardService();
         try {
-            const { month, year } = req.query;
-            const result = await service.getDataMonthSuperAdminDashboard(month, year);
+            const { month, startDate, endDate } = req.query;
+            const result = await service.getDataMonthSuperAdminDashboard(month, startDate, endDate);
             return responseHandler.succes(res, 'Success get all bimbingan', result);
         } catch (error) {
             next(error);
