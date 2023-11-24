@@ -13,6 +13,17 @@ class SuperAdminController {
         }
     }
 
+    static async getDataSuperAdminDashboard(req, res, next) {
+        const service = new SuperAdminDashboardService();
+        const { startDate, endDate } = req.query;
+        try {
+            const result = await service.getDataDashboard(startDate, endDate);
+            return responseHandler.succes(res, 'Success get all data', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
 }
 
 module.exports = SuperAdminController

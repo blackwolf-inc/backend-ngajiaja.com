@@ -74,6 +74,68 @@ class SuperAdminDashboard {
         }
     }
 
+    async getDataDashboard(startDate = '2023-01-01', endDate = '2023-12-31') {
+        const [total_bimbingan, total_penghasilan, penghasilan_pengajar, penghasilan_perusahaan] = await Promise.all([
+            sequelize.query(
+                `
+                SELECT COUNT(*) AS 'total'
+                FROM Periods
+                WHERE status IN ('ACTIVATED', 'FINISHED') AND updatedAt BETWEEN :startDate AND :endDate
+                `,
+                {
+                    replacements: { startDate, endDate },
+                    type: QueryTypes.SELECT
+                }
+            ),
+            sequelize.query(
+                `
+                SELECT SUM(pembayaran) AS 'total'
+                FROM PenghasilanPengajars
+                WHERE waktu_pembayaran BETWEEN :startDate AND :endDate
+                `,
+                {
+                    replacements: { startDate, endDate },
+                    type: QueryTypes.SELECT
+                }
+            ),
+            sequelize.query(
+                `
+                SELECT SUM(penghasilan) AS 'total'
+                FROM PenghasilanPengajars
+                WHERE waktu_pembayaran BETWEEN :startDate AND :endDate
+                `,
+                {
+                    replacements: { startDate, endDate },
+                    type: QueryTypes.SELECT
+                }
+            ),
+            sequelize.query(
+                `
+                SELECT (SUM(pembayaran) - SUM(penghasilan)) AS 'total'
+                FROM PenghasilanPengajars
+                WHERE waktu_pembayaran BETWEEN :startDate AND :endDate
+                `,
+                {
+                    replacements: { startDate, endDate },
+                    type: QueryTypes.SELECT
+                }
+            ),
+        ]);
+
+        const penghasilan_pengajar_chart = (penghasilan_pengajar[0].total / total_penghasilan[0].total) * 100;
+        const penghasilan_perusahaan_chart = (penghasilan_perusahaan[0].total / total_penghasilan[0].total) * 100;
+
+        return {
+            total_bimbingan: total_bimbingan[0].total,
+            total_penghasilan: total_penghasilan[0].total,
+            penghasilan_pengajar: penghasilan_pengajar[0].total,
+            penghasilan_perusahaan: penghasilan_perusahaan[0].total,
+            penghasilan_pengajar_chart: penghasilan_pengajar_chart,
+            penghasilan_perusahaan_chart: penghasilan_perusahaan_chart,
+        };
+    }
+
+
 }
 
 module.exports = SuperAdminDashboard;
