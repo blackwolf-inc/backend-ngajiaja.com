@@ -40,29 +40,35 @@ class AdminDashboard {
         };
     }
 
-    async getAllBimbingan(month) {
-        const monthMapping = { 'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12 };
-        month = monthMapping[month];
-
+    async getAllBimbingan(month, startDate = '2023-01-01', endDate = '2023-12-31') {
         if (month) {
+            const formattedMonth = month;
             const bimbinganReguler = await sequelize.query(
                 `
-                SELECT COUNT(*) AS total, DAY(tanggal) AS day
+                SELECT COUNT(*) AS total, DATE(tanggal) AS day
                 FROM BimbinganRegulers
-                WHERE MONTH(tanggal) = ${month}
-                GROUP BY DAY(tanggal)
+                JOIN Periods ON BimbinganRegulers.period_id = Periods.id
+                WHERE tanggal BETWEEN :startDate AND :endDate AND DATE_FORMAT(tanggal, '%Y-%m') = :formattedMonth AND Periods.status IN ('ACTIVATED', 'FINISHED')
+                GROUP BY DATE(tanggal)
                 `,
-                { type: QueryTypes.SELECT }
+                {
+                    replacements: { startDate, endDate, formattedMonth },
+                    type: QueryTypes.SELECT
+                }
             );
 
             const bimbinganTambahan = await sequelize.query(
                 `
-                SELECT COUNT(*) AS total, DAY(tanggal) AS day
+                SELECT COUNT(*) AS total, DATE(tanggal) AS day
                 FROM BimbinganTambahans
-                WHERE MONTH(tanggal) = ${month}
-                GROUP BY DAY(tanggal)
+                JOIN Periods ON BimbinganTambahans.period_id = Periods.id
+                WHERE tanggal BETWEEN :startDate AND :endDate AND DATE_FORMAT(tanggal, '%Y-%m') = :formattedMonth AND Periods.status IN ('ACTIVATED', 'FINISHED')
+                GROUP BY DATE(tanggal)
                 `,
-                { type: QueryTypes.SELECT }
+                {
+                    replacements: { startDate, endDate, formattedMonth },
+                    type: QueryTypes.SELECT
+                }
             );
 
             const result = {};
@@ -79,30 +85,39 @@ class AdminDashboard {
         } else {
             const bimbinganReguler = await sequelize.query(
                 `
-                SELECT COUNT(*) AS total, MONTH(tanggal) AS month
+                SELECT COUNT(*) AS total, DATE_FORMAT(tanggal, '%Y-%m') AS month
                 FROM BimbinganRegulers
-                GROUP BY MONTH(tanggal)
+                JOIN Periods ON BimbinganRegulers.period_id = Periods.id
+                WHERE tanggal BETWEEN :startDate AND :endDate AND Periods.status IN ('ACTIVATED', 'FINISHED')
+                GROUP BY DATE_FORMAT(tanggal, '%Y-%m')
                 `,
-                { type: QueryTypes.SELECT }
+                {
+                    replacements: { startDate, endDate },
+                    type: QueryTypes.SELECT
+                }
             );
 
             const bimbinganTambahan = await sequelize.query(
                 `
-                SELECT COUNT(*) AS total, MONTH(tanggal) AS month
+                SELECT COUNT(*) AS total, DATE_FORMAT(tanggal, '%Y-%m') AS month
                 FROM BimbinganTambahans
-                GROUP BY MONTH(tanggal)
+                JOIN Periods ON BimbinganTambahans.period_id = Periods.id
+                WHERE tanggal BETWEEN :startDate AND :endDate AND Periods.status IN ('ACTIVATED', 'FINISHED')
+                GROUP BY DATE_FORMAT(tanggal, '%Y-%m')
                 `,
-                { type: QueryTypes.SELECT }
+                {
+                    replacements: { startDate, endDate },
+                    type: QueryTypes.SELECT
+                }
             );
 
             const result = {};
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
             const allBimbingan = [...bimbinganReguler, ...bimbinganTambahan];
 
+
             for (const item of allBimbingan) {
-                const month = months[item.month - 1];
-                result[month] = (result[month] || 0) + item.total;
+                result[item.month] = (result[item.month] || 0) + item.total;
             }
 
             return result;

@@ -3,7 +3,7 @@ const db = require('../../../../models/index');
 const { Pengajar, User, sequelize } = db;
 
 class SuperAdminDashboard {
-    async getDataMonthSuperAdminDashboard(month, startDate = '2023-01-01', endDate = '2024-12-31') {
+    async getDataMonthSuperAdminDashboard(month, startDate = '2023-01-01', endDate = '2023-12-31') {
 
         if (month) {
             const formattedMonth = month;
