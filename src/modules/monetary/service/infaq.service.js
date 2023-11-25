@@ -9,7 +9,9 @@ const {
   Pengajar,
   PenghasilanPengajar,
 } = require('../../../models');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
+const fs = require('fs/promises');
+const path = require('path');
 
 class InfaqService extends BaseService {
   async checkUserById(payload) {
@@ -130,10 +132,23 @@ class InfaqService extends BaseService {
     return modifiedResult;
   }
 
+  async insertImages(req) {
+    if (req.file) {
+      const imageUrl = `${req.file.filename}`;
+      req.body.bukti_pembayaran = imageUrl;
+    } else {
+      throw ApiError.badRequest(`Image not found`);
+    }
+  }
   async updateImages(req) {
     if (req.file) {
       const imageUrl = `${req.file.filename}`;
       req.body.bukti_pembayaran = imageUrl;
+
+      const result = await Infaq.findOne({ where: { id: req.params.id } });
+      if (result.bukti_pembayaran) {
+        await fs.unlink(path.join(process.cwd(), `../images/${result.bukti_pembayaran}`), () => {});
+      }
     } else {
       throw ApiError.badRequest(`Image not found`);
     }
