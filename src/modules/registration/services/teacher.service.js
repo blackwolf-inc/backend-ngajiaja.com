@@ -40,7 +40,7 @@ class TeacherService extends BaseService {
       const dateOnly = new Date(
         dateObject.getFullYear(),
         dateObject.getMonth(),
-        dateObject.getDate(),
+        dateObject.getDate()
       );
       payload.tanggal_wawancara = dateOnly;
     }
@@ -94,7 +94,7 @@ class TeacherService extends BaseService {
             'tanggal_wawancara',
             'jam_wawancara',
             'nama_bank',
-            'no_bank',
+            'no_rekening',
             'link_wawancara',
           ],
         },
