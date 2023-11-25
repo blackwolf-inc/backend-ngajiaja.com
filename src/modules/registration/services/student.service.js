@@ -121,7 +121,6 @@ class StudentService extends BaseService {
     let profile_picture;
     if (req.file) {
       let { nama } = jwt.decode(req.headers.authorization.split(' ')[1]);
-      console.log(nama);
       nama = nama.replace(/\s/g, '-');
       const extension = path.extname(req.file.originalname);
       profile_picture = `public/profile-picture/pp-${nama}${extension}`;

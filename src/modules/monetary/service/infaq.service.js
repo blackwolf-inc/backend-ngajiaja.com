@@ -142,24 +142,12 @@ class InfaqService extends BaseService {
   }
   async updateImages(req) {
     if (req.file) {
-      const newImageName = `${req.file.filename}`;
-
-      req.body.bukti_pembayaran = newImageName;
+      const imageUrl = `${req.file.filename}`;
+      req.body.bukti_pembayaran = imageUrl;
 
       const result = await Infaq.findOne({ where: { id: req.params.id } });
-      const oldImageName = result.bukti_pembayaran;
-
       if (result.bukti_pembayaran) {
-        // Path lama dan path baru
-        const oldImagePath = path.join(process.cwd(), `../images/${oldImageName}`);
-        const newImagePath = path.join(process.cwd(), `../images/${newImageName}`);
-
-        // Ganti nama file
-        await fs.rename(oldImagePath, newImagePath, (err) => {
-          if (err) {
-            throw ApiError.internalServerError('Failed to rename file');
-          }
-        });
+        await fs.unlink(path.join(process.cwd(), `../images/${result.bukti_pembayaran}`), () => {});
       }
     } else {
       throw ApiError.badRequest(`Image not found`);
