@@ -43,7 +43,7 @@ class InfaqController {
         service.checkPeriodById(req.body),
         service.checkBankById(req.body),
         service.updateDateNow(req),
-        service.updateImages(req),
+        service.insertImages(req),
       ]);
       const result = await service.createData(req.body);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);

@@ -9,7 +9,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Peserta.belongsTo(models.User, { foreignKey: 'user_id' });
+      Peserta.belongsTo(models.User, {
+        foreignKey: 'user_id',
+        as: 'user',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
       Peserta.hasOne(models.JadwalBimbinganPeserta, {
         foreignKey: 'peserta_id',
         as: 'jadwal_bimbingan_peserta',
@@ -57,7 +62,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       tableName: 'Pesertas',
       modelName: 'Peserta',
-    },
+    }
   );
   return Peserta;
 };

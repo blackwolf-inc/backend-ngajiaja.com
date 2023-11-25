@@ -4,7 +4,7 @@ const StudentService = require('../services/student.service');
 const UserService = require('../services/user.service');
 const responseHandler = require('./../../../helpers/responseHandler');
 const db = require('./../../../models/index');
-const { Peserta, sequelize, JadwalBimbinganPeserta } = db;
+const { Peserta, sequelize, JadwalBimbinganPeserta, User } = db;
 
 class StudentController {
   static async getOne(req, res, next) {
@@ -82,6 +82,30 @@ class StudentController {
     try {
       await service.deleteStudentByUserId(req);
       return responseHandler.succes(res, `Success delete ${service.db.name}`);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getPesertaProfile(req, res, next) {
+    const service = new StudentService(req, Peserta);
+    const userService = new UserService(req, User);
+    try {
+      const user = await userService.getOneUser(req.user.id);
+      const result = await service.getPesertaProfile(user.peserta.id);
+      return responseHandler.succes(res, `Success get ${service.db.name}`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updatePesertaProfile(req, res, next) {
+    const service = new StudentService(req, Peserta);
+    const userService = new UserService(req, User);
+    try {
+      const user = await userService.getOneUser(req.user.id);
+      const result = await service.updatePesertaProfile(req, req.body, user.peserta.id);
+      return responseHandler.succes(res, `Success update ${service.db.name}`, result);
     } catch (error) {
       next(error);
     }
