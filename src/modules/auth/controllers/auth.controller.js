@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 const responseHandler = require('./../../../helpers/responseHandler');
 const db = require('./../../../models/index');
 const { User, UserResetPassword, sequelize } = db;
+const { validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
 
 class AuthController {
   static async login(req, res, next) {
@@ -80,6 +82,51 @@ class AuthController {
       delete user.password;
       delete user.token;
       return responseHandler.succes(res, `Success`, user);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async changePassword(req, res, next) {
+    const service = new AuthService(req, User);
+    try {
+      const { oldPassword, newPassword, confirmNewPassword } = req.body;
+      const errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        throw ApiError.badRequest('Validation failed', errors.array());
+      }
+
+      const user = await User.findOne({ where: { id: req.user.id } });
+
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) {
+        throw ApiError.badRequest('Old password is incorrect');
+      }
+
+      if (newPassword.length < 8) {
+        throw ApiError.badRequest('Password must be at least 8 characters long');
+      }
+
+      if (newPassword === oldPassword) {
+        throw ApiError.badRequest('New password cannot be same with old password');
+      }
+
+      if (newPassword !== confirmNewPassword) {
+        throw ApiError.badRequest('Password and confirm password not match');
+      }
+
+      const payload = {
+        password: getHash(newPassword),
+      };
+
+      await service.updateData(payload, { id: req.user.id });
+      const newToken = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET_KEY, { expiresIn: '2d' });
+
+      await User.update({ token: newToken }, { where: { id: req.user.id } });
+
+      return res.json({ message: 'Password changed successfully', token: newToken });
+
     } catch (err) {
       next(err);
     }

@@ -168,7 +168,7 @@ class AdminPengajarService {
       `
       SELECT 
         u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
-        p.id AS 'pengajar_id', p.tanggal_wawancara, p.jam_wawancara, p.link_wawancara
+        p.id AS 'pengajar_id', p.tanggal_wawancara, p.jam_wawancara, p.link_wawancara, p.link_video_membaca_quran, p.link_video_simulasi_mengajar
       FROM Pengajars p 
       JOIN Users u ON p.user_id = u.id 
       ${whereClause}

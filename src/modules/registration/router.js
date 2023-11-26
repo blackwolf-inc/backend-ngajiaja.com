@@ -30,7 +30,6 @@ router.use(isAuthenticate);
 router.get('/user', UserController.getAll);
 router.get('/user/:id', UserController.getOne);
 router.patch('/user/:id', validate(updateUserValidator), UserController.update);
-router.patch('/users/:id', upload.single('profile_picture'), UserController.updateUser);
 router.delete(
   '/user/:id',
   hasRole([USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN]),
@@ -73,5 +72,7 @@ router.get('/jadwal', StudentController.getOneJadwal);
 
 // get admin profile
 router.get('/profile/admin/:id', UserController.getAdminProfile);
+
+router.patch('/change-user-profile/:id', upload.single('profile_picture'), UserController.updateUser);
 
 module.exports = router;

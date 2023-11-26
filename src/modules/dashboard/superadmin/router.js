@@ -22,4 +22,8 @@ router.patch('/data/peserta/registered/:userId', SuperAdminDashboardController.u
 router.get('/data/peserta/verified', SuperAdminDashboardController.getPesertaVerified);
 router.patch('/data/peserta/verified/:userId', SuperAdminDashboardController.updateStatusPeserta);
 
+router.get('/data/pengajar', SuperAdminDashboardController.getDataPengajar);
+router.get('/data/pengajar/registered', SuperAdminDashboardController.getPengajarRegistered);
+router.patch('/data/pengajar/registered/:userId', SuperAdminDashboardController.updateStatusPengajarTerdaftar);
+
 module.exports = router;
