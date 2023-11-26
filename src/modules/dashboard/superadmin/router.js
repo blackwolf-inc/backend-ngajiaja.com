@@ -19,5 +19,7 @@ router.get('/data/infaq', SuperAdminDashboardController.getDataInfaqAdmin);
 router.get('/data/peserta', SuperAdminDashboardController.getDataPeserta);
 router.get('/data/peserta/registered', SuperAdminDashboardController.getPesertaRegistered);
 router.patch('/data/peserta/registered/:userId', SuperAdminDashboardController.updateStatusPeserta);
+router.get('/data/peserta/verified', SuperAdminDashboardController.getPesertaVerified);
+router.patch('/data/peserta/verified/:userId', SuperAdminDashboardController.updateStatusPeserta);
 
 module.exports = router;

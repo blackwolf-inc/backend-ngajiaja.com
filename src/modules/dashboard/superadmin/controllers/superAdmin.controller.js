@@ -81,6 +81,34 @@ class SuperAdminController {
         }
     }
 
+    static async getPesertaVerified(req, res, next) {
+        const service = new SuperAdminPesertaDashboardService();
+        try {
+            const { query } = req;
+            const { status, keyword, level } = query;
+            const result = await service.getPesertaVerified(query, status, keyword, level);
+            return responseHandler.succes(res, 'Success get peserta Terverifikasi', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async updateStatusPesertaVerified(req, res, next) {
+        const service = new SuperAdminPesertaDashboardService();
+        try {
+            const { userId } = req.params;
+            const { status_peserta, level_peserta } = req.body;
+            const result = await service.updateStatusPesertaVerified(
+                req,
+                { status_peserta, level_peserta },
+                userId
+            );
+            return responseHandler.succes(res, 'Success update status peserta', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
 }
 
 module.exports = SuperAdminController
