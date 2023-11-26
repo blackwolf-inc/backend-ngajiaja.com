@@ -162,6 +162,17 @@ class UserController {
 
     return responseHandler.succes(res, `Success update user id ${id}`, updatePayload);
   }
+
+  static async getAdminProfile(req, res) {
+    const service = new UserService(req, User);
+    try {
+      const result = await service.getAdminProfile(req.params.id);
+      return responseHandler.succes(res, `Success get admin profile ${service.db.name}`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 module.exports = UserController;

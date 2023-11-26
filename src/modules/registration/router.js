@@ -71,4 +71,7 @@ router.post(
 );
 router.get('/jadwal', StudentController.getOneJadwal);
 
+// get admin profile
+router.get('/profile/admin/:id', UserController.getAdminProfile);
+
 module.exports = router;
