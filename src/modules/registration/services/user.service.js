@@ -1,7 +1,7 @@
 const BaseService = require('../../../base/base.service');
 const { USER_ROLE } = require('../../../helpers/constanta');
 const ApiError = require('../../../helpers/errorHandler');
-const { sequelize, Pengajar, Peserta } = require('../../../models');
+const { sequelize, Pengajar, Peserta, User } = require('../../../models');
 
 class UserService extends BaseService {
   async getUserByEmail(email) {
@@ -103,6 +103,18 @@ class UserService extends BaseService {
       as: 'peserta',
     },
   ];
+
+  async getAdminProfile(userId) {
+    const user = await User.findByPk(userId, {
+      attributes: ['profile_picture', 'nama', 'email', 'role']
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return user;
+  }
 }
 
 module.exports = UserService;
