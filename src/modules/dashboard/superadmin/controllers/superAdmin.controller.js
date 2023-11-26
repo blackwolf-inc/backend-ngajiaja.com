@@ -109,6 +109,50 @@ class SuperAdminController {
         }
     }
 
+    static async getDataPengajar(req, res, next) {
+        const service = new SuperAdminPesertaDashboardService();
+        try {
+            const result = await service.getDataPengajar();
+            return responseHandler.succes(res, 'Success get all data', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getPengajarRegistered(req, res, next) {
+        const service = new SuperAdminPesertaDashboardService();
+        try {
+            const { query } = req;
+            const { status, keyword, startDate, endDate } = query;
+            const result = await service.getPengajarRegistered(
+                query,
+                status,
+                keyword,
+                startDate,
+                endDate
+            );
+            return responseHandler.succes(res, 'Success get pengajar Terdaftar', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async updateStatusPengajarTerdaftar(req, res, next) {
+        const service = new SuperAdminPesertaDashboardService();
+        try {
+            const { userId } = req.params;
+            const { link_wawancara, tanggal_wawancara, jam_wawancara, isVerifiedByAdmin, level_pengajar, status_pengajar } = req.body;
+            const result = await service.updateStatusPengajarTerdaftar(
+                req,
+                { link_wawancara, tanggal_wawancara, jam_wawancara, isVerifiedByAdmin, level_pengajar, status_pengajar },
+                userId
+            );
+            return responseHandler.succes(res, 'Success update status pengajar terdaftar', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
 }
 
 module.exports = SuperAdminController
