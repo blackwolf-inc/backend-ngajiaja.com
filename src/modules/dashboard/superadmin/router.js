@@ -14,5 +14,6 @@ router.use(hasRole([USER_ROLE.SUPER_ADMIN]));
 router.get('/data/totalbimbingan', SuperAdminDashboardController.getAllDataSuperAdminDashboard);
 router.get('/data/totaltransaksi', SuperAdminDashboardController.getDataSuperAdminDashboard);
 
+router.get('/data/infaq', SuperAdminDashboardController.getDataInfaqAdmin);
 
 module.exports = router;

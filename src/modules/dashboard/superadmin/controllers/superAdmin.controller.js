@@ -24,6 +24,17 @@ class SuperAdminController {
         }
     }
 
+    static async getDataInfaqAdmin(req, res, next) {
+        const service = new SuperAdminDashboardService();
+        const { nama, nama_bank, status, startDate, endDate } = req.query;
+        try {
+            const result = await service.getDataInfaqDashboard(nama, nama_bank, status, startDate, endDate);
+            return responseHandler.succes(res, 'Success get all data', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
 }
 
 module.exports = SuperAdminController
