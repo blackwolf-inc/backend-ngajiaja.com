@@ -16,4 +16,8 @@ router.get('/data/totaltransaksi', SuperAdminDashboardController.getDataSuperAdm
 
 router.get('/data/infaq', SuperAdminDashboardController.getDataInfaqAdmin);
 
+router.get('/data/peserta', SuperAdminDashboardController.getDataPeserta);
+router.get('/data/peserta/registered', SuperAdminDashboardController.getPesertaRegistered);
+router.patch('/data/peserta/registered/:userId', SuperAdminDashboardController.updateStatusPeserta);
+
 module.exports = router;

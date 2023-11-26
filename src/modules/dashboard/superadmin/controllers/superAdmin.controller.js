@@ -1,4 +1,5 @@
 const SuperAdminDashboardService = require('../services/superadminDashboard.service.js')
+const SuperAdminPesertaDashboardService = require('../services/superadminPesertaDashboard.service.js')
 const responseHandler = require('../../../../helpers/responseHandler');
 
 class SuperAdminController {
@@ -30,6 +31,51 @@ class SuperAdminController {
         try {
             const result = await service.getDataInfaqDashboard(nama, nama_bank, status, startDate, endDate);
             return responseHandler.succes(res, 'Success get all data', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getDataPeserta(req, res, next) {
+        const service = new SuperAdminPesertaDashboardService();
+        try {
+            const result = await service.getDataPeserta();
+            return responseHandler.succes(res, 'Success get all data', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getPesertaRegistered(req, res, next) {
+        const service = new SuperAdminPesertaDashboardService();
+        try {
+            const { query } = req;
+            const { status, keyword, startDate, endDate, bankName } = query;
+            const result = await service.getPesertaRegistered(
+                query,
+                status,
+                keyword,
+                startDate,
+                endDate,
+                bankName
+            );
+            return responseHandler.succes(res, 'Success get peserta Terdaftar', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async updateStatusPeserta(req, res, next) {
+        const service = new SuperAdminPesertaDashboardService();
+        try {
+            const { userId } = req.params;
+            const { status_peserta, level_peserta } = req.body;
+            const result = await service.updateStatusPeserta(
+                req,
+                { status_peserta, level_peserta },
+                userId
+            );
+            return responseHandler.succes(res, 'Success update status peserta', result);
         } catch (error) {
             next(error);
         }
