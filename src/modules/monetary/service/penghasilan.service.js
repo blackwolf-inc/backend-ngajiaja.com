@@ -12,9 +12,9 @@ class PenghasilanService extends BaseService {
     for (const item of result.datas) {
       const dataPenghasilan = {
         id: item.id,
-        peserta: item.peserta.User.nama,
+        peserta: item.peserta.user.nama,
         peserta_id: item.peserta.id,
-        user_id: item.peserta.User.id,
+        user_id: item.peserta.user.id,
         payed: item.pembayaran,
         income: item.penghasilan,
         percent: item.persentase_bagi_hasil,
@@ -104,6 +104,7 @@ class PenghasilanService extends BaseService {
       include: [
         {
           model: User,
+          as: 'user',
           attributes: {
             exclude: ['password', 'token'],
           },

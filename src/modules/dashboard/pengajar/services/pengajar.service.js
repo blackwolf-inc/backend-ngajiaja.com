@@ -52,7 +52,7 @@ class PengajarService extends BaseService {
       const bimbinganPending = {
         period_id: period.id,
         peserta_id: period.peserta.id,
-        user_id: period.peserta.User.id,
+        user_id: period.peserta.user.id,
         schedule: {
           day1: null,
           hour1: null,
@@ -60,7 +60,7 @@ class PengajarService extends BaseService {
           hour2: null,
         },
         category: period.tipe_bimbingan,
-        name: period.peserta.User.nama,
+        name: period.peserta.user.nama,
         level: period.peserta.level,
         last_approved: lastApproved,
       };
@@ -117,10 +117,10 @@ class PengajarService extends BaseService {
           const bimbinganOnGoing = {
             period_id: period.id,
             peserta_id: period.peserta.id,
-            user_id: period.peserta.User.id,
+            user_id: period.peserta.user.id,
             bimbingan_reguler_id: bimbinganReguler.id,
             status: null,
-            name: period.peserta.User.nama,
+            name: period.peserta.user.nama,
             date: bimbinganReguler.tanggal,
             time: bimbinganReguler.jam_bimbingan,
             level: period.peserta.level,
@@ -161,10 +161,10 @@ class PengajarService extends BaseService {
           const bimbinganOnGoing = {
             period_id: period.id,
             peserta_id: period.peserta.id,
-            user_id: period.peserta.User.id,
+            user_id: period.peserta.user.id,
             bimbingan_tambahan_id: bimbinganTambahan.id,
             status: null,
-            name: period.peserta.User.nama,
+            name: period.peserta.user.nama,
             date: bimbinganTambahan.tanggal,
             time: bimbinganTambahan.jam_bimbingan,
             level: period.peserta.level,
@@ -327,6 +327,7 @@ class PengajarService extends BaseService {
       include: [
         {
           model: User,
+          as: 'user',
           attributes: {
             exclude: ['password', 'token'],
           },

@@ -21,7 +21,7 @@ class BimbinganService extends BaseService {
   async bimbinganOnGoing(id, pesertaName, level) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: STATUS_BIMBINGAN.ACTIVATED } },
-      this.#includeQuery
+      this.#includeQuery,
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
@@ -36,8 +36,8 @@ class BimbinganService extends BaseService {
         const bimbinganOnGoing = {
           period_id: period.id,
           peserta_id: period.peserta.id,
-          user_id: period.peserta.User.id,
-          name: period.peserta.User.nama,
+          user_id: period.peserta.user.id,
+          name: period.peserta.user.nama,
           schedule: {
             day1: period.bimbingan_reguler[0].hari_bimbingan,
             hour1: period.bimbingan_reguler[0].jam_bimbingan,
@@ -61,8 +61,8 @@ class BimbinganService extends BaseService {
         const bimbinganOnGoing = {
           period_id: period.id,
           peserta_id: period.peserta.id,
-          user_id: period.peserta.User.id,
-          name: period.peserta.User.nama,
+          user_id: period.peserta.user.id,
+          name: period.peserta.user.nama,
           schedule: {
             day1: period.bimbingan_tambahan[0].hari_bimbingan,
             hour1: period.bimbingan_tambahan[0].jam_bimbingan,
@@ -116,7 +116,7 @@ class BimbinganService extends BaseService {
   async bimbinganDone(id, pesertaName, startDate, endDate) {
     const result = await this.__findAll(
       { where: { pengajar_id: id, status: STATUS_BIMBINGAN.FINISHED } },
-      this.#includeQuery
+      this.#includeQuery,
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
@@ -131,8 +131,8 @@ class BimbinganService extends BaseService {
         const bimbinganDone = {
           period_id: period.id,
           peserta_id: period.peserta.id,
-          user_id: period.peserta.User.id,
-          name: period.peserta.User.nama,
+          user_id: period.peserta.user.id,
+          name: period.peserta.user.nama,
           period: `${period.bimbingan_reguler[0].tanggal} - ${
             period.bimbingan_reguler[period.bimbingan_reguler.length - 1].tanggal
           }`,
@@ -152,8 +152,8 @@ class BimbinganService extends BaseService {
         const bimbinganDone = {
           period_id: period.id,
           peserta_id: period.peserta.id,
-          user_id: period.peserta.User.id,
-          name: period.peserta.User.nama,
+          user_id: period.peserta.user.id,
+          name: period.peserta.user.nama,
           period: `${period.bimbingan_tambahan[0].tanggal} - ${
             period.bimbingan_tambahan[period.bimbingan_tambahan.length - 1].tanggal
           }`,
@@ -208,13 +208,13 @@ class BimbinganService extends BaseService {
   async dataDetailBimbingan(id, pengajarId) {
     const result = await this.__findOne(
       { where: { id, pengajar_id: pengajarId } },
-      this.#includeQuery
+      this.#includeQuery,
     );
     if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
 
     let age = 0;
-    if (result.peserta.User.tgl_lahir) {
-      const birthdate = moment(result.peserta.User.tgl_lahir, 'YYYY-MM-DD').toDate();
+    if (result.peserta.user.tgl_lahir) {
+      const birthdate = moment(result.peserta.user.tgl_lahir, 'YYYY-MM-DD').toDate();
       const birthYear = birthdate.getFullYear();
       const birthMonth = birthdate.getMonth();
       const birthDay = birthdate.getDate();
@@ -229,8 +229,8 @@ class BimbinganService extends BaseService {
     }
 
     return {
-      name: result.peserta.User.nama,
-      gender: result.peserta.User.jenis_kelamin,
+      name: result.peserta.user.nama,
+      gender: result.peserta.user.jenis_kelamin,
       age,
       level: result.peserta.level,
     };
@@ -239,7 +239,7 @@ class BimbinganService extends BaseService {
   async detailBimbingan(id, pengajarId) {
     const result = await this.__findOne(
       { where: { id, pengajar_id: pengajarId } },
-      this.#includeQuery
+      this.#includeQuery,
     );
     if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
 
@@ -249,7 +249,7 @@ class BimbinganService extends BaseService {
         const dataBimbinganReguler = {
           period_id: result.id,
           peserta_id: result.peserta.id,
-          user_id: result.peserta.User.id,
+          user_id: result.peserta.user.id,
           bimbingan_reguler_id: bimbinganReguler.id,
           status: null,
           date: bimbinganReguler.tanggal,
@@ -295,7 +295,7 @@ class BimbinganService extends BaseService {
         const dataBimbinganTambahan = {
           period_id: result.id,
           peserta_id: result.peserta.id,
-          user_id: result.peserta.User.id,
+          user_id: result.peserta.user.id,
           bimbingan_tambahan_id: bimbinganTambahan.id,
           status: null,
           date: bimbinganTambahan.tanggal,
@@ -342,7 +342,7 @@ class BimbinganService extends BaseService {
   async progressPeserta(id, pengajarName, startDate, endDate) {
     const result = await this.__findAll(
       { where: { peserta_id: id } },
-      this.#includeQueryProgressPeserta
+      this.#includeQueryProgressPeserta,
     );
     if (!result) throw ApiError.notFound(`Peserta with id ${id} not found`);
 
@@ -428,7 +428,7 @@ class BimbinganService extends BaseService {
       {
         replacements: { userId: user_id },
         type: QueryTypes.SELECT,
-      }
+      },
     );
 
     const period = await Period.findAll({
@@ -569,7 +569,7 @@ class BimbinganService extends BaseService {
       {
         replacements: { userId: user_id },
         type: QueryTypes.SELECT,
-      }
+      },
     );
 
     const period = await Period.findOne({
@@ -649,6 +649,7 @@ class BimbinganService extends BaseService {
       include: [
         {
           model: User,
+          as: 'user',
           attributes: {
             exclude: ['password', 'token'],
           },
