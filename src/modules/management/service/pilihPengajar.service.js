@@ -95,8 +95,6 @@ class PilihPengajar extends BaseService {
         ],
       };
 
-      console.log(whereClause);
-
       const pengajarList = await Pengajar.findAll({
         include: [
           {
