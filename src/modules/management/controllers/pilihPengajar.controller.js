@@ -13,7 +13,7 @@ class PilihPengajar {
         req.query.hari_1,
         req.query.jam_1,
         req.query.hari_2,
-        req.query.jam_2
+        req.query.jam_2,
       );
       return responseHandler.succes(res, `Success get all ${service.db.name}s`, result);
     } catch (error) {
@@ -41,7 +41,7 @@ class PilihPengajar {
         req.body.hari_1,
         req.body.jam_1,
         req.body.hari_2,
-        req.body.jam_2
+        req.body.jam_2,
       );
       return responseHandler.succes(res, `Success get all ${service.db.name}s`, result);
     } catch (error) {
@@ -57,7 +57,7 @@ class PilihPengajar {
     // };
 
     try {
-      if ((req.body.status = STATUS_PERIOD.ACTIVATED)) {
+      if (req.body.status === STATUS_PERIOD.ACTIVATED) {
         //check apakah ada jadwal yang sama
         await service.checkJadwalDuplicate(user.id, req.params.id);
         //update status jadwalMengajarPengajar menjadi inactive saat di acc
@@ -65,7 +65,7 @@ class PilihPengajar {
       }
 
       //update status jadwalMengajarPengajar menjadi active saat bimbingan finished
-      if ((req.body.status = STATUS_PERIOD.FINISHED)) {
+      if (req.body.status === STATUS_PERIOD.FINISHED) {
         await service.autoUpdate(user.id, req.params.id, STATUS_JADWAL_PENGAJAR.ACTIVE);
       }
 
@@ -111,7 +111,7 @@ class PilihPengajar {
         req.body.hari_1,
         req.body.jam_1,
         req.body.hari_2,
-        req.body.jam_2
+        req.body.jam_2,
       );
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {
