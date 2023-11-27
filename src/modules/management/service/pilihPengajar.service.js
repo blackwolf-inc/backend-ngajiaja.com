@@ -8,6 +8,7 @@ const {
   Pengajar,
   JadwalMengajarPengajar,
   User,
+  sequelize,
 } = require('../../../models');
 const { Op, QueryTypes } = require('sequelize');
 const { STATUS_JADWAL_PENGAJAR } = require('../../../helpers/constanta');

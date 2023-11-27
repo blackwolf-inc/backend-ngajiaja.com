@@ -95,13 +95,13 @@ class PengajarService extends BaseService {
 
     // remove duplicate data from array
     const uniqueData = data.filter(
-      (thing, index, self) => index === self.findIndex((t) => t.jadwal_id === thing.jadwal_id),
+      (thing, index, self) => index === self.findIndex((t) => t.jadwal_id === thing.jadwal_id)
     );
 
     let filteredData;
     if (status && day && time) {
       filteredData = uniqueData.filter(
-        (item) => item.status === status && item.day === day && item.time === time,
+        (item) => item.status === status && item.day === day && item.time === time
       );
     } else if (status && day) {
       filteredData = uniqueData.filter((item) => item.status === status && item.day === day);
@@ -144,7 +144,7 @@ class PengajarService extends BaseService {
       payload.selesai_mengajar > result.mulai_mengajar
     ) {
       throw ApiError.badRequest(
-        `Jadwal with hari ${result.hari_mengajar} and mulai_mengajar ${result.mulai_mengajar} - selesai_mengajar ${result.selesai_mengajar} already exist`,
+        `Jadwal with hari ${result.hari_mengajar} and mulai_mengajar ${result.mulai_mengajar} - selesai_mengajar ${result.selesai_mengajar} already exist`
       );
     }
   }
