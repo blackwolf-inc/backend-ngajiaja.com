@@ -58,4 +58,6 @@ router.get('/data/pengajar/terverifikasi/export', AdminDashboardController.expor
 router.get('/data/peserta/terdaftar/export', AdminDashboardController.exportDataPesertaRegistered);
 router.get('/data/peserta/terverifikasi/export', AdminDashboardController.exportDataPesertaVerified);
 
+router.get('/data/period/ongoing/export/csv', AdminDashboardController.exportDataBimbinganOngoing);
+
 module.exports = router;

@@ -250,6 +250,44 @@ class AdminManageCourseService {
         );
         return result[0];
     }
+
+    async getCourseOngoingExport(startDate, endDate) {
+        let whereClause = "WHERE p.status = 'ACTIVATED'";
+        if (startDate) {
+            const startDateInit = moment(startDate).startOf('day').format('YYYY-MM-DD HH:mm:ss');
+            whereClause += ` AND p.createdAt >= '${startDateInit}'`;
+        }
+        if (endDate) {
+            const endDateInit = moment(endDate).endOf('day').format('YYYY-MM-DD HH:mm:ss');
+            whereClause += ` AND p.createdAt <= '${endDateInit}'`;
+        }
+
+        const result = await sequelize.query(
+            `
+            SELECT 
+                p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', p.hari_1, p.jam_1, p.hari_2, p.jam_2, p.createdAt,
+                CASE 
+                    WHEN p.tipe_bimbingan = 'REGULER' THEN (SELECT COUNT(*) FROM BimbinganRegulers br WHERE br.period_id = p.id AND br.absensi_peserta = 1)
+                    WHEN p.tipe_bimbingan = 'TAMBAHAN' THEN (SELECT COUNT(*) FROM BimbinganTambahans bt WHERE bt.period_id = p.id AND bt.absensi_peserta = 1)
+                    ELSE 0
+                END AS 'hadir',
+                CASE 
+                    WHEN p.tipe_bimbingan = 'REGULER' THEN (SELECT COUNT(*) FROM BimbinganRegulers br WHERE br.period_id = p.id AND br.absensi_peserta = 0)
+                    WHEN p.tipe_bimbingan = 'TAMBAHAN' THEN (SELECT COUNT(*) FROM BimbinganTambahans
+                    bt WHERE bt.period_id = p.id AND bt.absensi_peserta = 0)
+                    ELSE 0
+                END AS 'absen'
+            FROM Periods p
+            JOIN Pesertas ps ON p.peserta_id = ps.id
+            JOIN Users u1 ON ps.user_id = u1.id
+            JOIN Pengajars pg ON p.pengajar_id = pg.id
+            JOIN Users u2 ON pg.user_id = u2.id
+            ${whereClause}
+            `,
+            { type: sequelize.QueryTypes.SELECT }
+        );
+        return result;
+    }
 }
 
 module.exports = AdminManageCourseService;

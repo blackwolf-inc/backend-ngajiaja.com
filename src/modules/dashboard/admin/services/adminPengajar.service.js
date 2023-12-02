@@ -248,7 +248,7 @@ class AdminPengajarService {
     if (startDate && endDate) {
       const startDateInit = moment(startDate).startOf('day').format('YYYY-MM-DD');
       const endDateInit = moment(endDate).endOf('day').format('YYYY-MM-DD');
-      whereClause += ` AND p.tanggal_wawancara BETWEEN '${startDateInit}' AND '${endDateInit}'`;
+      whereClause += ` AND p.createdAt BETWEEN '${startDateInit}' AND '${endDateInit}'`;
     }
 
     const result = await sequelize.query(
