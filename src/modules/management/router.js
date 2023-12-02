@@ -93,6 +93,10 @@ router.patch(
 router.get('/bimbingan-peserta', Bimbingan.getAllPeriodByPesertaId);
 router.get('/bimbingan-peserta/:id', Bimbingan.getOnePeriodByPesertaId);
 
+// Read Catatan Bimbingan Peserta
+router.get('/bimbingan-reguler/catatan-pengajar/:id', Bimbingan.getCatatanReguler);
+router.get('/bimbingan-tambahan/catatan-pengajar/:id', Bimbingan.getCatatanTambahan);
+
 //Testendpoint
 router.get('/testing-test/:id', PilihPengajar.update);
 
