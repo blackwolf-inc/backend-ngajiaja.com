@@ -3,6 +3,8 @@ const AdminPesertaService = require('../services/adminPeserta.service.js');
 const AdminDashboard = require('../services/adminDashboard.service.js');
 const AdminManageCourseService = require('../services/adminKelolaBimbingan.js');
 const responseHandler = require('../../../../helpers/responseHandler');
+const fs = require('fs');
+const Papa = require('papaparse');
 
 class AdminDashboardController {
   static async dataPengajar(req, res, next) {
@@ -230,6 +232,29 @@ class AdminDashboardController {
       const { periodId } = req.params;
       const result = await service.getCourseFinishedById(periodId);
       return responseHandler.succes(res, 'Success get course finished by id', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async exportDataPengajarRegistered(req, res, next) {
+    const service = new AdminPengajarService();
+    try {
+      const { query } = req;
+      const { startDate, endDate } = query;
+      const result = await service.getPengajarRegisteredExport(
+        startDate,
+        endDate
+      );
+      const csv = Papa.unparse(result);
+      const date = +new Date();
+
+      const filename = `PengajarRegistered_${date}.csv`;
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+      res.send(csv);
     } catch (error) {
       next(error);
     }
