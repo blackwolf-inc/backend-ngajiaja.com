@@ -200,6 +200,26 @@ class BimbinganPeserta {
       next(error);
     }
   }
+
+  static async getCatatanReguler(req, res, next) {
+    const service = new BimbinganService(req, BimbinganReguler);
+    try {
+      const result = await service.getCatatanBimbinganReguler(req.params.id);
+      return responseHandler.succes(res, `Success get data ${service.db.name}s`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getCatatanTambahan(req, res, next) {
+    const service = new BimbinganService(req, BimbinganTambahan);
+    try {
+      const result = await service.getCatatanBimbinganTambahan(req.params.id);
+      return responseHandler.succes(res, `Success get data ${service.db.name}s`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = BimbinganPeserta;

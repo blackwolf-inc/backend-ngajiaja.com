@@ -11,7 +11,7 @@ const {
   sequelize,
 } = require('../../../models');
 const { Op, QueryTypes } = require('sequelize');
-const { STATUS_JADWAL_PENGAJAR } = require('../../../helpers/constanta');
+const { STATUS_JADWAL_PENGAJAR, STATUS_BIMBINGAN_ACTIVE } = require('../../../helpers/constanta');
 class PilihPengajar extends BaseService {
   async checkDays(hari_1, hari_2) {
     const arrayDays = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'];
@@ -231,6 +231,7 @@ class PilihPengajar extends BaseService {
           tanggal: moment(dateThisMonth).format('YYYY-MM-DD'),
           hari_bimbingan: hari_1,
           jam_bimbingan: jam_1,
+          status: STATUS_BIMBINGAN_ACTIVE.NOT_SET,
         };
         const result = await BimbinganReguler.create(query);
         records.push(result);
@@ -242,6 +243,7 @@ class PilihPengajar extends BaseService {
           tanggal: moment(dateThisMonth).format('YYYY-MM-DD'),
           hari_bimbingan: hari_2,
           jam_bimbingan: jam_2,
+          status: STATUS_BIMBINGAN_ACTIVE.NOT_SET,
         };
         const result = await BimbinganReguler.create(query);
         records.push(result);
@@ -271,6 +273,7 @@ class PilihPengajar extends BaseService {
           tanggal: moment(dateThisMonth).format('YYYY-MM-DD'),
           hari_bimbingan: hari_1,
           jam_bimbingan: jam_1,
+          status: STATUS_BIMBINGAN_ACTIVE.NOT_SET,
         };
         const result = await BimbinganTambahan.create(query);
         records.push(result);
@@ -281,6 +284,7 @@ class PilihPengajar extends BaseService {
           tanggal: moment(dateThisMonth).format('YYYY-MM-DD'),
           hari_bimbingan: hari_2,
           jam_bimbingan: jam_2,
+          status: STATUS_BIMBINGAN_ACTIVE.NOT_SET,
         };
         const result = await BimbinganTambahan.create(query);
         records.push(result);
