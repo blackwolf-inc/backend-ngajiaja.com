@@ -59,5 +59,6 @@ router.get('/data/peserta/terdaftar/export', AdminDashboardController.exportData
 router.get('/data/peserta/terverifikasi/export', AdminDashboardController.exportDataPesertaVerified);
 
 router.get('/data/period/ongoing/export/csv', AdminDashboardController.exportDataBimbinganOngoing);
+router.get('/data/period/finished/export/csv', AdminDashboardController.exportDataBimbinganFinished);
 
 module.exports = router;
