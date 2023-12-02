@@ -31,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
       tanggal_baru: DataTypes.STRING,
       jam_baru: DataTypes.STRING,
       persetujuan_peserta: DataTypes.INTEGER,
+      status: DataTypes.STRING,
     },
     {
       sequelize,
