@@ -16,7 +16,7 @@ router.get('/test', (req, res) => {
   });
 });
 
-// router.use(hasRole([USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN]));
+router.use(hasRole([USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN]));
 router.get('/data/pengajar', AdminDashboardController.dataPengajar);
 router.patch(
   '/data/pengajar/terdaftar/:userId',
@@ -53,5 +53,6 @@ router.get('/data/period/ongoing/:periodId', AdminDashboardController.getCourseO
 router.get('/data/period/finished/:periodId', AdminDashboardController.getCourseFinishedById);
 
 router.get('/data/pengajar/terdaftar/export', AdminDashboardController.exportDataPengajarRegistered);
+router.get('/data/pengajar/terverifikasi/export', AdminDashboardController.exportDataPengajarVerified);
 
 module.exports = router;

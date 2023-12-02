@@ -265,6 +265,30 @@ class AdminPengajarService {
 
     return result;
   }
+
+  async getPengajarVerifiedExport(startDate, endDate) {
+    let whereClause = "WHERE u.role = 'PENGAJAR' AND u.status IN ('ACTIVE', 'NONACTIVE')";
+
+    if (startDate && endDate) {
+      const startDateInit = moment(startDate).startOf('day').format('YYYY-MM-DD');
+      const endDateInit = moment(endDate).endOf('day').format('YYYY-MM-DD');
+      whereClause += ` AND p.createdAt BETWEEN '${startDateInit}' AND '${endDateInit}'`;
+    }
+
+    const result = await sequelize.query(
+      `
+      SELECT 
+           u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+           p.id AS 'pengajar_id', p.level, p.createdAt
+      FROM Pengajars p 
+      JOIN Users u ON p.user_id = u.id 
+      ${whereClause}
+      `,
+      { type: QueryTypes.SELECT }
+    );
+
+    return result;
+  }
 }
 
 module.exports = AdminPengajarService;
