@@ -56,5 +56,6 @@ router.get('/data/pengajar/terdaftar/export', AdminDashboardController.exportDat
 router.get('/data/pengajar/terverifikasi/export', AdminDashboardController.exportDataPengajarVerified);
 
 router.get('/data/peserta/terdaftar/export', AdminDashboardController.exportDataPesertaRegistered);
+router.get('/data/peserta/terverifikasi/export', AdminDashboardController.exportDataPesertaVerified);
 
 module.exports = router;

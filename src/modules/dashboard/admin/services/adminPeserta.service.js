@@ -236,6 +236,34 @@ class AdminPesertaService {
 
         return result;
     }
+
+    async getPesertaVerifiedExport(startDate, endDate) {
+        let whereClause = "WHERE u.role = 'PESERTA' AND u.status IN ('ACTIVE', 'NONACTIVE')";
+        if (startDate && endDate) {
+            const startDateInit = moment(startDate).startOf('day').format('YYYY-MM-DD');
+            const endDateInit = moment(endDate).endOf('day').format('YYYY-MM-DD');
+            whereClause += ` AND DATE(pr.createdAt) BETWEEN '${startDateInit}' AND '${endDateInit}'`;
+        }
+
+        const result = await sequelize.query(
+            `
+          SELECT 
+            u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+            p.id AS 'peserta_id', p.level,
+            pr.id AS 'period_id', pr.status AS 'period_status', pr.createdAt as 'period_createAt',
+            SUM(CASE WHEN br.absensi_peserta = 0 THEN 1 ELSE 0 END) AS notAttend
+            FROM Pesertas p 
+          JOIN Users u ON p.user_id = u.id 
+          LEFT JOIN Periods pr ON p.id = pr.peserta_id
+          LEFT JOIN BimbinganRegulers br ON pr.id = br.period_id
+          ${whereClause}
+          GROUP BY u.id, p.id, pr.id
+          `,
+            { type: QueryTypes.SELECT }
+        );
+
+        return result;
+    }
 }
 
 module.exports = AdminPesertaService;
