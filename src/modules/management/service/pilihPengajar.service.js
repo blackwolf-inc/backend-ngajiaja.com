@@ -55,11 +55,8 @@ class PilihPengajar extends BaseService {
       console.log(whereClause);
 
       const pengajarList = await Pengajar.findAll({
+        attributes: ['id'],
         include: [
-          {
-            model: User,
-            as: 'user',
-          },
           {
             model: JadwalMengajarPengajar,
             required: true,
@@ -69,21 +66,39 @@ class PilihPengajar extends BaseService {
         ],
       });
 
-      const filteredPengajarList = pengajarList.filter((pengajar) => {
-        return pengajar.jadwal_mengajar && pengajar.jadwal_mengajar.length >= 2;
+      const arrayPengajarId = [];
+
+      pengajarList.filter((pengajar) => {
+        if (pengajar.jadwal_mengajar && pengajar.jadwal_mengajar.length >= 2) {
+          arrayPengajarId.push(pengajar.id);
+        }
       });
 
-      const result = filteredPengajarList.map((pengajar) => {
-        return {
-          id_pengajar: pengajar.id,
-          nama: pengajar.user.nama,
-          jenis_kelamin: pengajar.user.jenis_kelamin,
-          jadwalActive: pengajar.jadwal_mengajar ? pengajar.jadwal_mengajar.length : 0,
-          jadwal_mengajar: pengajar.jadwal_mengajar,
-        };
+      const result = await Pengajar.findAll({
+        where: { id: arrayPengajarId },
+        include: [
+          {
+            model: User,
+            as: 'user',
+          },
+          {
+            model: JadwalMengajarPengajar,
+            required: true,
+            as: 'jadwal_mengajar',
+            where: { status: STATUS_JADWAL_PENGAJAR.ACTIVE },
+          },
+        ],
       });
 
-      return result;
+      const formattedResult = result.map((pengajar) => ({
+        id_pengajar: pengajar.id,
+        nama: pengajar.user.nama,
+        jenis_kelamin: pengajar.user.jenis_kelamin,
+        jadwalActive: pengajar.jadwal_mengajar ? pengajar.jadwal_mengajar.length : 0,
+        jadwal_mengajar: pengajar.jadwal_mengajar,
+      }));
+
+      return formattedResult;
     }
 
     if (hari_1 && jam_1) {
@@ -96,11 +111,8 @@ class PilihPengajar extends BaseService {
       };
 
       const pengajarList = await Pengajar.findAll({
+        attributes: ['id'],
         include: [
-          {
-            model: User,
-            as: 'user',
-          },
           {
             model: JadwalMengajarPengajar,
             required: true,
@@ -110,17 +122,39 @@ class PilihPengajar extends BaseService {
         ],
       });
 
-      const result = pengajarList.map((pengajar) => {
-        return {
-          id_pengajar: pengajar.id,
-          nama: pengajar.user.nama,
-          jenis_kelamin: pengajar.user.jenis_kelamin,
-          jadwalActive: pengajar.jadwal_mengajar ? pengajar.jadwal_mengajar.length : 0,
-          jadwal_mengajar: pengajar.jadwal_mengajar,
-        };
+      const arrayPengajarId = [];
+
+      pengajarList.filter((pengajar) => {
+        if (pengajar.jadwal_mengajar && pengajar.jadwal_mengajar.length >= 1) {
+          arrayPengajarId.push(pengajar.id);
+        }
       });
 
-      return result;
+      const result = await Pengajar.findAll({
+        where: { id: arrayPengajarId },
+        include: [
+          {
+            model: User,
+            as: 'user',
+          },
+          {
+            model: JadwalMengajarPengajar,
+            required: true,
+            as: 'jadwal_mengajar',
+            where: { status: STATUS_JADWAL_PENGAJAR.ACTIVE },
+          },
+        ],
+      });
+
+      const formattedResult = result.map((pengajar) => ({
+        id_pengajar: pengajar.id,
+        nama: pengajar.user.nama,
+        jenis_kelamin: pengajar.user.jenis_kelamin,
+        jadwalActive: pengajar.jadwal_mengajar ? pengajar.jadwal_mengajar.length : 0,
+        jadwal_mengajar: pengajar.jadwal_mengajar,
+      }));
+
+      return formattedResult;
     }
 
     const pengajarList = await Pengajar.findAll({
