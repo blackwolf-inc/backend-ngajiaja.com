@@ -209,6 +209,33 @@ class AdminPesertaService {
             level: afterUpdatePeserta.level,
         };
     }
+
+    async getPesertaRegisteredExport(startDate, endDate) {
+        let whereClause = "WHERE u.role = 'PESERTA' AND u.status IN ('REGISTERED', 'REJECTED', 'ADMINISTRATION')";
+        if (startDate && endDate) {
+            const startDateInit = moment(startDate).startOf('day').format('YYYY-MM-DD');
+            const endDateInit = moment(endDate).endOf('day').format('YYYY-MM-DD');
+            whereClause += ` AND DATE(b.createdAt) BETWEEN '${startDateInit}' AND '${endDateInit}'`;
+        }
+
+        const result = await sequelize.query(
+            `
+          SELECT 
+            u.id AS 'user_id', u.nama, u.role, u.status,
+            p.id AS 'peserta_id', p.level,
+            b.bank_id, b.bukti_pembayaran, b.createdAt,
+            bk.nama_bank
+            FROM Pesertas p 
+          JOIN Users u ON p.user_id = u.id 
+          LEFT JOIN BiayaAdministrasis b ON p.user_id = b.user_id
+          LEFT JOIN Banks bk ON b.bank_id = bk.id
+          ${whereClause}
+          `,
+            { type: QueryTypes.SELECT }
+        );
+
+        return result;
+    }
 }
 
 module.exports = AdminPesertaService;

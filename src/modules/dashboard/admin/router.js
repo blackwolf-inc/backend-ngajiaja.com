@@ -55,4 +55,6 @@ router.get('/data/period/finished/:periodId', AdminDashboardController.getCourse
 router.get('/data/pengajar/terdaftar/export', AdminDashboardController.exportDataPengajarRegistered);
 router.get('/data/pengajar/terverifikasi/export', AdminDashboardController.exportDataPengajarVerified);
 
+router.get('/data/peserta/terdaftar/export', AdminDashboardController.exportDataPesertaRegistered);
+
 module.exports = router;

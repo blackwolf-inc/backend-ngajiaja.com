@@ -282,6 +282,29 @@ class AdminDashboardController {
       next(error);
     }
   }
+
+  static async exportDataPesertaRegistered(req, res, next) {
+    const service = new AdminPesertaService();
+    try {
+      const { query } = req;
+      const { startDate, endDate } = query;
+      const result = await service.getPesertaRegisteredExport(
+        startDate,
+        endDate
+      );
+      const csv = Papa.unparse(result);
+      const date = +new Date();
+
+      const filename = `PesertaRegistered_${date}.csv`;
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+      res.send(csv);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = AdminDashboardController;
