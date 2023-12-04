@@ -547,12 +547,12 @@ class BimbinganService extends BaseService {
         {
           model: BimbinganReguler,
           as: 'bimbingan_reguler',
-          attributes: ['id', 'tanggal', 'hari_bimbingan', 'jam_bimbingan', 'link_meet'],
+          attributes: { exclude: ['updatedAt', 'createdAt'] },
         },
         {
           model: BimbinganTambahan,
           as: 'bimbingan_tambahan',
-          attributes: ['id', 'tanggal', 'hari_bimbingan', 'jam_bimbingan', 'link_meet'],
+          attributes: { exclude: ['updatedAt', 'createdAt'] },
         },
       ],
       attributes: ['id', 'tipe_bimbingan', 'status', 'tanggal_pengingat_infaq'],
