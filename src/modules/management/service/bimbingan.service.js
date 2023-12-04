@@ -560,6 +560,10 @@ class BimbinganService extends BaseService {
 
     let arrayPeriodeBimbingan = [];
 
+    if (!period) {
+      throw ApiError.badRequest('Data not found');
+    }
+
     if ((period.status = TYPE_BIMBINGAN.REGULER)) {
       period.bimbingan_reguler.map((data) => {
         arrayPeriodeBimbingan.push(data.tanggal);

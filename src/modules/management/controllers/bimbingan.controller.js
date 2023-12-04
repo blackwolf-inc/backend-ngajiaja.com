@@ -4,18 +4,23 @@ const UserService = require('../../registration/services/user.service');
 const responseHandler = require('../../../helpers/responseHandler');
 const db = require('../../../models/index');
 const moment = require('moment');
+const ApiError = require('../../../helpers/errorHandler');
 const { Period, BimbinganReguler, User, BimbinganTambahan } = db;
 
 class BimbinganPeserta {
   static async getDataBimbingan(req, res, next) {
     const service = new PengajarService(req, Period);
     const userService = new UserService(req, User);
+    const user = req.user;
     try {
-      const user = await userService.getOneUser(req.user.id);
+      if (!user) {
+        throw ApiError.unauthorized('Not Authorized');
+      }
+      const userData = await userService.getOneUser(user.id);
       const [totalPending, totalOnGoing, totalAbsent] = await Promise.all([
-        service.bimbinganPending(user.pengajar.id, null),
-        service.getBimbinganActivated(user.pengajar.id),
-        service.getAbsent(user.pengajar.id),
+        service.bimbinganPending(userData.pengajar.id, null),
+        service.getBimbinganActivated(userData.pengajar.id),
+        service.getAbsent(userData.pengajar.id),
       ]);
       return responseHandler.succes(res, `Success get data bimbingan`, {
         total_pending: totalPending.length,
@@ -30,9 +35,13 @@ class BimbinganPeserta {
   static async getBimbinganPending(req, res, next) {
     const service = new PengajarService(req, Period);
     const userService = new UserService(req, User);
+    const user = req.user;
     try {
-      const user = await userService.getOneUser(req.user.id);
-      const result = await service.bimbinganPending(user.pengajar.id, req.query.name);
+      if (!user) {
+        throw ApiError.unauthorized('Not Authorized');
+      }
+      const userData = await userService.getOneUser(user.id);
+      const result = await service.bimbinganPending(userData.pengajar.id, req.query.name);
       return responseHandler.succes(res, `Success get bimbingan menunggu`, result);
     } catch (error) {
       next(error);
@@ -42,10 +51,14 @@ class BimbinganPeserta {
   static async getBimbinganOnGoing(req, res, next) {
     const service = new BimbinganService(req, Period);
     const userService = new UserService(req, User);
+    const user = req.user;
     try {
-      const user = await userService.getOneUser(req.user.id);
+      if (!user) {
+        throw ApiError.unauthorized('Not Authorized');
+      }
+      const userData = await userService.getOneUser(user.id);
       const result = await service.bimbinganOnGoing(
-        user.pengajar.id,
+        userData.pengajar.id,
         req.query.name,
         req.query.level
       );
@@ -58,10 +71,14 @@ class BimbinganPeserta {
   static async getBimbinganDone(req, res, next) {
     const service = new BimbinganService(req, Period);
     const userService = new UserService(req, User);
+    const user = req.user;
     try {
-      const user = await userService.getOneUser(req.user.id);
+      if (!user) {
+        throw ApiError.unauthorized('Not Authorized');
+      }
+      const userData = await userService.getOneUser(user.id);
       const result = await service.bimbinganDone(
-        user.pengajar.id,
+        userData.pengajar.id,
         req.query.name,
         req.query.startDate,
         req.query.endDate
@@ -75,9 +92,13 @@ class BimbinganPeserta {
   static async getOneBimbingan(req, res, next) {
     const service = new BimbinganService(req, Period);
     const userService = new UserService(req, User);
+    const user = req.user;
     try {
-      const user = await userService.getOneUser(req.user.id);
-      const result = await service.detailBimbingan(req.params.id, user.pengajar.id);
+      if (!user) {
+        throw ApiError.unauthorized('Not Authorized');
+      }
+      const userData = await userService.getOneUser(user.id);
+      const result = await service.detailBimbingan(req.params.id, userData.pengajar.id);
       return responseHandler.succes(res, `Success get detail bimbingan`, result);
     } catch (error) {
       next(error);
@@ -87,9 +108,13 @@ class BimbinganPeserta {
   static async getDataDetailBimbingan(req, res, next) {
     const service = new BimbinganService(req, Period);
     const userService = new UserService(req, User);
+    const user = req.user;
     try {
-      const user = await userService.getOneUser(req.user.id);
-      const result = await service.dataDetailBimbingan(req.params.id, user.pengajar.id);
+      if (!user) {
+        throw ApiError.unauthorized('Not Authorized');
+      }
+      const dataUser = await userService.getOneUser(user.id);
+      const result = await service.dataDetailBimbingan(req.params.id, dataUser.pengajar.id);
       return responseHandler.succes(res, `Success get data detail bimbingan`, result);
     } catch (error) {
       next(error);
@@ -181,8 +206,14 @@ class BimbinganPeserta {
 
   static async getAllPeriodByPesertaId(req, res, next) {
     const service = new BimbinganService(req, Period);
-    const user = req.user;
+    // const user = req.user;
     try {
+      // if (!user) {
+      //   throw ApiError.unauthorized('Not Authorized');
+      // }
+      const user = {
+        id: 74,
+      };
       const result = await service.getAllPeriod(user.id, req.query);
       return responseHandler.succes(res, `Success get all ${service.db.name}s`, result);
     } catch (error) {
@@ -192,8 +223,16 @@ class BimbinganPeserta {
 
   static async getOnePeriodByPesertaId(req, res, next) {
     const service = new BimbinganService(req, Period);
-    const user = req.user;
+    // const user = req.user;
     try {
+      // if (!user) {
+      //   throw ApiError.unauthorized('Not Authorized');
+      // }
+
+      const user = {
+        id: 74,
+      };
+
       const result = await service.getOnePeriod(user.id, req.params.id);
       return responseHandler.succes(res, `Success get data ${service.db.name}s`, result);
     } catch (error) {
