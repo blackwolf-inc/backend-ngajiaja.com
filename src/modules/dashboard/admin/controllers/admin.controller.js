@@ -44,10 +44,10 @@ class AdminDashboardController {
     const service = new AdminPengajarService();
     try {
       const { userId } = req.params;
-      const { status_pengajar, level_pengajar } = req.body;
+      const { status_pengajar, level_pengajar, persentase_bagi_hasil } = req.body;
       const result = await service.updateStatusPengajar(
         req,
-        { status_pengajar, level_pengajar },
+        { status_pengajar, level_pengajar, persentase_bagi_hasil },
         userId
       );
       return responseHandler.succes(res, 'Success update status pengajar', result);
