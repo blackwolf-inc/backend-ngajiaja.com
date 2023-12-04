@@ -206,14 +206,11 @@ class BimbinganPeserta {
 
   static async getAllPeriodByPesertaId(req, res, next) {
     const service = new BimbinganService(req, Period);
-    // const user = req.user;
+    const user = req.user;
     try {
-      // if (!user) {
-      //   throw ApiError.unauthorized('Not Authorized');
-      // }
-      const user = {
-        id: 74,
-      };
+      if (!user) {
+        throw ApiError.unauthorized('Not Authorized');
+      }
       const result = await service.getAllPeriod(user.id, req.query);
       return responseHandler.succes(res, `Success get all ${service.db.name}s`, result);
     } catch (error) {
@@ -223,15 +220,11 @@ class BimbinganPeserta {
 
   static async getOnePeriodByPesertaId(req, res, next) {
     const service = new BimbinganService(req, Period);
-    // const user = req.user;
+    const user = req.user;
     try {
-      // if (!user) {
-      //   throw ApiError.unauthorized('Not Authorized');
-      // }
-
-      const user = {
-        id: 74,
-      };
+      if (!user) {
+        throw ApiError.unauthorized('Not Authorized');
+      }
 
       const result = await service.getOnePeriod(user.id, req.params.id);
       return responseHandler.succes(res, `Success get data ${service.db.name}s`, result);
