@@ -3,6 +3,8 @@ const AdminPesertaService = require('../services/adminPeserta.service.js');
 const AdminDashboard = require('../services/adminDashboard.service.js');
 const AdminManageCourseService = require('../services/adminKelolaBimbingan.js');
 const responseHandler = require('../../../../helpers/responseHandler');
+const fs = require('fs');
+const Papa = require('papaparse');
 
 class AdminDashboardController {
   static async dataPengajar(req, res, next) {
@@ -42,10 +44,10 @@ class AdminDashboardController {
     const service = new AdminPengajarService();
     try {
       const { userId } = req.params;
-      const { status_pengajar, level_pengajar } = req.body;
+      const { status_pengajar, level_pengajar, persentase_bagi_hasil } = req.body;
       const result = await service.updateStatusPengajar(
         req,
-        { status_pengajar, level_pengajar },
+        { status_pengajar, level_pengajar, persentase_bagi_hasil },
         userId
       );
       return responseHandler.succes(res, 'Success update status pengajar', result);
@@ -230,6 +232,138 @@ class AdminDashboardController {
       const { periodId } = req.params;
       const result = await service.getCourseFinishedById(periodId);
       return responseHandler.succes(res, 'Success get course finished by id', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async exportDataPengajarRegistered(req, res, next) {
+    const service = new AdminPengajarService();
+    try {
+      const { query } = req;
+      const { startDate, endDate } = query;
+      const result = await service.getPengajarRegisteredExport(
+        startDate,
+        endDate
+      );
+      const csv = Papa.unparse(result);
+      const date = +new Date();
+
+      const filename = `PengajarRegistered_${date}.csv`;
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+      res.send(csv);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async exportDataPengajarVerified(req, res, next) {
+    const service = new AdminPengajarService();
+    try {
+      const { query } = req;
+      const { startDate, endDate } = query;
+      const result = await service.getPengajarVerifiedExport(
+        startDate,
+        endDate
+      );
+      const csv = Papa.unparse(result);
+      const date = +new Date();
+
+      const filename = `PengajarVerified_${date}.csv`;
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+      res.send(csv);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async exportDataPesertaRegistered(req, res, next) {
+    const service = new AdminPesertaService();
+    try {
+      const { query } = req;
+      const { startDate, endDate } = query;
+      const result = await service.getPesertaRegisteredExport(
+        startDate,
+        endDate
+      );
+      const csv = Papa.unparse(result);
+      const date = +new Date();
+
+      const filename = `PesertaRegistered_${date}.csv`;
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+      res.send(csv);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async exportDataPesertaVerified(req, res, next) {
+    const service = new AdminPesertaService();
+    try {
+      const { query } = req;
+      const { startDate, endDate } = query;
+      const result = await service.getPesertaVerifiedExport(
+        startDate,
+        endDate
+      );
+      const csv = Papa.unparse(result);
+      const date = +new Date();
+
+      const filename = `PesertaVerified_${date}.csv`;
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+      res.send(csv);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async exportDataBimbinganOngoing(req, res, next) {
+    const service = new AdminManageCourseService();
+    try {
+      const { query } = req;
+      const { startDate, endDate } = query;
+      const result = await service.getCourseOngoingExport(startDate, endDate);
+      const csv = Papa.unparse(result);
+      const date = +new Date();
+
+      const filename = `BimbinganOngoing_${date}.csv`;
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+      res.send(csv);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async exportDataBimbinganFinished(req, res, next) {
+    const service = new AdminManageCourseService();
+    try {
+      const { query } = req;
+      const { startDate, endDate } = query;
+      const result = await service.getCourseFinishedExport(startDate, endDate);
+      const csv = Papa.unparse(result);
+      const date = +new Date();
+
+      const filename = `BimbinganFinished_${date}.csv`;
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+      res.send(csv);
     } catch (error) {
       next(error);
     }

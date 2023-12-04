@@ -52,4 +52,13 @@ router.get('/data/period/finished', AdminDashboardController.getCourseFinished);
 router.get('/data/period/ongoing/:periodId', AdminDashboardController.getCourseOngoingById);
 router.get('/data/period/finished/:periodId', AdminDashboardController.getCourseFinishedById);
 
+router.get('/data/pengajar/terdaftar/export', AdminDashboardController.exportDataPengajarRegistered);
+router.get('/data/pengajar/terverifikasi/export', AdminDashboardController.exportDataPengajarVerified);
+
+router.get('/data/peserta/terdaftar/export', AdminDashboardController.exportDataPesertaRegistered);
+router.get('/data/peserta/terverifikasi/export', AdminDashboardController.exportDataPesertaVerified);
+
+router.get('/data/period/ongoing/export/csv', AdminDashboardController.exportDataBimbinganOngoing);
+router.get('/data/period/finished/export/csv', AdminDashboardController.exportDataBimbinganFinished);
+
 module.exports = router;
