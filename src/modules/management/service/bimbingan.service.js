@@ -558,19 +558,22 @@ class BimbinganService extends BaseService {
       attributes: ['id', 'tipe_bimbingan', 'status', 'tanggal_pengingat_infaq'],
     });
 
+    console.log('period.status');
+    console.log(period.status);
+
     let arrayPeriodeBimbingan = [];
 
     if (!period) {
       throw ApiError.badRequest('Data not found');
     }
 
-    if ((period.status = TYPE_BIMBINGAN.REGULER)) {
+    if ((period.tipe_bimbingan = TYPE_BIMBINGAN.REGULER)) {
       period.bimbingan_reguler.map((data) => {
         arrayPeriodeBimbingan.push(data.tanggal);
       });
     }
 
-    if ((period.status = TYPE_BIMBINGAN.TAMBAHAN)) {
+    if ((period.tipe_bimbingan = TYPE_BIMBINGAN.TAMBAHAN)) {
       period.bimbingan_tambahan.map((data) => {
         arrayPeriodeBimbingan.push(data.tanggal);
       });
