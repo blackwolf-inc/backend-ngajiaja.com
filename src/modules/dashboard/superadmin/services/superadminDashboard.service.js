@@ -1,6 +1,6 @@
 const { QueryTypes, Op } = require('sequelize');
 const db = require('../../../../models/index');
-const { Pengajar, User, Infaq, Bank, sequelize } = db;
+const { Pengajar, Peserta, User, Infaq, Bank, sequelize } = db;
 
 class SuperAdminDashboard {
     async getDataMonthSuperAdminDashboard(month, startDate = '2023-01-01', endDate = '2023-12-31') {
@@ -149,7 +149,7 @@ class SuperAdminDashboard {
         };
     }
 
-    async getDataInfaqDashboard(status, nama, nama_bank, startDate, endDate) {
+    async getDataInfaqDashboard(status, nama_bank, startDate, endDate) {
         const infaqs = await Infaq.findAll({
             where: {
                 status,
@@ -159,19 +159,13 @@ class SuperAdminDashboard {
             },
             include: [
                 {
-                    model: User,
-                    as: 'peserta',
-                    where: { nama },
-                    attributes: ['nama']
-                },
-                {
                     model: Bank,
                     as: 'bank',
                     where: { nama_bank },
                     attributes: ['nama_bank']
                 }
             ],
-            attributes: ['status', 'peserta_id', 'bank_id', 'nominal', 'waktu_pembayaran', 'bukti_pembayaran', 'keterangan']
+            attributes: ['status', 'bank_id', 'nama_bank', 'nominal', 'waktu_pembayaran', 'bukti_pembayaran', 'keterangan']
         });
 
         return infaqs;

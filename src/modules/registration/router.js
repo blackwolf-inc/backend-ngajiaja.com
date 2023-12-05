@@ -76,7 +76,7 @@ router.get('/profile/admin/:id', UserController.getAdminProfile);
 
 router.patch(
   '/change-user-profile/:id',
-  upload.single('profile_picture'),
+  storageImage.image.single('profile_picture'),
   UserController.updateUser,
 );
 
