@@ -40,7 +40,7 @@ class TeacherService extends BaseService {
       const dateOnly = new Date(
         dateObject.getFullYear(),
         dateObject.getMonth(),
-        dateObject.getDate()
+        dateObject.getDate(),
       );
       payload.tanggal_wawancara = dateOnly;
     }
@@ -146,22 +146,20 @@ class TeacherService extends BaseService {
     const pengajar = await this.__findOne({ where: id }, this.#includeQuery);
     if (!pengajar) throw ApiError.notFound(`Pengajar with id ${id} not found`);
 
-    let profile_picture;
+    let filePath;
+    let fileName;
     if (req.file) {
-      let { nama } = jwt.decode(req.headers.authorization.split(' ')[1]);
-      console.log(nama);
-      nama = nama.replace(/\s/g, '-');
-      const extension = path.extname(req.file.originalname);
-      profile_picture = `public/profile-picture/pp-${nama}${extension}`;
+      fileName = `${Date.now()}${path.extname(req.file.originalname)}`;
+      filePath = `public/profile-picture/${fileName}`;
 
       if (!req.file.mimetype.startsWith('image/')) {
         throw ApiError.badRequest('File must be an image');
       }
 
-      fs.renameSync(req.file.path, profile_picture);
+      fs.renameSync(req.file.path, filePath);
     }
 
-    payload.profile_picture = profile_picture;
+    payload.profile_picture = fileName;
 
     await User.update(payload, { where: { id: pengajar.user.id } });
     await Pengajar.update(payload, { where: { id } });
