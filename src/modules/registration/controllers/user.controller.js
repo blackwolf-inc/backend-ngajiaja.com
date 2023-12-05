@@ -105,17 +105,21 @@ class UserController {
     }
 
     let profile_picture;
+    let filePath;
     if (req.file) {
-      let { nama } = jwt.decode(req.headers.authorization.split(' ')[1]);
-      nama = nama.replace(/\s/g, '-');
       const extension = path.extname(req.file.originalname);
-      profile_picture = `public/profile-picture/pp-${nama}${extension}`;
+      profile_picture = `${Date.now()}${extension}`;
+      filePath = `images/${profile_picture}`;
 
       if (!req.file.mimetype.startsWith('image/')) {
         return res.status(400).json({ message: 'File must be an image' });
       }
 
-      fs.renameSync(req.file.path, profile_picture);
+      if (!fs.existsSync('images')) {
+        fs.mkdirSync('images');
+      }
+
+      fs.renameSync(req.file.path, filePath);
     }
     if (req.body.password) {
       req.body.password = getHash(req.body.password);
