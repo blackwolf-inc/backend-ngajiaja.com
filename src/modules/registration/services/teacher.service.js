@@ -147,8 +147,9 @@ class TeacherService extends BaseService {
     if (!pengajar) throw ApiError.notFound(`Pengajar with id ${id} not found`);
 
     let filePath;
-    const fileName = `${Date.now()}${path.extname(req.file.originalname)}`;
+    let fileName;
     if (req.file) {
+      fileName = `${Date.now()}${path.extname(req.file.originalname)}`;
       filePath = `public/profile-picture/${fileName}`;
 
       if (!req.file.mimetype.startsWith('image/')) {
