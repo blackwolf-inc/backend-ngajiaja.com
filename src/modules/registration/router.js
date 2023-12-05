@@ -15,6 +15,7 @@ const { hasRole } = require('../../middlewares/roleAuth');
 const { USER_ROLE } = require('../../helpers/constanta');
 const multer = require('multer');
 const upload = multer({ dest: 'public/profile-picture/' }); // adjust this to your needs
+const storageImage = require('../../utils/storageImage');
 
 router.get('/test', (req, res) => {
   res.send('test registration');
@@ -33,7 +34,7 @@ router.patch('/user/:id', validate(updateUserValidator), UserController.update);
 router.delete(
   '/user/:id',
   hasRole([USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN]),
-  UserController.delete
+  UserController.delete,
 );
 
 // Teacher Route
@@ -45,8 +46,8 @@ router.delete('/pengajar/:id', PengajarController.delete);
 router.get('/profile/pengajar', PengajarController.getPengajarProfile);
 router.patch(
   '/profile/pengajar',
-  upload.single('profile_picture'),
-  PengajarController.updatePengajarProfile
+  storageImage.image.single('profile_picture'),
+  PengajarController.updatePengajarProfile,
 );
 
 // students route
@@ -59,20 +60,24 @@ router.get('/profile/peserta', StudentController.getPesertaProfile);
 router.patch(
   '/profile/peserta',
   upload.single('profile_picture'),
-  StudentController.updatePesertaProfile
+  StudentController.updatePesertaProfile,
 );
 
 // students route jadwal_bimbingan_peserta
 router.post(
   '/jadwal',
   validate(students.createJadwalValidator),
-  StudentController.createJadwalBimbingan
+  StudentController.createJadwalBimbingan,
 );
 router.get('/jadwal', StudentController.getOneJadwal);
 
 // get admin profile
 router.get('/profile/admin/:id', UserController.getAdminProfile);
 
-router.patch('/change-user-profile/:id', upload.single('profile_picture'), UserController.updateUser);
+router.patch(
+  '/change-user-profile/:id',
+  upload.single('profile_picture'),
+  UserController.updateUser,
+);
 
 module.exports = router;
