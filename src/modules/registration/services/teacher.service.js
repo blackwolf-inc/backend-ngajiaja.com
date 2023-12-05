@@ -130,6 +130,10 @@ class TeacherService extends BaseService {
     const result = await this.__findOne({ where: id }, this.#includeQuery);
     if (!result) throw ApiError.notFound(`Pengajar with id ${id} not found`);
 
+    const profile_uri = result.user.profile_picture
+      ? `${process.env.BASE_URL}/images/${result.user.profile_picture}`
+      : null;
+
     return {
       name: result.user.nama,
       email: result.user.email,
@@ -138,7 +142,7 @@ class TeacherService extends BaseService {
       address: result.user.alamat,
       birthdate: result.user.tgl_lahir,
       last_education: result.pendidikan_terakhir,
-      profile_picture: result.user.profile_picture,
+      profile_picture: profile_uri,
     };
   }
 
@@ -146,25 +150,18 @@ class TeacherService extends BaseService {
     const pengajar = await this.__findOne({ where: id }, this.#includeQuery);
     if (!pengajar) throw ApiError.notFound(`Pengajar with id ${id} not found`);
 
-    let filePath;
-    let fileName;
     if (req.file) {
-      fileName = `${Date.now()}${path.extname(req.file.originalname)}`;
-      filePath = `public/profile-picture/${fileName}`;
-
-      if (!req.file.mimetype.startsWith('image/')) {
-        throw ApiError.badRequest('File must be an image');
-      }
-
-      fs.renameSync(req.file.path, filePath);
+      payload.profile_picture = req.file.filename;
     }
-
-    payload.profile_picture = fileName;
 
     await User.update(payload, { where: { id: pengajar.user.id } });
     await Pengajar.update(payload, { where: { id } });
 
     const result = await this.__findOne({ where: id }, this.#includeQuery);
+
+    const profile_uri = result.user.profile_picture
+      ? `${process.env.BASE_URL}/images/${result.user.profile_picture}`
+      : null;
 
     return {
       name: result.user.nama,
@@ -174,7 +171,7 @@ class TeacherService extends BaseService {
       address: result.user.alamat,
       birthdate: result.user.tgl_lahir,
       last_education: result.pendidikan_terakhir,
-      profile_picture: result.user.profile_picture,
+      profile_picture: profile_uri,
     };
   }
 
