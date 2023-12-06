@@ -91,7 +91,7 @@ class UserController {
       status: body.status,
       password: getHash(body.password),
       token: body.token,
-      profile_picture: body.profile_picture || 'public/profile-picture/default_pp.png',
+      profile_picture: body.profile_picture,
     };
   }
 
