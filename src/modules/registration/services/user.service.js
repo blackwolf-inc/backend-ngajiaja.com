@@ -113,9 +113,9 @@ class UserService extends BaseService {
       throw new Error('User not found');
     }
 
-    if (user.profile_picture) {
-      user.profile_picture = `${process.env.BASE_URL}/images/${user.profile_picture}`;
-    }
+    user.profile_picture = user.profile_picture
+      ? `${process.env.BASE_URL}/images/${user.profile_picture}`
+      : null;
 
     return user;
   }
