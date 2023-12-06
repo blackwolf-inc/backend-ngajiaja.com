@@ -122,7 +122,7 @@ class StudentService extends BaseService {
       payload.profile_picture = req.file.filename;
     }
 
-    await User.update(payload, { where: { id: pengajar.user.id } });
+    await User.update(payload, { where: { id: peserta.user.id } });
     await Peserta.update(payload, { where: { id } });
 
     const result = await this.__findOne({ where: id }, this.#includeQuery);
