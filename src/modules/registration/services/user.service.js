@@ -106,7 +106,7 @@ class UserService extends BaseService {
 
   async getAdminProfile(userId) {
     const user = await User.findByPk(userId, {
-      attributes: ['profile_picture', 'nama', 'email', 'role']
+      attributes: ['profile_picture', 'nama', 'email', 'role'],
     });
 
     if (!user) {
@@ -114,7 +114,7 @@ class UserService extends BaseService {
     }
 
     if (user.profile_picture) {
-      user.profile_picture = `http://${process.env.BASE_URL}/images/${user.profile_picture}`;
+      user.profile_picture = `${process.env.BASE_URL}/images/${user.profile_picture}`;
     }
 
     return user;
