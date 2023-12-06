@@ -34,7 +34,7 @@ router.patch('/user/:id', validate(updateUserValidator), UserController.update);
 router.delete(
   '/user/:id',
   hasRole([USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN]),
-  UserController.delete,
+  UserController.delete
 );
 
 // Teacher Route
@@ -47,7 +47,7 @@ router.get('/profile/pengajar', PengajarController.getPengajarProfile);
 router.patch(
   '/profile/pengajar',
   storageImage.image.single('profile_picture'),
-  PengajarController.updatePengajarProfile,
+  PengajarController.updatePengajarProfile
 );
 
 // students route
@@ -59,15 +59,15 @@ router.delete('/student/:id', StudentController.delete);
 router.get('/profile/peserta', StudentController.getPesertaProfile);
 router.patch(
   '/profile/peserta',
-  upload.single('profile_picture'),
-  StudentController.updatePesertaProfile,
+  storageImage.image.single('profile_picture'),
+  StudentController.updatePesertaProfile
 );
 
 // students route jadwal_bimbingan_peserta
 router.post(
   '/jadwal',
   validate(students.createJadwalValidator),
-  StudentController.createJadwalBimbingan,
+  StudentController.createJadwalBimbingan
 );
 router.get('/jadwal', StudentController.getOneJadwal);
 
@@ -77,7 +77,7 @@ router.get('/profile/admin/:id', UserController.getAdminProfile);
 router.patch(
   '/change-user-profile/:id',
   storageImage.image.single('profile_picture'),
-  UserController.updateUser,
+  UserController.updateUser
 );
 
 module.exports = router;
