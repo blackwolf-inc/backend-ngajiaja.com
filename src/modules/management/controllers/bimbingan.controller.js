@@ -5,6 +5,7 @@ const responseHandler = require('../../../helpers/responseHandler');
 const db = require('../../../models/index');
 const moment = require('moment');
 const ApiError = require('../../../helpers/errorHandler');
+const { STATUS_BIMBINGAN_ACTIVE } = require('../../../helpers/constanta');
 const { Period, BimbinganReguler, User, BimbinganTambahan } = db;
 
 class BimbinganPeserta {
@@ -148,6 +149,7 @@ class BimbinganPeserta {
               persetujuan_peserta: req.body.persetujuan_peserta,
               tanggal: bimbingan.tanggal_baru,
               jam_bimbingan: bimbingan.jam_baru,
+              status: STATUS_BIMBINGAN_ACTIVE.WAITING,
               hari_bimbingan: moment(bimbingan.tanggal_baru)
                 .locale('id')
                 .format('dddd')
@@ -182,6 +184,7 @@ class BimbinganPeserta {
               persetujuan_peserta: req.body.persetujuan_peserta,
               tanggal: bimbingan.tanggal_baru,
               jam_bimbingan: bimbingan.jam_baru,
+              status: STATUS_BIMBINGAN_ACTIVE.WAITING,
               hari_bimbingan: moment(bimbingan.tanggal_baru)
                 .locale('id')
                 .format('dddd')
