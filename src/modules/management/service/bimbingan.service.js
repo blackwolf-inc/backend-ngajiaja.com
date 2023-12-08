@@ -592,7 +592,8 @@ class BimbinganService extends BaseService {
       tanggal_selesai: arrayPeriodeBimbingan
         ? arrayPeriodeBimbingan[arrayPeriodeBimbingan.length - 1]
         : null,
-      jumlah_attedance_bimbingan_regular: totalBimbinganReguler ? totalBimbinganReguler : 0,
+      jumlah_attedance_bimbingan_reguler: totalBimbinganReguler ? totalBimbinganReguler : 0,
+      total_bimbingan_reguler: totalBimbinganReguler,
       tipe_bimbingan: period.tipe_bimbingan,
       status: period.status,
       infaq_bimbingan_tambahan_sebelum:
