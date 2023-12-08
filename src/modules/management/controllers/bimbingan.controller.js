@@ -163,6 +163,11 @@ class BimbinganPeserta {
             { id: req.params.id }
           );
         }
+      } else if (req.body.keterangan_izin_peserta) {
+        result = await service.updateData(
+          { absensi_pengajar: 0, status: STATUS_BIMBINGAN_ACTIVE.CANCELED },
+          { id: req.params.id }
+        );
       } else {
         result = await service.updateData(req.body, { id: req.params.id });
       }
