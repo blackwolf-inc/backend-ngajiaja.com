@@ -4,7 +4,7 @@ const SendEmailNotification = require('../../../utils/nodemailer');
 const { User, Peserta } = require('../../../models');
 const jwt = require('jsonwebtoken');
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs/promises');
 
 class StudentService extends BaseService {
   async checkUserId(req) {
@@ -102,6 +102,10 @@ class StudentService extends BaseService {
     const result = await this.__findOne({ where: id }, this.#includeQuery);
     if (!result) throw ApiError.notFound(`Peserta with id ${id} not found`);
 
+    const profile_uri = result.user.profile_picture
+      ? `${process.env.BASE_URL}/images/${result.user.profile_picture}`
+      : null;
+
     return {
       name: result.user.nama,
       email: result.user.email,
@@ -110,7 +114,7 @@ class StudentService extends BaseService {
       address: result.user.alamat,
       birthdate: result.user.tgl_lahir,
       profesion: result.profesi,
-      profile_picture: result.user.profile_picture,
+      profile_picture: profile_uri,
     };
   }
 
@@ -120,6 +124,7 @@ class StudentService extends BaseService {
 
     if (req.file) {
       payload.profile_picture = req.file.filename;
+      await fs.unlink(path.join(process.cwd(), '../images', peserta.user.profile_picture));
     }
 
     await User.update(payload, { where: { id: peserta.user.id } });
