@@ -124,6 +124,9 @@ class StudentService extends BaseService {
 
     if (req.file) {
       payload.profile_picture = req.file.filename;
+    }
+
+    if (peserta.user.profile_picture) {
       await fs.unlink(path.join(process.cwd(), '../images', peserta.user.profile_picture));
     }
 
