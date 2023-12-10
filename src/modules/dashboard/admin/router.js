@@ -61,4 +61,7 @@ router.get('/data/peserta/terverifikasi/export', AdminDashboardController.export
 router.get('/data/period/ongoing/export/csv', AdminDashboardController.exportDataBimbinganOngoing);
 router.get('/data/period/finished/export/csv', AdminDashboardController.exportDataBimbinganFinished);
 
+router.post('/article-category', AdminDashboardController.createArticleCategory);
+router.delete('/article-category/:id', AdminDashboardController.deleteArticleCategory);
+
 module.exports = router;

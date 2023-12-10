@@ -2,7 +2,7 @@ const InfaqService = require('../service/infaq.service');
 const PesertaService = require('../../registration/services/student.service');
 const responseHandler = require('../../../helpers/responseHandler');
 const db = require('../../../models/index');
-const { Infaq } = db;
+const { Infaq, PenghasilanPengajar } = db;
 
 class InfaqController {
   static async getOne(req, res, next) {
@@ -85,6 +85,39 @@ class InfaqController {
     try {
       const result = await service.deleteData(req.params.id);
       return responseHandler.succes(res, `Success delete ${service.db.name}`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateInfaqAdmin(req, res, next) {
+    const service = new InfaqService(req, Infaq);
+    try {
+      const { status, keterangan } = req.body;
+      const { id } = req.params
+      await Infaq.update({ status, keterangan }, {
+        where: {
+          id
+        }
+      });
+
+      const infaqdata = await Infaq.findByPk(id);
+      if (status === 'ACCEPTED') {
+        const existingRecord = await PenghasilanPengajar.findOne({
+          where: {
+            periode_id: infaqdata.periode_id
+          }
+        });
+
+        if (existingRecord) {
+          return responseHandler.succes(res, `Success update infaq ${service.db.name}`, infaqdata);
+        }
+        await service.updateInfaqAdmin(infaqdata);
+        return responseHandler.succes(res, `Success add to penghasilan pengajar ${service.db.name}`, infaqdata);
+      } else {
+        return responseHandler.succes(res, `Success update infaq ${service.db.name}`, infaqdata);
+      }
+
     } catch (error) {
       next(error);
     }

@@ -5,6 +5,7 @@ const AdminManageCourseService = require('../services/adminKelolaBimbingan.js');
 const responseHandler = require('../../../../helpers/responseHandler');
 const fs = require('fs');
 const Papa = require('papaparse');
+const AdminArticle = require('../services/adminArticle.service.js');
 
 class AdminDashboardController {
   static async dataPengajar(req, res, next) {
@@ -364,6 +365,29 @@ class AdminDashboardController {
       res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
 
       res.send(csv);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async createArticleCategory(req, res, next) {
+    const service = new AdminArticle();
+    try {
+      const { categories } = req.body;
+      const token = req.headers.authorization.split(' ')[1];
+      const result = await service.createArticleCategoryService({ categories }, token);
+      return responseHandler.succes(res, 'Success create article category', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async deleteArticleCategory(req, res, next) {
+    const service = new AdminArticle();
+    try {
+      const { id } = req.params;
+      const result = await service.deleteArticleCategoryService(id);
+      return responseHandler.succes(res, 'Success delete article category', result);
     } catch (error) {
       next(error);
     }

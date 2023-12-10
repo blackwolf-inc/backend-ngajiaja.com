@@ -78,4 +78,6 @@ router.delete('/infaq/:id', InfaqController.delete);
 router.get('/penghasilan', PenghasilanController.getIncome);
 router.get('/penghasilan/detail', PenghasilanController.dataIncome);
 
+router.patch('/infaqadmin/:id', storageImage.image.single('media'), InfaqController.updateInfaqAdmin)
+
 module.exports = router;

@@ -191,10 +191,14 @@ class InfaqService extends BaseService {
       pengajar_id: req.pengajar_id,
       peserta_id: req.peserta_id,
       pembayaran: req.nominal,
+      periode_id: req.periode_id,
+      status: req.status,
+      media: req.file,
       penghasilan: ((parseFloat(req.nominal) * pengajar.persentase_bagi_hasil) / 100),
       persentase_bagi_hasil: pengajar.persentase_bagi_hasil,
       waktu_pembayaran: req.waktu_pembayaran,
     };
+
 
     const result = await PenghasilanPengajar.create(data);
   }
@@ -222,6 +226,29 @@ class InfaqService extends BaseService {
       as: 'bank',
     },
   ];
+
+  async updateInfaqAdmin(req) {
+    const pengajar = await Pengajar.findByPk(req.pengajar_id);
+
+    if (!pengajar) {
+      throw new Error('Pengajar not found');
+    }
+
+    const data = {
+      pengajar_id: req.pengajar_id,
+      peserta_id: req.peserta_id,
+      pembayaran: req.nominal,
+      periode_id: req.periode_id,
+      status: req.status,
+      penghasilan: ((parseFloat(req.nominal) * pengajar.persentase_bagi_hasil) / 100),
+      persentase_bagi_hasil: pengajar.persentase_bagi_hasil,
+      waktu_pembayaran: req.waktu_pembayaran,
+    };
+
+
+    await PenghasilanPengajar.create(data);
+  }
+
 }
 
 module.exports = InfaqService;

@@ -24,6 +24,13 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
+
+      PenghasilanPengajar.belongsTo(models.Period, {
+        foreignKey: 'periode_id',
+        as: 'period',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
     }
   }
   PenghasilanPengajar.init(
@@ -32,6 +39,7 @@ module.exports = (sequelize, DataTypes) => {
       peserta_id: DataTypes.INTEGER,
       pembayaran: DataTypes.DOUBLE,
       penghasilan: DataTypes.DOUBLE,
+      periode_id: DataTypes.INTEGER,
       persentase_bagi_hasil: DataTypes.FLOAT,
       waktu_pembayaran: DataTypes.DATE,
     },
