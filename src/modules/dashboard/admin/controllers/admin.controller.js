@@ -392,6 +392,18 @@ class AdminDashboardController {
       next(error);
     }
   }
+
+  static async createArticle(req, res, next) {
+    const service = new AdminArticle()
+    try {
+      const { article_title, article_body, article_category_id, article_picture, main_article, archived_article, article_thumbnail } = req.body;
+      const token = req.headers.authorization.split(' ')[1];
+      const result = await service.createArticleService({ article_title, article_body, article_category_id, article_picture, main_article, archived_article, article_thumbnail }, token);
+      return responseHandler.succes(res, 'Success create article category', result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = AdminDashboardController;

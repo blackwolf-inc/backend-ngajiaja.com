@@ -37,7 +37,7 @@ class AdminArticle {
     }
 
     async createArticleService(data, token) {
-        const { article_title, article_body, article_category_id, article_picture, main_article, archived_article } = data;
+        const { article_title, article_body, article_category_id, article_picture, main_article, archived_article, article_thumbnail } = data;
 
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
         const user_id = decodedToken.id;
@@ -62,7 +62,8 @@ class AdminArticle {
             article_picture,
             main_article,
             archived_article,
-            article_createby
+            article_createby,
+            article_thumbnail
         });
         return article;
 

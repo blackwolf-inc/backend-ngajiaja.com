@@ -9,6 +9,7 @@ const {
   updateStatusPengajar,
   updateLinkWawancara,
 } = require('./validators/adminPengajar.validator');
+const AdminDashboard = require('./services/adminDashboard.service.js');
 
 router.get('/test', (req, res) => {
   res.status(200).json({
@@ -63,5 +64,7 @@ router.get('/data/period/finished/export/csv', AdminDashboardController.exportDa
 
 router.post('/article-category', AdminDashboardController.createArticleCategory);
 router.delete('/article-category/:id', AdminDashboardController.deleteArticleCategory);
+
+router.post('/create-article', AdminDashboardController.createArticle)
 
 module.exports = router;
