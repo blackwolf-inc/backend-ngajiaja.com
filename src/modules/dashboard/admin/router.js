@@ -9,6 +9,7 @@ const {
   updateStatusPengajar,
   updateLinkWawancara,
 } = require('./validators/adminPengajar.validator');
+const AdminDashboard = require('./services/adminDashboard.service.js');
 
 router.get('/test', (req, res) => {
   res.status(200).json({
@@ -60,5 +61,10 @@ router.get('/data/peserta/terverifikasi/export', AdminDashboardController.export
 
 router.get('/data/period/ongoing/export/csv', AdminDashboardController.exportDataBimbinganOngoing);
 router.get('/data/period/finished/export/csv', AdminDashboardController.exportDataBimbinganFinished);
+
+router.post('/article-category', AdminDashboardController.createArticleCategory);
+router.delete('/article-category/:id', AdminDashboardController.deleteArticleCategory);
+
+router.post('/create-article', AdminDashboardController.createArticle)
 
 module.exports = router;
