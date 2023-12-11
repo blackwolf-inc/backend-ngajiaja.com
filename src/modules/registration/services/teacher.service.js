@@ -40,7 +40,7 @@ class TeacherService extends BaseService {
       const dateOnly = new Date(
         dateObject.getFullYear(),
         dateObject.getMonth(),
-        dateObject.getDate()
+        dateObject.getDate(),
       );
       payload.tanggal_wawancara = dateOnly;
     }
@@ -130,6 +130,10 @@ class TeacherService extends BaseService {
     const result = await this.__findOne({ where: id }, this.#includeQuery);
     if (!result) throw ApiError.notFound(`Pengajar with id ${id} not found`);
 
+    const profile_uri = result.user.profile_picture
+      ? `${process.env.BASE_URL}/images/${result.user.profile_picture}`
+      : null;
+
     return {
       name: result.user.nama,
       email: result.user.email,
@@ -138,7 +142,7 @@ class TeacherService extends BaseService {
       address: result.user.alamat,
       birthdate: result.user.tgl_lahir,
       last_education: result.pendidikan_terakhir,
-      profile_picture: result.user.profile_picture,
+      profile_picture: profile_uri,
     };
   }
 
@@ -146,27 +150,18 @@ class TeacherService extends BaseService {
     const pengajar = await this.__findOne({ where: id }, this.#includeQuery);
     if (!pengajar) throw ApiError.notFound(`Pengajar with id ${id} not found`);
 
-    let profile_picture;
     if (req.file) {
-      let { nama } = jwt.decode(req.headers.authorization.split(' ')[1]);
-      console.log(nama);
-      nama = nama.replace(/\s/g, '-');
-      const extension = path.extname(req.file.originalname);
-      profile_picture = `public/profile-picture/pp-${nama}${extension}`;
-
-      if (!req.file.mimetype.startsWith('image/')) {
-        throw ApiError.badRequest('File must be an image');
-      }
-
-      fs.renameSync(req.file.path, profile_picture);
+      payload.profile_picture = req.file.filename;
     }
-
-    payload.profile_picture = profile_picture;
 
     await User.update(payload, { where: { id: pengajar.user.id } });
     await Pengajar.update(payload, { where: { id } });
 
     const result = await this.__findOne({ where: id }, this.#includeQuery);
+
+    const profile_uri = result.user.profile_picture
+      ? `${process.env.BASE_URL}/images/${result.user.profile_picture}`
+      : null;
 
     return {
       name: result.user.nama,
@@ -176,7 +171,7 @@ class TeacherService extends BaseService {
       address: result.user.alamat,
       birthdate: result.user.tgl_lahir,
       last_education: result.pendidikan_terakhir,
-      profile_picture: result.user.profile_picture,
+      profile_picture: profile_uri,
     };
   }
 

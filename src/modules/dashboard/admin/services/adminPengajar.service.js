@@ -135,6 +135,7 @@ class AdminPengajarService {
     const afterUpdatePengajar = await servicePengajar.updateData(
       {
         level: payload.level_pengajar,
+        persentase_bagi_hasil: payload.persentase_bagi_hasil
       },
       { id: user.pengajar.id }
     );
@@ -142,6 +143,7 @@ class AdminPengajarService {
     return {
       status: afterUpdateUser.status,
       level: afterUpdatePengajar.level,
+      persentase_bagi_hasil: afterUpdatePengajar.persentase_bagi_hasil
     };
   }
 
@@ -215,7 +217,7 @@ class AdminPengajarService {
       `
       SELECT 
         u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
-        p.id AS 'pengajar_id', p.level
+        p.id AS 'pengajar_id', p.level, p.persentase_bagi_hasil
       FROM Pengajars p 
       JOIN Users u ON p.user_id = u.id 
       ${whereClause}
@@ -236,9 +238,57 @@ class AdminPengajarService {
     `,
       { type: QueryTypes.SELECT }
     );
-    let data = result?.map((item) => ({ ...item, bagi_hasil: 50 }));
     const totalPages = Math.ceil(totalCount[0].total / pageSize);
-    return { data, page, totalPages };
+    return { result, page, totalPages };
+  }
+
+  async getPengajarRegisteredExport(startDate, endDate) {
+    let whereClause =
+      "WHERE u.role = 'PENGAJAR' AND u.status IN ('REGISTERED', 'WAITING', 'INTERVIEWED', 'REJECTED')";
+
+    if (startDate && endDate) {
+      const startDateInit = moment(startDate).startOf('day').format('YYYY-MM-DD');
+      const endDateInit = moment(endDate).endOf('day').format('YYYY-MM-DD');
+      whereClause += ` AND p.createdAt BETWEEN '${startDateInit}' AND '${endDateInit}'`;
+    }
+
+    const result = await sequelize.query(
+      `
+      SELECT 
+        u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+        p.id AS 'pengajar_id', p.tanggal_wawancara, p.jam_wawancara, p.link_wawancara, p.link_video_membaca_quran, p.link_video_simulasi_mengajar, p.createdAt
+      FROM Pengajars p 
+      JOIN Users u ON p.user_id = u.id 
+      ${whereClause}
+      `,
+      { type: QueryTypes.SELECT }
+    );
+
+    return result;
+  }
+
+  async getPengajarVerifiedExport(startDate, endDate) {
+    let whereClause = "WHERE u.role = 'PENGAJAR' AND u.status IN ('ACTIVE', 'NONACTIVE')";
+
+    if (startDate && endDate) {
+      const startDateInit = moment(startDate).startOf('day').format('YYYY-MM-DD');
+      const endDateInit = moment(endDate).endOf('day').format('YYYY-MM-DD');
+      whereClause += ` AND p.createdAt BETWEEN '${startDateInit}' AND '${endDateInit}'`;
+    }
+
+    const result = await sequelize.query(
+      `
+      SELECT 
+           u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+           p.id AS 'pengajar_id', p.level, p.createdAt
+      FROM Pengajars p 
+      JOIN Users u ON p.user_id = u.id 
+      ${whereClause}
+      `,
+      { type: QueryTypes.SELECT }
+    );
+
+    return result;
   }
 }
 

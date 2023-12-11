@@ -147,7 +147,7 @@ class InfaqService extends BaseService {
 
       const result = await Infaq.findOne({ where: { id: req.params.id } });
       if (result.bukti_pembayaran) {
-        await fs.unlink(path.join(process.cwd(), `../images/${result.bukti_pembayaran}`), () => {});
+        await fs.unlink(path.join(process.cwd(), `../images/${result.bukti_pembayaran}`), () => { });
       }
     } else {
       throw ApiError.badRequest(`Image not found`);
@@ -179,16 +179,27 @@ class InfaqService extends BaseService {
   }
 
   async addToPenghasilanPengajar(req) {
-    const penguranganPenghasilan = (50 / 100) * parseFloat(req.nominal);
+    const pengajar = await Pengajar.findByPk(req.pengajar_id);
+
+    if (!pengajar) {
+      throw new Error('Pengajar not found');
+    }
+
+    // const penguranganPenghasilan = (pengajar.persentase_bagi_hasil / 100) * parseFloat(req.nominal);
 
     const data = {
       pengajar_id: req.pengajar_id,
       peserta_id: req.peserta_id,
       pembayaran: req.nominal,
-      penghasilan: parseFloat(req.nominal) - penguranganPenghasilan,
-      persentase_bagi_hasil: 50,
+      periode_id: req.periode_id,
+      status: req.status,
+      media: req.file,
+      penghasilan: ((parseFloat(req.nominal) * pengajar.persentase_bagi_hasil) / 100),
+      persentase_bagi_hasil: pengajar.persentase_bagi_hasil,
       waktu_pembayaran: req.waktu_pembayaran,
     };
+
+
     const result = await PenghasilanPengajar.create(data);
   }
 
@@ -215,6 +226,29 @@ class InfaqService extends BaseService {
       as: 'bank',
     },
   ];
+
+  async updateInfaqAdmin(req) {
+    const pengajar = await Pengajar.findByPk(req.pengajar_id);
+
+    if (!pengajar) {
+      throw new Error('Pengajar not found');
+    }
+
+    const data = {
+      pengajar_id: req.pengajar_id,
+      peserta_id: req.peserta_id,
+      pembayaran: req.nominal,
+      periode_id: req.periode_id,
+      status: req.status,
+      penghasilan: ((parseFloat(req.nominal) * pengajar.persentase_bagi_hasil) / 100),
+      persentase_bagi_hasil: pengajar.persentase_bagi_hasil,
+      waktu_pembayaran: req.waktu_pembayaran,
+    };
+
+
+    await PenghasilanPengajar.create(data);
+  }
+
 }
 
 module.exports = InfaqService;

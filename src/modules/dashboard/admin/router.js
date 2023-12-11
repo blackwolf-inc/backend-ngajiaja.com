@@ -9,6 +9,7 @@ const {
   updateStatusPengajar,
   updateLinkWawancara,
 } = require('./validators/adminPengajar.validator');
+const AdminDashboard = require('./services/adminDashboard.service.js');
 
 router.get('/test', (req, res) => {
   res.status(200).json({
@@ -51,5 +52,19 @@ router.get('/data/period/ongoing', AdminDashboardController.getCourseOngoing);
 router.get('/data/period/finished', AdminDashboardController.getCourseFinished);
 router.get('/data/period/ongoing/:periodId', AdminDashboardController.getCourseOngoingById);
 router.get('/data/period/finished/:periodId', AdminDashboardController.getCourseFinishedById);
+
+router.get('/data/pengajar/terdaftar/export', AdminDashboardController.exportDataPengajarRegistered);
+router.get('/data/pengajar/terverifikasi/export', AdminDashboardController.exportDataPengajarVerified);
+
+router.get('/data/peserta/terdaftar/export', AdminDashboardController.exportDataPesertaRegistered);
+router.get('/data/peserta/terverifikasi/export', AdminDashboardController.exportDataPesertaVerified);
+
+router.get('/data/period/ongoing/export/csv', AdminDashboardController.exportDataBimbinganOngoing);
+router.get('/data/period/finished/export/csv', AdminDashboardController.exportDataBimbinganFinished);
+
+router.post('/article-category', AdminDashboardController.createArticleCategory);
+router.delete('/article-category/:id', AdminDashboardController.deleteArticleCategory);
+
+router.post('/create-article', AdminDashboardController.createArticle)
 
 module.exports = router;

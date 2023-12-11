@@ -106,12 +106,16 @@ class UserService extends BaseService {
 
   async getAdminProfile(userId) {
     const user = await User.findByPk(userId, {
-      attributes: ['profile_picture', 'nama', 'email', 'role']
+      attributes: ['profile_picture', 'nama', 'email', 'role'],
     });
 
     if (!user) {
       throw new Error('User not found');
     }
+
+    user.profile_picture = user.profile_picture
+      ? `${process.env.BASE_URL}/images/${user.profile_picture}`
+      : null;
 
     return user;
   }
