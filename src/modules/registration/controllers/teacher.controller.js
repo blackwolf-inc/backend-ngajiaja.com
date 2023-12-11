@@ -1,10 +1,12 @@
 const TeacherService = require('../services/teacher.service');
 const UserService = require('../services/user.service');
+const PenghasilanService = require('../../monetary/service/penghasilan.service');
 const responseHandler = require('./../../../helpers/responseHandler');
 const db = require('./../../../models/index');
-const { Pengajar, User, sequelize } = db;
+const { Pengajar, User, PenghasilanPengajar, Pencairan, sequelize } = db;
 const { USER_ROLE } = require('./../../../helpers/constanta');
 const ApiError = require('../../../helpers/errorHandler');
+const PencairanService = require('../../monetary/service/pencairan.service');
 class TeacherController {
   static async getOne(req, res, next) {
     const service = new TeacherService(req, Pengajar);
@@ -71,9 +73,16 @@ class TeacherController {
   static async getPengajarProfile(req, res, next) {
     const service = new TeacherService(req, Pengajar);
     const userService = new UserService(req, User);
+    const penghasilanService = new PenghasilanService(req, PenghasilanPengajar);
+    const pencairanService = new PencairanService(req, Pencairan);
     try {
       const user = await userService.getOneUser(req.user.id);
       const result = await service.getPengajarProfile(user.pengajar.id);
+      const [totalIncome, totalPencairan] = await Promise.all([
+        penghasilanService.totalIncome(user.pengajar.id),
+        pencairanService.totalPencairan(req.user.id),
+      ]);
+      result.saldo = totalIncome - totalPencairan;
       return responseHandler.succes(res, `Success get ${service.db.name}`, result);
     } catch (error) {
       next(error);

@@ -1,7 +1,9 @@
 const PencairanService = require('../service/pencairan.service');
+const UserService = require('../../registration/services/user.service');
 const responseHandler = require('../../../helpers/responseHandler');
 const db = require('../../../models/index');
-const { Pencairan } = db;
+const { STATUS_PENCAIRAN } = require('../../../helpers/constanta');
+const { Pencairan, User } = db;
 
 class PencairanController {
   static async getOne(req, res, next) {
@@ -28,9 +30,15 @@ class PencairanController {
 
   static async create(req, res, next) {
     const service = new PencairanService(req, Pencairan);
+    const userService = new UserService(req, User);
     try {
-      await service.checkUserById(req.body);
-      const result = await service.createData(req.body);
+      const user = await userService.getOneUser(req.user.id);
+      const result = await service.createData({
+        user_id: req.user.id,
+        nama_bank: user.pengajar.nama_bank,
+        nominal: req.body.nominal,
+        status: STATUS_PENCAIRAN.WAITING,
+      });
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {
       next(error);
