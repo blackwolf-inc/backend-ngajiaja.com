@@ -1,35 +1,6 @@
 const { check, body } = require('express-validator');
 
 const createPencairanValidator = [
-  check('user_id')
-    .exists()
-    .withMessage('Must have user_id')
-    .bail()
-    .notEmpty()
-    .withMessage('Can not be empty')
-    .bail()
-    .isNumeric()
-    .withMessage('Must be integer'),
-  check('bank_id')
-    .exists()
-    .withMessage('Must have bank_id')
-    .bail()
-    .notEmpty()
-    .withMessage('Can not be empty')
-    .bail()
-    .isNumeric()
-    .withMessage('Must be integer'),
-  check('status')
-    .exists()
-    .withMessage('Must have status')
-    .bail()
-    .notEmpty()
-    .withMessage('Can not be empty')
-    .bail()
-    .isString()
-    .withMessage('Must be integer')
-    .isIn(['WAITING', 'ACCEPTED', 'REJECTED'])
-    .withMessage('level must be WAITING / ACCEPTED / REJECTED'),
   check('nominal')
     .exists()
     .withMessage('Must have nominal')

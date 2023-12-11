@@ -143,6 +143,9 @@ class TeacherService extends BaseService {
       birthdate: result.user.tgl_lahir,
       last_education: result.pendidikan_terakhir,
       profile_picture: profile_uri,
+      nama_bank: result.nama_bank,
+      no_rekening: result.no_rekening,
+      atas_nama: result.nama_rekening,
     };
   }
 
