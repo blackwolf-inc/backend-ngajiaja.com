@@ -14,14 +14,6 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
-
-      //Relation to Pencairan
-      Bank.hasMany(models.Pencairan, {
-        foreignKey: 'bank_id',
-        as: 'pencairan',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
-      });
     }
   }
   Bank.init(
@@ -33,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: 'Bank',
-    }
+    },
   );
   return Bank;
 };

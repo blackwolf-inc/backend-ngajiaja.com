@@ -16,13 +16,8 @@ module.exports = {
           key: 'id',
         },
       },
-      bank_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'Banks',
-          key: 'id',
-        },
+      nama_bank: {
+        type: Sequelize.STRING,
       },
       status: {
         type: Sequelize.STRING,

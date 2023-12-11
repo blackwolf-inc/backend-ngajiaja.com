@@ -8,14 +8,6 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      //Relation to Bank
-      Pencairan.belongsTo(models.Bank, {
-        foreignKey: 'user_id',
-        as: 'bank',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
-      });
-
       //Relation to User
       Pencairan.belongsTo(models.User, {
         foreignKey: 'user_id',
@@ -28,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
   Pencairan.init(
     {
       user_id: DataTypes.INTEGER,
-      bank_id: DataTypes.INTEGER,
+      nama_bank: DataTypes.STRING,
       status: DataTypes.STRING,
       nominal: DataTypes.DOUBLE,
       waktu_pembayaran: DataTypes.DATE,
@@ -38,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: 'Pencairan',
-    }
+    },
   );
   return Pencairan;
 };
