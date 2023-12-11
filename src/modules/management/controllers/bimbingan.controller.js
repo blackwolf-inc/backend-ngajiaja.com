@@ -166,6 +166,7 @@ class BimbinganPeserta {
       } else if (req.body.keterangan_izin_peserta) {
         result = await service.updateData(
           {
+            absensi_peserta: req.body.absensi_peserta,
             absensi_pengajar: 0,
             status: STATUS_BIMBINGAN_ACTIVE.CANCELED,
             keterangan_izin_peserta: req.body.keterangan_izin_peserta,
