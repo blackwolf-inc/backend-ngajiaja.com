@@ -126,15 +126,14 @@ class StudentService extends BaseService {
       payload.profile_picture = req.file.filename;
     }
 
-    if (peserta.user.profile_picture) {
-      await fs.unlink(path.join(process.cwd(), '../images', peserta.user.profile_picture));
-    }
-
     await User.update(payload, { where: { id: peserta.user.id } });
     await Peserta.update(payload, { where: { id } });
 
     const result = await this.__findOne({ where: id }, this.#includeQuery);
 
+    if (req.file && peserta.user.profile_picture && result.user.profile_picture) {
+      await fs.unlink(path.join(process.cwd(), '../images', peserta.user.profile_picture));
+    }
     const profile_uri = result.user.profile_picture
       ? `${process.env.BASE_URL}/images/${result.user.profile_picture}`
       : null;
