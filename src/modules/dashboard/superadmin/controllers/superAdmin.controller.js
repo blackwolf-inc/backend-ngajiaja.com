@@ -2,6 +2,7 @@ const SuperAdminDashboardService = require('../services/superadminDashboard.serv
 const SuperAdminPesertaDashboardService = require('../services/superadminPesertaDashboard.service.js')
 const SuperAdminPengajarDashboardService = require('../services/superadminPengajarDashboard.service.js')
 const responseHandler = require('../../../../helpers/responseHandler');
+const Papa = require('papaparse');
 
 class SuperAdminController {
     static async getAllDataSuperAdminDashboard(req, res, next) {
@@ -177,6 +178,29 @@ class SuperAdminController {
                 userId
             );
             return responseHandler.succes(res, 'Success update status pengajar', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getPesertaRegisteredExport(req, res, next) {
+        const service = new SuperAdminPesertaDashboardService();
+        try {
+            const { query } = req;
+            const { startDate, endDate } = query;
+            const result = await service.getPesertaRegisteredExport(
+                startDate,
+                endDate
+            );
+            const csv = Papa.unparse(result);
+            const date = +new Date();
+
+            const filename = `PesertaRegistered_${date}.csv`;
+
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+            res.send(csv);
         } catch (error) {
             next(error);
         }

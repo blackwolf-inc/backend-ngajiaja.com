@@ -28,4 +28,6 @@ router.patch('/data/pengajar/registered/:userId', SuperAdminDashboardController.
 router.get('/data/pengajar/verified', SuperAdminDashboardController.getPengajarVerified);
 router.patch('/data/pengajar/verified/:userId', SuperAdminDashboardController.updateStatusPengajar);
 
+router.get('/export/peserta/registered/', SuperAdminDashboardController.getPesertaRegisteredExport);
+
 module.exports = router;
