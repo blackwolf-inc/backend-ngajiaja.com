@@ -37,7 +37,7 @@ class Application {
       responseHandler.succes(res, 'Test route');
     });
 
-    this.app.use('dev/api/v1', await routers());
+    this.app.use('/dev/api/v1', await routers());
 
     this.app.use((req, res, next) => {
       next(ApiError.notFound('Page not found!'));
