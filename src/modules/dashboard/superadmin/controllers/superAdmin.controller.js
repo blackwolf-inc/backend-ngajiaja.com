@@ -1,5 +1,6 @@
 const SuperAdminDashboardService = require('../services/superadminDashboard.service.js')
 const SuperAdminPesertaDashboardService = require('../services/superadminPesertaDashboard.service.js')
+const SuperAdminPengajarDashboardService = require('../services/superadminPengajarDashboard.service.js')
 const responseHandler = require('../../../../helpers/responseHandler');
 
 class SuperAdminController {
@@ -110,7 +111,7 @@ class SuperAdminController {
     }
 
     static async getDataPengajar(req, res, next) {
-        const service = new SuperAdminPesertaDashboardService();
+        const service = new SuperAdminPengajarDashboardService();
         try {
             const result = await service.getDataPengajar();
             return responseHandler.succes(res, 'Success get all data', result);
@@ -120,11 +121,11 @@ class SuperAdminController {
     }
 
     static async getPengajarRegistered(req, res, next) {
-        const service = new SuperAdminPesertaDashboardService();
+        const service = new SuperAdminPengajarDashboardService();
         try {
             const { query } = req;
             const { status, keyword, startDate, endDate } = query;
-            const result = await service.getPengajarRegistered(
+            const result = await service.getPesertaPengajarRegistered(
                 query,
                 status,
                 keyword,
@@ -138,11 +139,11 @@ class SuperAdminController {
     }
 
     static async updateStatusPengajarTerdaftar(req, res, next) {
-        const service = new SuperAdminPesertaDashboardService();
+        const service = new SuperAdminPengajarDashboardService();
         try {
             const { userId } = req.params;
             const { link_wawancara, tanggal_wawancara, jam_wawancara, isVerifiedByAdmin, level_pengajar, status_pengajar } = req.body;
-            const result = await service.updateStatusPengajarTerdaftar(
+            const result = await service.updatePengajarRegistered(
                 req,
                 { link_wawancara, tanggal_wawancara, jam_wawancara, isVerifiedByAdmin, level_pengajar, status_pengajar },
                 userId
@@ -153,6 +154,33 @@ class SuperAdminController {
         }
     }
 
+    static async getPengajarVerified(req, res, next) {
+        const service = new SuperAdminPengajarDashboardService();
+        try {
+            const { query } = req;
+            const { status, keyword, level } = query;
+            const result = await service.getPengajarVerified(query, status, keyword, level);
+            return responseHandler.succes(res, 'Success get pengajar Terverifikasi', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async updateStatusPengajar(req, res, next) {
+        const service = new SuperAdminPengajarDashboardService();
+        try {
+            const { userId } = req.params;
+            const { status_pengajar, level_pengajar, persentase_bagi_hasil } = req.body;
+            const result = await service.updateStatusPengajar(
+                req,
+                { status_pengajar, level_pengajar, persentase_bagi_hasil },
+                userId
+            );
+            return responseHandler.succes(res, 'Success update status pengajar', result);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = SuperAdminController
