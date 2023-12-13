@@ -23,6 +23,7 @@ router.get('/test', (req, res) => {
 
 // create user without auth
 router.post('/user', validate(createUserValidator), UserController.create);
+router.get('/pengajar/verified', PengajarController.getPengajarVerified);
 
 // after login everything need to check auth
 router.use(isAuthenticate);
@@ -34,7 +35,7 @@ router.patch('/user/:id', validate(updateUserValidator), UserController.update);
 router.delete(
   '/user/:id',
   hasRole([USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN]),
-  UserController.delete
+  UserController.delete,
 );
 
 // Teacher Route
@@ -47,7 +48,7 @@ router.get('/profile/pengajar', PengajarController.getPengajarProfile);
 router.patch(
   '/profile/pengajar',
   storageImage.image.single('profile_picture'),
-  PengajarController.updatePengajarProfile
+  PengajarController.updatePengajarProfile,
 );
 
 // students route
@@ -60,14 +61,14 @@ router.get('/profile/peserta', StudentController.getPesertaProfile);
 router.patch(
   '/profile/peserta',
   storageImage.image.single('profile_picture'),
-  StudentController.updatePesertaProfile
+  StudentController.updatePesertaProfile,
 );
 
 // students route jadwal_bimbingan_peserta
 router.post(
   '/jadwal',
   validate(students.createJadwalValidator),
-  StudentController.createJadwalBimbingan
+  StudentController.createJadwalBimbingan,
 );
 router.get('/jadwal', StudentController.getOneJadwal);
 
@@ -77,7 +78,7 @@ router.get('/profile/admin/:id', UserController.getAdminProfile);
 router.patch(
   '/change-user-profile/:id',
   storageImage.image.single('profile_picture'),
-  UserController.updateUser
+  UserController.updateUser,
 );
 
 module.exports = router;

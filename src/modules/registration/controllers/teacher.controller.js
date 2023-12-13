@@ -100,6 +100,16 @@ class TeacherController {
       next(error);
     }
   }
+
+  static async getPengajarVerified(req, res, next) {
+    const service = new TeacherService(req, User);
+    try {
+      const result = await service.getPengajarVerifed();
+      return responseHandler.succes(res, `Success get ${service.db.name}`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = TeacherController;

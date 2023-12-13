@@ -3,7 +3,7 @@ const ApiError = require('../../../helpers/errorHandler');
 const SendEmailNotification = require('../../../utils/nodemailer');
 const moment = require('moment');
 const { User, Pengajar } = require('../../../models');
-const { STATUS_USER } = require('../../../helpers/constanta');
+const { STATUS_USER, USER_ROLE } = require('../../../helpers/constanta');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const fs = require('fs');
@@ -178,6 +178,28 @@ class TeacherService extends BaseService {
     };
   }
 
+  async getPengajarVerifed() {
+    const result = await this.__findAll(
+      { where: { role: USER_ROLE.PENGAJAR, status: STATUS_USER.ACTIVE }, limit: 4 },
+      this.#includeQueryPengajarVerified,
+      'createdAt',
+      'DESC',
+    );
+
+    const datas = [];
+    for (const data of result.datas) {
+      datas.push({
+        name: data.nama,
+        last_education: data.pengajar.pendidikan_terakhir,
+        experience: data.pengajar.pengalaman_mengajar,
+        have_certificate: data.pengajar.punya_sertifikasi_guru_quran,
+        profile_picture: `${process.env.BASE_URL}/images/${data.profile_picture}`,
+      });
+    }
+
+    return datas;
+  }
+
   #includeQuery = [
     {
       model: User,
@@ -185,6 +207,13 @@ class TeacherService extends BaseService {
       attributesL: {
         exclude: ['password', 'token'],
       },
+    },
+  ];
+
+  #includeQueryPengajarVerified = [
+    {
+      model: Pengajar,
+      as: 'pengajar',
     },
   ];
 }
