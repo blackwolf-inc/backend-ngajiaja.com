@@ -481,7 +481,7 @@ class BimbinganService extends BaseService {
 
     let arrayPeriodeBimbingan = [];
 
-    if ((periodeBimbingan.status = TYPE_BIMBINGAN.REGULER)) {
+    if (periodeBimbingan.status == TYPE_BIMBINGAN.REGULER) {
       periodeBimbingan.map((data) => {
         data.bimbingan_reguler.map((dataTanggal) => {
           arrayPeriodeBimbingan.push(dataTanggal.tanggal);
@@ -489,7 +489,7 @@ class BimbinganService extends BaseService {
       });
     }
 
-    if ((periodeBimbingan.status = TYPE_BIMBINGAN.TAMBAHAN)) {
+    if (periodeBimbingan.status == TYPE_BIMBINGAN.TAMBAHAN) {
       periodeBimbingan.map((data) => {
         data.bimbingan_tambahan.map((dataTanggal) => {
           arrayPeriodeBimbingan.push(dataTanggal.tanggal);
@@ -501,6 +501,7 @@ class BimbinganService extends BaseService {
       const totalBimbinganReguler = data.bimbingan_reguler.length;
       return {
         id: data.id,
+        pengajar_id: data.pengajar_id,
         nama: data.pengajar.user.nama,
         jenis_kelamin: data.pengajar.user.jenis_kelamin,
         hari_1: data.hari_1,
@@ -562,30 +563,32 @@ class BimbinganService extends BaseService {
       attributes: ['id', 'tipe_bimbingan', 'status', 'tanggal_pengingat_infaq'],
     });
 
-    console.log('period.status');
-    console.log(period.status);
-
     let arrayPeriodeBimbingan = [];
+
+    let tipeBimbingan = '';
 
     if (!period) {
       throw ApiError.badRequest('Data not found');
     }
 
-    if ((period.tipe_bimbingan = TYPE_BIMBINGAN.REGULER)) {
+    if (period.tipe_bimbingan == TYPE_BIMBINGAN.REGULER) {
       period.bimbingan_reguler.map((data) => {
         arrayPeriodeBimbingan.push(data.tanggal);
       });
+      tipeBimbingan = TYPE_BIMBINGAN.REGULER;
     }
 
-    if ((period.tipe_bimbingan = TYPE_BIMBINGAN.TAMBAHAN)) {
+    if (period.tipe_bimbingan == TYPE_BIMBINGAN.TAMBAHAN) {
       period.bimbingan_tambahan.map((data) => {
         arrayPeriodeBimbingan.push(data.tanggal);
       });
+      tipeBimbingan = TYPE_BIMBINGAN.TAMBAHAN;
     }
 
     const totalBimbinganReguler = period.bimbingan_reguler.length;
     return {
       id: period.id,
+      id_pengajar: period.pengajar_id,
       nama: period.pengajar.user.nama,
       jenis_kelamin: period.pengajar.user.jenis_kelamin,
       hari_1: period.hari_1,
@@ -645,8 +648,6 @@ class BimbinganService extends BaseService {
 
     return result;
   }
-
-  // return result;
 
   #includeQuery = [
     {
