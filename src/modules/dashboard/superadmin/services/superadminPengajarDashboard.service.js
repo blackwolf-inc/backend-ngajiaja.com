@@ -136,6 +136,75 @@ class SuperAdminDashboardPengajar {
             level: afterUpdateJadwal.level,
         };
     }
+
+    async getPengajarVerified(query, status, keyword, level) {
+        const { pageSize = 10 } = query;
+        let page = query.page ? parseInt(query.page) : 1;
+        const offset = (page - 1) * pageSize;
+
+        let whereClause = "WHERE u.role = 'PENGAJAR' AND u.status IN ('ACTIVE', 'NONACTIVE')";
+        if (status) {
+            whereClause += ` AND u.status = '${status}'`;
+        }
+        if (keyword) {
+            whereClause += ` AND u.nama LIKE '%${keyword}%'`;
+        }
+        if (level) {
+            whereClause += ` AND p.level = '${level}'`;
+        }
+
+        const result = await sequelize.query(
+            `
+      SELECT 
+        u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+        p.id AS 'pengajar_id', p.level, p.persentase_bagi_hasil
+      FROM Pengajars p 
+      JOIN Users u ON p.user_id = u.id 
+      ${whereClause}
+      LIMIT ${pageSize} OFFSET ${offset}
+      `,
+            { type: QueryTypes.SELECT }
+        );
+
+        const totalCount = await sequelize.query(
+            `
+    SELECT COUNT(*) AS total
+    FROM (
+      SELECT 1
+      FROM Pengajars p 
+      JOIN Users u ON p.user_id = u.id 
+      ${whereClause}
+    ) AS subquery
+    `,
+            { type: QueryTypes.SELECT }
+        );
+        const totalPages = Math.ceil(totalCount[0].total / pageSize);
+        return { result, page, totalPages };
+    }
+
+    async updatePengajarVerified(req, payload, userId) {
+        const serviceUser = new UserService(req, User);
+        const servicePengajar = new PengajarService(req, Pengajar);
+
+        const [user, afterUpdateUser] = await Promise.all([
+            serviceUser.getOneUser(userId),
+            serviceUser.updateUserData({ status: payload.status_pengajar }, { id: userId }),
+        ]);
+
+        const afterUpdatePengajar = await servicePengajar.updateData(
+            {
+                level: payload.level,
+                persentase_bagi_hasil: payload.persentase_bagi_hasil,
+            },
+            { id: user.pengajar.id }
+        );
+
+        return {
+            status: afterUpdateUser.status,
+            level: afterUpdatePengajar.level,
+            persentase_bagi_hasil: afterUpdatePengajar.persentase_bagi_hasil,
+        };
+    }
 }
 
 module.exports = SuperAdminDashboardPengajar;
