@@ -309,6 +309,28 @@ class SuperAdminController {
             next(error);
         }
     }
+
+    static async getCourseOngoingById(req, res, next) {
+        const service = new SuperAdminManageCourseService();
+        try {
+            const { courseId } = req.params;
+            const result = await service.getCourseOngoingById(courseId);
+            return responseHandler.succes(res, 'Success get course ongoing by id', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getCourseFinishedById(req, res, next) {
+        const service = new SuperAdminManageCourseService();
+        try {
+            const { courseId } = req.params;
+            const result = await service.getCourseFinishedById(courseId);
+            return responseHandler.succes(res, 'Success get course finished by id', result);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = SuperAdminController

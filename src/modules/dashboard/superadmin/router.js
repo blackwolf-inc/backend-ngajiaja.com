@@ -37,5 +37,7 @@ router.get('/export/pengajar/verified/', SuperAdminDashboardController.getPengaj
 router.get('/data/course', SuperAdminDashboardController.getAllCourse);
 router.get('/data/course/ongoing', SuperAdminDashboardController.getCourseOngoing);
 router.get('/data/course/finished', SuperAdminDashboardController.getCourseFinished);
+router.get('/data/course/ongoing/:courseId', SuperAdminDashboardController.getCourseOngoingById);
+router.get('/data/course/finished/:courseId', SuperAdminDashboardController.getCourseFinishedById);
 
 module.exports = router;
