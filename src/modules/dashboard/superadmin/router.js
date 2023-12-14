@@ -25,5 +25,19 @@ router.patch('/data/peserta/verified/:userId', SuperAdminDashboardController.upd
 router.get('/data/pengajar', SuperAdminDashboardController.getDataPengajar);
 router.get('/data/pengajar/registered', SuperAdminDashboardController.getPengajarRegistered);
 router.patch('/data/pengajar/registered/:userId', SuperAdminDashboardController.updateStatusPengajarTerdaftar);
+router.get('/data/pengajar/verified', SuperAdminDashboardController.getPengajarVerified);
+router.patch('/data/pengajar/verified/:userId', SuperAdminDashboardController.updateStatusPengajar);
+
+router.get('/export/peserta/registered/', SuperAdminDashboardController.getPesertaRegisteredExport);
+router.get('/export/peserta/verified/', SuperAdminDashboardController.getPesertaVerifiedExport);
+
+router.get('/export/pengajar/registered/', SuperAdminDashboardController.getPengajarRegisteredExport);
+router.get('/export/pengajar/verified/', SuperAdminDashboardController.getPengajarVerifiedExport);
+
+router.get('/data/course', SuperAdminDashboardController.getAllCourse);
+router.get('/data/course/ongoing', SuperAdminDashboardController.getCourseOngoing);
+router.get('/data/course/finished', SuperAdminDashboardController.getCourseFinished);
+router.get('/data/course/ongoing/:courseId', SuperAdminDashboardController.getCourseOngoingById);
+router.get('/data/course/finished/:courseId', SuperAdminDashboardController.getCourseFinishedById);
 
 module.exports = router;

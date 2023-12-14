@@ -12,6 +12,7 @@ const {
   updateLinkWawancara,
 } = require('./validators/adminPengajar.validator');
 const AdminDashboard = require('./services/adminDashboard.service.js');
+const { image } = require('../../../utils/storageImage');
 
 router.get('/test', (req, res) => {
   res.status(200).json({
@@ -70,7 +71,16 @@ router.get(
 router.post('/article-category', AdminDashboardController.createArticleCategory);
 router.delete('/article-category/:id', AdminDashboardController.deleteArticleCategory);
 
-router.post('/create-article', AdminDashboardController.createArticle);
+router.post(
+  '/create-article',
+  image.single('article_thumbnail'),
+  AdminDashboardController.createArticle
+);
+router.patch(
+  '/update-article/:id',
+  image.single('article_thumbnail'),
+  AdminDashboardController.updateArticle
+);
 
 router.get('/infaq-peserta', AdminDashboardController.getInfaqPeserta);
 router.get('/pencairan-pengajar', AdminDashboardController.getPencairanPengajar);

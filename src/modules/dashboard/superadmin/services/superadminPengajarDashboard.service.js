@@ -136,6 +136,124 @@ class SuperAdminDashboardPengajar {
             level: afterUpdateJadwal.level,
         };
     }
+
+    async getPengajarVerified(query, status, keyword, level) {
+        const { pageSize = 10 } = query;
+        let page = query.page ? parseInt(query.page) : 1;
+        const offset = (page - 1) * pageSize;
+
+        let whereClause = "WHERE u.role = 'PENGAJAR' AND u.status IN ('ACTIVE', 'NONACTIVE')";
+        if (status) {
+            whereClause += ` AND u.status = '${status}'`;
+        }
+        if (keyword) {
+            whereClause += ` AND u.nama LIKE '%${keyword}%'`;
+        }
+        if (level) {
+            whereClause += ` AND p.level = '${level}'`;
+        }
+
+        const result = await sequelize.query(
+            `
+      SELECT 
+        u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+        p.id AS 'pengajar_id', p.level, p.persentase_bagi_hasil
+      FROM Pengajars p 
+      JOIN Users u ON p.user_id = u.id 
+      ${whereClause}
+      LIMIT ${pageSize} OFFSET ${offset}
+      `,
+            { type: QueryTypes.SELECT }
+        );
+
+        const totalCount = await sequelize.query(
+            `
+    SELECT COUNT(*) AS total
+    FROM (
+      SELECT 1
+      FROM Pengajars p 
+      JOIN Users u ON p.user_id = u.id 
+      ${whereClause}
+    ) AS subquery
+    `,
+            { type: QueryTypes.SELECT }
+        );
+        const totalPages = Math.ceil(totalCount[0].total / pageSize);
+        return { result, page, totalPages };
+    }
+
+    async updatePengajarVerified(req, payload, userId) {
+        const serviceUser = new UserService(req, User);
+        const servicePengajar = new PengajarService(req, Pengajar);
+
+        const [user, afterUpdateUser] = await Promise.all([
+            serviceUser.getOneUser(userId),
+            serviceUser.updateUserData({ status: payload.status_pengajar }, { id: userId }),
+        ]);
+
+        const afterUpdatePengajar = await servicePengajar.updateData(
+            {
+                level: payload.level,
+                persentase_bagi_hasil: payload.persentase_bagi_hasil,
+            },
+            { id: user.pengajar.id }
+        );
+
+        return {
+            status: afterUpdateUser.status,
+            level: afterUpdatePengajar.level,
+            persentase_bagi_hasil: afterUpdatePengajar.persentase_bagi_hasil,
+        };
+    }
+
+    async getPengajarRegisteredExport(startDate, endDate) {
+        let whereClause =
+            "WHERE u.role = 'PENGAJAR' AND u.status IN ('REGISTERED', 'WAITING', 'INTERVIEWED', 'REJECTED')";
+
+        if (startDate && endDate) {
+            const startDateInit = moment(startDate).startOf('day').format('YYYY-MM-DD');
+            const endDateInit = moment(endDate).endOf('day').format('YYYY-MM-DD');
+            whereClause += ` AND p.createdAt BETWEEN '${startDateInit}' AND '${endDateInit}'`;
+        }
+
+        const result = await sequelize.query(
+            `
+        SELECT 
+          u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+          p.id AS 'pengajar_id', p.tanggal_wawancara, p.jam_wawancara, p.link_wawancara, p.link_video_membaca_quran, p.link_video_simulasi_mengajar, p.createdAt
+        FROM Pengajars p 
+        JOIN Users u ON p.user_id = u.id 
+        ${whereClause}
+        `,
+            { type: QueryTypes.SELECT }
+        );
+
+        return result;
+    }
+
+    async getPengajarVerifiedExport(startDate, endDate) {
+        let whereClause = "WHERE u.role = 'PENGAJAR' AND u.status IN ('ACTIVE', 'NONACTIVE')";
+
+        if (startDate && endDate) {
+            const startDateInit = moment(startDate).startOf('day').format('YYYY-MM-DD');
+            const endDateInit = moment(endDate).endOf('day').format('YYYY-MM-DD');
+            whereClause += ` AND p.createdAt BETWEEN '${startDateInit}' AND '${endDateInit}'`;
+        }
+
+        const result = await sequelize.query(
+            `
+          SELECT 
+               u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+               p.id AS 'pengajar_id', p.level, p.createdAt
+          FROM Pengajars p 
+          JOIN Users u ON p.user_id = u.id 
+          ${whereClause}
+          `,
+            { type: QueryTypes.SELECT }
+        );
+
+        return result;
+    }
 }
 
 module.exports = SuperAdminDashboardPengajar;
