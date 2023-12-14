@@ -69,6 +69,50 @@ class AdminArticle {
 
     }
 
+    async updateArticleService(data, token, id) {
+        const { article_title, article_body, article_category_id, article_picture, main_article, archived_article, article_thumbnail } = data;
+
+        console.log('article_category_id:', article_category_id);
+
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        const user_id = decodedToken.id;
+
+        const user = await User.findByPk(user_id);
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const category = await ArticleCategories.findByPk(article_category_id);
+        console.log('category:', category);
+
+        if (!category) {
+            throw new Error('Category not found');
+        }
+
+        const article_category = category.categories;
+        const article_createby = user.nama;
+        const article = await Article.findByPk(id);
+
+        if (!article) {
+            throw new Error('Article not found');
+        }
+
+        await article.update({
+            article_title,
+            article_body,
+            article_category,
+            article_category_id,
+            article_picture,
+            main_article,
+            archived_article,
+            article_createby,
+            article_thumbnail,
+            categories: category
+        });
+        return article;
+    }
+
+
 }
 
 module.exports = AdminArticle
