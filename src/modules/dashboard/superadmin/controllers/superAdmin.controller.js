@@ -205,6 +205,29 @@ class SuperAdminController {
             next(error);
         }
     }
+
+    static async getPesertaVerifiedExport(req, res, next) {
+        const service = new SuperAdminPesertaDashboardService();
+        try {
+            const { query } = req;
+            const { startDate, endDate } = query;
+            const result = await service.getPesertaVerifiedExport(
+                startDate,
+                endDate
+            );
+            const csv = Papa.unparse(result);
+            const date = +new Date();
+
+            const filename = `PengajarRegistered_${date}.csv`;
+
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+            res.send(csv);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = SuperAdminController
