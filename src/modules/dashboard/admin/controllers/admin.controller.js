@@ -423,6 +423,37 @@ class AdminDashboardController {
       next(error);
     }
   }
+
+  static async updateArticle(req, res, next) {
+    const service = new AdminArticle();
+    try {
+      const { id } = req.params;
+      const { article_title, article_body, article_category_id, article_picture, main_article, archived_article } = req.body;
+      const token = req.headers.authorization.split(' ')[1];
+      let article_thumbnail;
+      let filePath;
+      if (req.file) {
+        const extension = path.extname(req.file.originalname);
+        article_thumbnail = `${Date.now()}${extension}`;
+        filePath = `images/${article_thumbnail}`;
+
+        if (!req.file.mimetype.startsWith('image/')) {
+          return res.status(400).json({ message: 'File must be an image' });
+        }
+
+        if (!fs.existsSync('images')) {
+          fs.mkdirSync('images');
+        }
+
+        fs.renameSync(req.file.path, filePath);
+      }
+      const result = await service.updateArticleService({ article_title, article_body, article_category_id, article_picture, main_article, archived_article, article_thumbnail }, token, id);
+      return responseHandler.succes(res, 'Success update article category', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 module.exports = AdminDashboardController;

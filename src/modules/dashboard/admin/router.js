@@ -67,5 +67,6 @@ router.post('/article-category', AdminDashboardController.createArticleCategory)
 router.delete('/article-category/:id', AdminDashboardController.deleteArticleCategory);
 
 router.post('/create-article', image.single('article_thumbnail'), AdminDashboardController.createArticle)
+router.patch('/update-article/:id', image.single('article_thumbnail'), AdminDashboardController.updateArticle)
 
 module.exports = router;
