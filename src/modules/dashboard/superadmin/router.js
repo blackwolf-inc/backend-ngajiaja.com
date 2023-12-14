@@ -31,4 +31,6 @@ router.patch('/data/pengajar/verified/:userId', SuperAdminDashboardController.up
 router.get('/export/peserta/registered/', SuperAdminDashboardController.getPesertaRegisteredExport);
 router.get('/export/peserta/verified/', SuperAdminDashboardController.getPesertaVerifiedExport);
 
+router.get('/export/pengajar/registered/', SuperAdminDashboardController.getPengajarRegisteredExport);
+
 module.exports = router;
