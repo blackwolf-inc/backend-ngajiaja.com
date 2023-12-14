@@ -1,6 +1,7 @@
 const SuperAdminDashboardService = require('../services/superadminDashboard.service.js')
 const SuperAdminPesertaDashboardService = require('../services/superadminPesertaDashboard.service.js')
 const SuperAdminPengajarDashboardService = require('../services/superadminPengajarDashboard.service.js')
+const SuperAdminManageCourseService = require('../services/superadminKelolaBimbingan.service.js')
 const responseHandler = require('../../../../helpers/responseHandler');
 const Papa = require('papaparse');
 
@@ -270,6 +271,40 @@ class SuperAdminController {
             res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
 
             res.send(csv);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getAllCourse(req, res, next) {
+        const service = new SuperAdminManageCourseService();
+        try {
+            const result = await service.getAllDataCourse();
+            return responseHandler.succes(res, 'Success get all course', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getCourseOngoing(req, res, next) {
+        const service = new SuperAdminManageCourseService();
+        try {
+            const { query } = req;
+            const { keywordStudent, keywordTeacher } = query;
+            const result = await service.getCourseOngoing(query, keywordStudent, keywordTeacher);
+            return responseHandler.succes(res, 'Success get course ongoing', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getCourseFinished(req, res, next) {
+        const service = new SuperAdminManageCourseService();
+        try {
+            const { query } = req;
+            const { keywordStudent, keywordTeacher, startDate, endDate } = query;
+            const result = await service.getCourseFinished(query, keywordStudent, keywordTeacher, startDate, endDate);
+            return responseHandler.succes(res, 'Success get course finished', result);
         } catch (error) {
             next(error);
         }

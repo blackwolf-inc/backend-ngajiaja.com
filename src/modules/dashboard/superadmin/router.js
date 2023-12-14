@@ -34,4 +34,8 @@ router.get('/export/peserta/verified/', SuperAdminDashboardController.getPeserta
 router.get('/export/pengajar/registered/', SuperAdminDashboardController.getPengajarRegisteredExport);
 router.get('/export/pengajar/verified/', SuperAdminDashboardController.getPengajarVerifiedExport);
 
+router.get('/data/course', SuperAdminDashboardController.getAllCourse);
+router.get('/data/course/ongoing', SuperAdminDashboardController.getCourseOngoing);
+router.get('/data/course/finished', SuperAdminDashboardController.getCourseFinished);
+
 module.exports = router;
