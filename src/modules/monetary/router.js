@@ -5,6 +5,8 @@ const PenghasilanController = require('./controllers/penghasilan.controller');
 const BiayaAdministrasiPesertaController = require('./controllers/biayaAdminPeserta.controller');
 const InfaqController = require('./controllers/infaq.controller');
 const storageImage = require('../../utils/storageImage');
+const { USER_ROLE } = require('../../helpers/constanta');
+const { hasRole } = require('../../middlewares/roleAuth');
 const router = Router();
 const validate = require('./../../utils/validatorIndex');
 const isAuthenticate = require('./../../middlewares/authentication');
@@ -40,13 +42,13 @@ router.post(
   '/biaya-administrasi-peserta',
   storageImage.image.single('media'),
   validate(cost.createBiayaAdminPesertaValidator),
-  BiayaAdministrasiPesertaController.create,
+  BiayaAdministrasiPesertaController.create
 );
 router.patch(
   '/biaya-administrasi-peserta/:id',
   storageImage.image.single('media'),
   validate(cost.updateBiayaAdminPesertaValidator),
-  BiayaAdministrasiPesertaController.update,
+  BiayaAdministrasiPesertaController.update
 );
 
 // pencairan route
@@ -57,7 +59,7 @@ router.patch(
   '/pencairan/:id',
   storageImage.image.single('media'),
   validate(updatePencairanValidator),
-  PencairanController.update,
+  PencairanController.update
 );
 router.delete('/pencairan/:id', PencairanController.delete);
 
@@ -68,7 +70,7 @@ router.post(
   '/infaq',
   storageImage.image.single('media'),
   validate(infaqValidator.createInfaqValidator),
-  InfaqController.create,
+  InfaqController.create
 );
 router.patch('/infaq/images/:id', storageImage.image.single('media'), InfaqController.updateImages);
 router.patch('/infaq/:id', validate(infaqValidator.updateInfaqValidator), InfaqController.update);
@@ -78,6 +80,11 @@ router.delete('/infaq/:id', InfaqController.delete);
 router.get('/penghasilan', PenghasilanController.getIncome);
 router.get('/penghasilan/detail', PenghasilanController.dataIncome);
 
-router.patch('/infaqadmin/:id', storageImage.image.single('media'), InfaqController.updateInfaqAdmin)
+router.use(hasRole([USER_ROLE.SUPER_ADMIN, USER_ROLE.ADMIN]));
+router.patch(
+  '/infaqadmin/:id',
+  storageImage.image.single('media'),
+  InfaqController.updateInfaqAdmin
+);
 
 module.exports = router;

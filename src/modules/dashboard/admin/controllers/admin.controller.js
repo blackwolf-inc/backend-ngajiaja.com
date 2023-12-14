@@ -2,6 +2,8 @@ const AdminPengajarService = require('../services/adminPengajar.service.js');
 const AdminPesertaService = require('../services/adminPeserta.service.js');
 const AdminDashboard = require('../services/adminDashboard.service.js');
 const AdminManageCourseService = require('../services/adminKelolaBimbingan.js');
+const AdminTransaksiService = require('../services/adminTransaksi.service.js');
+const { Infaq, Pencairan } = require('../../../../models');
 const responseHandler = require('../../../../helpers/responseHandler');
 const fs = require('fs');
 const Papa = require('papaparse');
@@ -24,7 +26,14 @@ class AdminDashboardController {
     const service = new AdminPengajarService();
     try {
       const { userId } = req.params;
-      const { link_wawancara, tanggal_wawancara, jam_wawancara, status_pengajar, isVerifiedByAdmin, level_pengajar } = req.body;
+      const {
+        link_wawancara,
+        tanggal_wawancara,
+        jam_wawancara,
+        status_pengajar,
+        isVerifiedByAdmin,
+        level_pengajar,
+      } = req.body;
       const result = await service.updateJadwalWawancara(
         req,
         {
@@ -33,7 +42,7 @@ class AdminDashboardController {
           jam_wawancara,
           status_pengajar,
           isVerifiedByAdmin,
-          level_pengajar
+          level_pengajar,
         },
         userId
       );
@@ -211,7 +220,13 @@ class AdminDashboardController {
     try {
       const { query } = req;
       const { keywordStudent, keywordTeacher, startDate, endDate } = query;
-      const result = await service.getCourseFinished(query, keywordStudent, keywordTeacher, startDate, endDate);
+      const result = await service.getCourseFinished(
+        query,
+        keywordStudent,
+        keywordTeacher,
+        startDate,
+        endDate
+      );
       return responseHandler.succes(res, 'Success get course finished', result);
     } catch (error) {
       next(error);
@@ -245,10 +260,7 @@ class AdminDashboardController {
     try {
       const { query } = req;
       const { startDate, endDate } = query;
-      const result = await service.getPengajarRegisteredExport(
-        startDate,
-        endDate
-      );
+      const result = await service.getPengajarRegisteredExport(startDate, endDate);
       const csv = Papa.unparse(result);
       const date = +new Date();
 
@@ -268,10 +280,7 @@ class AdminDashboardController {
     try {
       const { query } = req;
       const { startDate, endDate } = query;
-      const result = await service.getPengajarVerifiedExport(
-        startDate,
-        endDate
-      );
+      const result = await service.getPengajarVerifiedExport(startDate, endDate);
       const csv = Papa.unparse(result);
       const date = +new Date();
 
@@ -291,10 +300,7 @@ class AdminDashboardController {
     try {
       const { query } = req;
       const { startDate, endDate } = query;
-      const result = await service.getPesertaRegisteredExport(
-        startDate,
-        endDate
-      );
+      const result = await service.getPesertaRegisteredExport(startDate, endDate);
       const csv = Papa.unparse(result);
       const date = +new Date();
 
@@ -314,10 +320,7 @@ class AdminDashboardController {
     try {
       const { query } = req;
       const { startDate, endDate } = query;
-      const result = await service.getPesertaVerifiedExport(
-        startDate,
-        endDate
-      );
+      const result = await service.getPesertaVerifiedExport(startDate, endDate);
       const csv = Papa.unparse(result);
       const date = +new Date();
 
@@ -398,7 +401,14 @@ class AdminDashboardController {
   static async createArticle(req, res, next) {
     const service = new AdminArticle();
     try {
-      const { article_title, article_body, article_category_id, article_picture, main_article, archived_article } = req.body;
+      const {
+        article_title,
+        article_body,
+        article_category_id,
+        article_picture,
+        main_article,
+        archived_article,
+      } = req.body;
       const token = req.headers.authorization.split(' ')[1];
       let article_thumbnail;
       let filePath;
@@ -417,7 +427,18 @@ class AdminDashboardController {
 
         fs.renameSync(req.file.path, filePath);
       }
-      const result = await service.createArticleService({ article_title, article_body, article_category_id, article_picture, main_article, archived_article, article_thumbnail }, token);
+      const result = await service.createArticleService(
+        {
+          article_title,
+          article_body,
+          article_category_id,
+          article_picture,
+          main_article,
+          archived_article,
+          article_thumbnail,
+        },
+        token
+      );
       return responseHandler.succes(res, 'Success create article category', result);
     } catch (error) {
       next(error);
@@ -428,7 +449,14 @@ class AdminDashboardController {
     const service = new AdminArticle();
     try {
       const { id } = req.params;
-      const { article_title, article_body, article_category_id, article_picture, main_article, archived_article } = req.body;
+      const {
+        article_title,
+        article_body,
+        article_category_id,
+        article_picture,
+        main_article,
+        archived_article,
+      } = req.body;
       const token = req.headers.authorization.split(' ')[1];
       let article_thumbnail;
       let filePath;
@@ -447,13 +475,60 @@ class AdminDashboardController {
 
         fs.renameSync(req.file.path, filePath);
       }
-      const result = await service.updateArticleService({ article_title, article_body, article_category_id, article_picture, main_article, archived_article, article_thumbnail }, token, id);
+      const result = await service.updateArticleService(
+        {
+          article_title,
+          article_body,
+          article_category_id,
+          article_picture,
+          main_article,
+          archived_article,
+          article_thumbnail,
+        },
+        token,
+        id
+      );
       return responseHandler.succes(res, 'Success update article category', result);
     } catch (error) {
       next(error);
     }
   }
 
+  static async getInfaqPeserta(req, res, next) {
+    try {
+      const { query } = req;
+      const adminTransaksiService = new AdminTransaksiService(req, Infaq);
+      const result = await adminTransaksiService.getInfaqPeserta(query);
+      return responseHandler.succes(res, 'Success get data infaq Peserta', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getPencairanPengajar(req, res, next) {
+    try {
+      const { query } = req;
+      const adminTransaksiService = new AdminTransaksiService(req, Pencairan);
+      const result = await adminTransaksiService.getPencairanPengajar(query);
+      return responseHandler.succes(res, 'Success get data pencairan pengajar', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updatePencairanPengajar(req, res, next) {
+    const service = new AdminTransaksiService(req, Pencairan);
+    try {
+      await Promise.all([
+        await service.checkPencairanById(req.params.id),
+        await service.updateImages(req),
+      ]);
+      const result = await service.updateData(req.body, { id: req.params.id });
+      return responseHandler.succes(res, `Success update ${service.db.name}`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = AdminDashboardController;
