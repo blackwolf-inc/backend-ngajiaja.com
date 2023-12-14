@@ -32,5 +32,6 @@ router.get('/export/peserta/registered/', SuperAdminDashboardController.getPeser
 router.get('/export/peserta/verified/', SuperAdminDashboardController.getPesertaVerifiedExport);
 
 router.get('/export/pengajar/registered/', SuperAdminDashboardController.getPengajarRegisteredExport);
+router.get('/export/pengajar/verified/', SuperAdminDashboardController.getPengajarVerifiedExport);
 
 module.exports = router;
