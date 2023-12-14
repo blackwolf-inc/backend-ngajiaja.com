@@ -94,30 +94,36 @@ class InfaqController {
     const service = new InfaqService(req, Infaq);
     try {
       const { status, keterangan } = req.body;
-      const { id } = req.params
-      await Infaq.update({ status, keterangan }, {
-        where: {
-          id
+      const { id } = req.params;
+      await Infaq.update(
+        { status, keterangan },
+        {
+          where: {
+            id,
+          },
         }
-      });
+      );
 
       const infaqdata = await Infaq.findByPk(id);
       if (status === 'ACCEPTED') {
         const existingRecord = await PenghasilanPengajar.findOne({
           where: {
-            periode_id: infaqdata.periode_id
-          }
+            periode_id: infaqdata.periode_id,
+          },
         });
 
         if (existingRecord) {
           return responseHandler.succes(res, `Success update infaq ${service.db.name}`, infaqdata);
         }
         await service.updateInfaqAdmin(infaqdata);
-        return responseHandler.succes(res, `Success add to penghasilan pengajar ${service.db.name}`, infaqdata);
+        return responseHandler.succes(
+          res,
+          `Success add to penghasilan pengajar ${service.db.name}`,
+          infaqdata
+        );
       } else {
         return responseHandler.succes(res, `Success update infaq ${service.db.name}`, infaqdata);
       }
-
     } catch (error) {
       next(error);
     }

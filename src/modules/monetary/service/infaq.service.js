@@ -15,7 +15,7 @@ const path = require('path');
 
 class InfaqService extends BaseService {
   async checkUserById(payload) {
-    const result = await User.findOne({ id: payload.user_id });
+    const result = await User.findOne({ where: { id: payload.user_id } });
     if (!result) throw ApiError.notFound(`User with id ${id} not found`);
     return result;
   }
@@ -33,7 +33,8 @@ class InfaqService extends BaseService {
   }
   async checkBankById(payload) {
     let id = payload.bank_id;
-    const result = await Bank.findOne({ id });
+    const result = await Bank.findOne({ where: { id } });
+    console.log(result);
     if (!result) throw ApiError.notFound(`Bank with id ${id} not found`);
     return result;
   }
@@ -44,7 +45,7 @@ class InfaqService extends BaseService {
     return result;
   }
   async checkInfaqById(id) {
-    const result = await Infaq.findOne({ id });
+    const result = await Infaq.findOne({ where: { id } });
     if (!result) throw ApiError.notFound(`Infaq with id ${id} not found`);
     return result;
   }
@@ -95,7 +96,7 @@ class InfaqService extends BaseService {
 
     const result = await this.__findAll({ where: whereClause }, includeQuery);
 
-    const totalPage = Math.ceil(result.total / parseInt(query.paginate ? query.paginate : 1));
+    const totalPage = Math.ceil(result.total / parseInt(query.paginate, 10) || 1);
 
     let modifiedResult;
 
@@ -147,7 +148,7 @@ class InfaqService extends BaseService {
 
       const result = await Infaq.findOne({ where: { id: req.params.id } });
       if (result.bukti_pembayaran) {
-        await fs.unlink(path.join(process.cwd(), `../images/${result.bukti_pembayaran}`), () => { });
+        await fs.unlink(path.join(process.cwd(), `../images/${result.bukti_pembayaran}`), () => {});
       }
     } else {
       throw ApiError.badRequest(`Image not found`);
@@ -194,11 +195,10 @@ class InfaqService extends BaseService {
       periode_id: req.periode_id,
       status: req.status,
       media: req.file,
-      penghasilan: ((parseFloat(req.nominal) * pengajar.persentase_bagi_hasil) / 100),
+      penghasilan: (parseFloat(req.nominal) * pengajar.persentase_bagi_hasil) / 100,
       persentase_bagi_hasil: pengajar.persentase_bagi_hasil,
       waktu_pembayaran: req.waktu_pembayaran,
     };
-
 
     const result = await PenghasilanPengajar.create(data);
   }
@@ -240,15 +240,13 @@ class InfaqService extends BaseService {
       pembayaran: req.nominal,
       periode_id: req.periode_id,
       status: req.status,
-      penghasilan: ((parseFloat(req.nominal) * pengajar.persentase_bagi_hasil) / 100),
+      penghasilan: (parseFloat(req.nominal) * pengajar.persentase_bagi_hasil) / 100,
       persentase_bagi_hasil: pengajar.persentase_bagi_hasil,
       waktu_pembayaran: req.waktu_pembayaran,
     };
 
-
     await PenghasilanPengajar.create(data);
   }
-
 }
 
 module.exports = InfaqService;
