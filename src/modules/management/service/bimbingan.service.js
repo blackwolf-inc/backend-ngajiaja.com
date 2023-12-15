@@ -449,56 +449,26 @@ class BimbinganService extends BaseService {
         {
           model: BimbinganReguler,
           as: 'bimbingan_reguler',
-          where: {
-            absensi_peserta: 1,
-            absensi_pengajar: 1,
-          },
-          required: false,
+          attributes: ['tanggal', 'status'],
         },
         {
           model: BimbinganTambahan,
           as: 'bimbingan_tambahan',
-          required: false,
+          attributes: ['tanggal', 'status'],
         },
       ],
       order: [['createdAt', 'DESC']],
     });
-
-    const periodeBimbingan = await Period.findAll({
-      where: { peserta_id: pesertaId[0].id, status: req.status },
-      include: [
-        {
-          model: BimbinganReguler,
-          as: 'bimbingan_reguler',
-        },
-        {
-          model: BimbinganTambahan,
-          as: 'bimbingan_tambahan',
-        },
-      ],
-      order: [['createdAt', 'DESC']],
-    });
-
-    let arrayPeriodeBimbingan = [];
-
-    if (periodeBimbingan.status == TYPE_BIMBINGAN.REGULER) {
-      periodeBimbingan.map((data) => {
-        data.bimbingan_reguler.map((dataTanggal) => {
-          arrayPeriodeBimbingan.push(dataTanggal.tanggal);
-        });
-      });
-    }
-
-    if (periodeBimbingan.status == TYPE_BIMBINGAN.TAMBAHAN) {
-      periodeBimbingan.map((data) => {
-        data.bimbingan_tambahan.map((dataTanggal) => {
-          arrayPeriodeBimbingan.push(dataTanggal.tanggal);
-        });
-      });
-    }
 
     const result = period.map((data) => {
+      const totalBimbinganRegulerFinished = data.bimbingan_reguler.filter(
+        (bimbingan) => bimbingan.status === STATUS_BIMBINGAN_ACTIVE.FINISHED
+      ).length;
+
       const totalBimbinganReguler = data.bimbingan_reguler.length;
+      let start_date = data.bimbingan_reguler[0];
+      let end_date = data.bimbingan_reguler[totalBimbinganReguler - 1];
+
       return {
         id: data.id,
         pengajar_id: data.pengajar_id,
@@ -508,11 +478,10 @@ class BimbinganService extends BaseService {
         jam_1: data.jam_1,
         hari_2: data.hari_2,
         jam_2: data.jam_2,
-        tanggal_mulai: arrayPeriodeBimbingan ? arrayPeriodeBimbingan[0] : null,
-        tanggal_selesai: arrayPeriodeBimbingan
-          ? arrayPeriodeBimbingan[arrayPeriodeBimbingan.length - 1]
-          : null,
-        jumlah_attedance_bimbingan_regular: totalBimbinganReguler ? totalBimbinganReguler : 0,
+        tanggal_mulai_reguler: start_date ? start_date : null,
+        tanggal_selesai_reguler: end_date ? end_date : null,
+        total_attendance_reguler: totalBimbinganRegulerFinished,
+        total_bimbingan_reguler: totalBimbinganReguler,
         tipe_bimbingan: data.tipe_bimbingan,
         status: data.status,
         infaq_bimbingan_tambahan_sebelum:
