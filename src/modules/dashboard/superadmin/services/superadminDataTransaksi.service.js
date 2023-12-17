@@ -73,7 +73,24 @@ class SuperAdminDataTransaksi {
     }
 
     async updateStatusPencairan(id, status, bukti_pembayaran, keterangan) {
+        const pencairan = await Pencairan.findOne({
+            where: {
+                id
+            }
+        });
 
+        if (!pencairan) {
+            throw new Error('Pencairan tidak ditemukan');
+        }
+
+        pencairan.status = status;
+        pencairan.bukti_pembayaran = bukti_pembayaran;
+        pencairan.waktu_pembayaran = new Date();
+        pencairan.keterangan = keterangan;
+
+        await pencairan.save();
+
+        return pencairan;
     }
 }
 

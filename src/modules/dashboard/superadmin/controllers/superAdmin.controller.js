@@ -5,6 +5,8 @@ const SuperAdminManageCourseService = require('../services/superadminKelolaBimbi
 const SuperAdminDataTransaksi = require('../services/superadminDataTransaksi.service.js')
 const responseHandler = require('../../../../helpers/responseHandler');
 const Papa = require('papaparse');
+const fs = require('fs');
+const path = require('path');
 
 class SuperAdminController {
     static async getAllDataSuperAdminDashboard(req, res, next) {
@@ -351,6 +353,37 @@ class SuperAdminController {
             const { id } = req.params;
             const result = await service.getDataPencairanById(id);
             return responseHandler.succes(res, 'Success get data pencairan by id', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async updateStatusPencairan(req, res, next) {
+        const service = new SuperAdminDataTransaksi();
+        try {
+            const { id } = req.params;
+            const { status, keterangan } = req.body;
+
+            let bukti_pembayaran;
+            let filePath;
+            if (req.file) {
+                const extension = path.extname(req.file.originalname);
+                bukti_pembayaran = `${Date.now()}${extension}`;
+                filePath = `images/${bukti_pembayaran}`;
+
+                if (!req.file.mimetype.startsWith('image/')) {
+                    return res.status(400).json({ message: 'File must be an image' });
+                }
+
+                if (!fs.existsSync('images')) {
+                    fs.mkdirSync('images');
+                }
+
+                fs.renameSync(req.file.path, filePath);
+            }
+
+            const result = await service.updateStatusPencairan(id, status, bukti_pembayaran, keterangan);
+            return responseHandler.succes(res, 'Success update status pencairan', result);
         } catch (error) {
             next(error);
         }
