@@ -92,5 +92,6 @@ router.patch(
 );
 
 router.get('/article-list', AdminDashboardController.getArticleList);
+router.get('/article-category', AdminDashboardController.getArticleCategoryList);
 
 module.exports = router;

@@ -541,6 +541,19 @@ class AdminDashboardController {
       next(error);
     }
   }
+
+  static async getArticleCategoryList(req, res, next) {
+    const service = new AdminArticle();
+    try {
+      const { query } = req;
+      const { page, pageSize } = query;
+      const result = await service.getArticleCategoryListService(page, pageSize);
+      return responseHandler.succes(res, 'Success get article category list', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 module.exports = AdminDashboardController;

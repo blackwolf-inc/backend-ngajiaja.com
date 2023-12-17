@@ -156,6 +156,45 @@ class AdminArticle {
         };
     }
 
+    async getArticleCategoryListService(page = 1, pageSize = 10) {
+        page = Number(page);
+        pageSize = Number(pageSize);
+        const offset = (page - 1) * pageSize;
+
+        const totalArticleCategories = await ArticleCategories.count();
+
+        const totalPages = Math.ceil(totalArticleCategories / pageSize);
+
+        const articleCategories = await ArticleCategories.findAll({
+            offset: offset,
+            limit: pageSize,
+            attributes: [
+                'categories_id',
+                'categories',
+                'user_id',
+                'created_by',
+                'createdAt',
+                'updatedAt',
+                [
+                    sequelize.literal(`(
+                        SELECT COUNT(*)
+                        FROM Articles AS a
+                        WHERE a.article_category_id = ArticleCategories.categories_id
+                    )`),
+                    'jumlah_article',
+                ],
+            ],
+        });
+
+        return {
+            data: articleCategories,
+            page,
+            pageSize,
+            totalPages,
+        };
+    }
+
+
 
 }
 
