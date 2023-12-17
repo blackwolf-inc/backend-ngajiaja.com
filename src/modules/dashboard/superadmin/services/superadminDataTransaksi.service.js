@@ -1,7 +1,6 @@
 const { QueryTypes, Op } = require('sequelize');
 const db = require('../../../../models/index');
-const { Pengajar, Peserta, User, Infaq, Pencairan, sequelize } = db;
-const multer = require('multer');
+const { PenghasilanPengajar, BiayaAdministrasi, Infaq, Pencairan, sequelize } = db;
 
 class SuperAdminDataTransaksi {
     async getDataPencairan(query, startDate, endDate, status, keywordTeacher) {
@@ -10,6 +9,7 @@ class SuperAdminDataTransaksi {
         const offset = (page - 1) * pageSize;
 
         let whereClause = '';
+        const base_url = process.env.BASE_URL;
 
         if (startDate && endDate) {
             whereClause += `WHERE Pencairans.createdAt BETWEEN '${startDate}' AND '${endDate}'`;
@@ -25,7 +25,7 @@ class SuperAdminDataTransaksi {
 
         const result = await sequelize.query(
             `
-            SELECT Pencairans.id, Pencairans.user_id, Pencairans.status, Pencairans.nominal, Pencairans.waktu_pembayaran, Pencairans.bukti_pembayaran, Pencairans.pengajar_id, Pencairans.createdAt, Pencairans.updatedAt, Users.nama
+            SELECT Pencairans.id, Pencairans.user_id, Pencairans.status, Pencairans.nominal, Pencairans.waktu_pembayaran, CONCAT('${base_url}/images/', Pencairans.bukti_pembayaran) AS bukti_pembayaran, Pencairans.pengajar_id, Pencairans.createdAt, Pencairans.updatedAt, Users.nama
             FROM Pencairans
             JOIN Users ON Pencairans.user_id = Users.id
             ${whereClause}
@@ -91,6 +91,78 @@ class SuperAdminDataTransaksi {
         await pencairan.save();
 
         return pencairan;
+    }
+
+    async getDataTransaksi(startDate = '2023-01-01', endDate = '2023-12-31') {
+        const pencairanCount = await Pencairan.count({
+            where: {
+                status: 'WAITING',
+                createdAt: {
+                    [Op.between]: [startDate, endDate]
+                }
+            }
+        });
+
+        const infaqCount = await Infaq.count({
+            where: {
+                status: 'WAITING',
+                createdAt: {
+                    [Op.between]: [startDate, endDate]
+                }
+            }
+        });
+
+        const menunggu_persetujuan = pencairanCount + infaqCount;
+
+        const total_penghasilanpengajar = await PenghasilanPengajar.sum('pembayaran', {
+            where: {
+                createdAt: {
+                    [Op.between]: [startDate, endDate]
+                }
+            }
+        });
+
+        const biayaAdministrasiCount = await BiayaAdministrasi.count({
+            where: {
+                status: 'ACCEPTED',
+                createdAt: {
+                    [Op.between]: [startDate, endDate]
+                }
+            }
+        });
+
+        const total_biayaAdministrasi = biayaAdministrasiCount * 20000;
+
+        const total_transaksi = total_penghasilanpengajar + total_biayaAdministrasi;
+
+        const total_pengeluaran = await PenghasilanPengajar.sum('penghasilan', {
+            where: {
+                createdAt: {
+                    [Op.between]: [startDate, endDate]
+                }
+            }
+        });
+
+        const total_penghasilan = total_transaksi - total_pengeluaran;
+
+        return { menunggu_persetujuan, total_transaksi, total_penghasilan };
+    }
+
+    async exportDataPencairan(startDate = '2023-01-01', endDate = '2023-12-31') {
+        const pencairan = await sequelize.query(
+            `
+            SELECT Pencairans.id, Pencairans.user_id, Pencairans.status, Pencairans.nominal, Pencairans.waktu_pembayaran, Pencairans.bukti_pembayaran, Pencairans.pengajar_id, Pencairans.nama_bank, Pencairans.no_rekening, Pencairans.nama_rekening, Users.nama
+            FROM Pencairans
+            JOIN Users ON Pencairans.user_id = Users.id
+            WHERE Pencairans.createdAt BETWEEN '${startDate}' AND '${endDate}'
+            `,
+            {
+                type: QueryTypes.SELECT
+            }
+        );
+
+        return pencairan;
+
     }
 }
 

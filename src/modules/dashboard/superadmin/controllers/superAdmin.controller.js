@@ -388,6 +388,36 @@ class SuperAdminController {
             next(error);
         }
     }
+
+    static async getDataTransaksi(req, res, next) {
+        const service = new SuperAdminDataTransaksi();
+        try {
+            const { startDate, endDate } = req.query;
+            const result = await service.getDataTransaksi(startDate, endDate);
+            return responseHandler.succes(res, 'Success get data transaksi', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async exportDataPencairan(req, res, next) {
+        const service = new SuperAdminDataTransaksi();
+        try {
+            const { startDate, endDate } = req.query;
+            const result = await service.exportDataPencairan(startDate, endDate);
+            const csv = Papa.unparse(result);
+            const date = +new Date();
+
+            const filename = `DataPencairan_${date}.csv`;
+
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+            res.send(csv);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = SuperAdminController

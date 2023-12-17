@@ -42,8 +42,10 @@ router.get('/data/course/finished', SuperAdminDashboardController.getCourseFinis
 router.get('/data/course/ongoing/:courseId', SuperAdminDashboardController.getCourseOngoingById);
 router.get('/data/course/finished/:courseId', SuperAdminDashboardController.getCourseFinishedById);
 
+router.get('/data/transaksi/', SuperAdminDashboardController.getDataTransaksi);
 router.get('/data/transaksi/pencairan', SuperAdminDashboardController.getDataPencairan);
 router.get('/data/transaksi/pencairan/:id', SuperAdminDashboardController.getDataPencairanById);
 router.patch('/data/transaksi/pencairan/:id', image.single('bukti_pembayaran'), SuperAdminDashboardController.updateStatusPencairan);
+router.get('/export/transaksi/pencairan/', SuperAdminDashboardController.exportDataPencairan);
 
 module.exports = router;
