@@ -91,4 +91,6 @@ router.patch(
   AdminDashboardController.updatePencairanPengajar
 );
 
+router.get('/article-list', AdminDashboardController.getArticleList);
+
 module.exports = router;

@@ -91,8 +91,14 @@ class AdminArticle {
 
         const article_category = category.categories;
         const article_createby = user.nama;
-        const article = await Article.findByPk(id);
-
+        const article = await Article.findByPk(id, {
+            include: [{
+                model: ArticleCategories,
+                as: 'categories_id',
+                attributes: ['categories_id', 'categories', 'user_id', 'created_by', 'createdAt', 'updatedAt']
+            }],
+            attributes: ['article_id', 'article_title', 'article_body', 'article_category', 'article_category_id', 'article_picture', 'article_thumbnail', 'main_article', 'archived_article', 'article_createby', 'createdAt', 'updatedAt'] // specify the fields you want to select from the 'Articles' table
+        });
         if (!article) {
             throw new Error('Article not found');
         }
@@ -107,7 +113,16 @@ class AdminArticle {
             archived_article,
             article_createby,
             article_thumbnail,
-            categories: category
+        });
+        return article;
+    }
+
+    async getArticleListService() {
+        const article = await Article.findAll({
+            include: [{
+                model: ArticleCategories, // replace with your associated model
+                as: 'categories' // replace with the alias you used in your association
+            }]
         });
         return article;
     }
