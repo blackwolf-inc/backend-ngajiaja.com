@@ -554,6 +554,18 @@ class AdminDashboardController {
     }
   }
 
+  static async updateArticleCategory(req, res, next) {
+    const service = new AdminArticle();
+    try {
+      const { categoriesId } = req.params;
+      const { categories } = req.body;
+      const result = await service.updateArticleCategoryService(categories, categoriesId);
+      return responseHandler.succes(res, 'Success update article category', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 module.exports = AdminDashboardController;

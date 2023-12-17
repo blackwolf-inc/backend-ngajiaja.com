@@ -194,6 +194,21 @@ class AdminArticle {
         };
     }
 
+    async updateArticleCategoryService(data, categoriesId) {
+        const categories = data;
+
+        const articleCategory = await ArticleCategories.findByPk(categoriesId);
+        if (!articleCategory) {
+            console.error(`Article category not found for id: ${categoriesId}`);
+            throw new Error('Article category not found');
+        }
+
+        await articleCategory.update({ categories: categories });
+
+        console.log('data:', data);
+        console.log('categories:', categories)
+        return articleCategory;
+    }
 
 
 }
