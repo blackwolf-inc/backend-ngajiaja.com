@@ -533,7 +533,9 @@ class AdminDashboardController {
   static async getArticleList(req, res, next) {
     const service = new AdminArticle();
     try {
-      const result = await service.getArticleListService();
+      const { query } = req;
+      const { page, pageSize } = query;
+      const result = await service.getArticleListService(page, pageSize);
       return responseHandler.succes(res, 'Success get article list', result);
     } catch (error) {
       next(error);

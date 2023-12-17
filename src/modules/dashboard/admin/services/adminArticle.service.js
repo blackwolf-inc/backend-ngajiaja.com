@@ -1,7 +1,8 @@
-const { QueryTypes } = require('sequelize');
+const { QueryTypes, Op, Sequelize } = require('sequelize');
 const db = require('../../../../models/index');
 const { Article, ArticleCategories, User, sequelize } = db;
 const jwt = require('jsonwebtoken');
+const { ceil } = Math;
 
 class AdminArticle {
     async createArticleCategoryService(data, token) {
@@ -117,14 +118,42 @@ class AdminArticle {
         return article;
     }
 
-    async getArticleListService() {
-        const article = await Article.findAll({
-            include: [{
-                model: ArticleCategories, // replace with your associated model
-                as: 'categories' // replace with the alias you used in your association
-            }]
+    async getArticleListService(page = 1, pageSize = 10) {
+        page = Number(page);
+        pageSize = Number(pageSize);
+        const offset = (page - 1) * pageSize;
+
+        const totalArticles = await Article.count();
+
+        const base_url = process.env.BASE_URL;
+
+        const totalPages = ceil(totalArticles / pageSize);
+
+        const articles = await Article.findAll({
+            offset: offset,
+            limit: pageSize,
+            attributes: [
+                'article_id',
+                'article_title',
+                'article_body',
+                'article_category',
+                'article_category_id',
+                'article_picture',
+                [Sequelize.literal(`CONCAT('${base_url}/images/', article_thumbnail)`), 'article_thumbnail'],
+                'main_article',
+                'archived_article',
+                'article_createby',
+                'createdAt',
+                'updatedAt'
+            ]
         });
-        return article;
+
+        return {
+            data: articles,
+            page,
+            pageSize,
+            totalPages
+        };
     }
 
 
