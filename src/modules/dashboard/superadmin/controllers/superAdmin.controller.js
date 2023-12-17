@@ -2,6 +2,7 @@ const SuperAdminDashboardService = require('../services/superadminDashboard.serv
 const SuperAdminPesertaDashboardService = require('../services/superadminPesertaDashboard.service.js')
 const SuperAdminPengajarDashboardService = require('../services/superadminPengajarDashboard.service.js')
 const SuperAdminManageCourseService = require('../services/superadminKelolaBimbingan.service.js')
+const SuperAdminDataTransaksi = require('../services/superadminDataTransaksi.service.js')
 const responseHandler = require('../../../../helpers/responseHandler');
 const Papa = require('papaparse');
 
@@ -327,6 +328,29 @@ class SuperAdminController {
             const { courseId } = req.params;
             const result = await service.getCourseFinishedById(courseId);
             return responseHandler.succes(res, 'Success get course finished by id', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getDataPencairan(req, res, next) {
+        const service = new SuperAdminDataTransaksi();
+        try {
+            const { query } = req;
+            const { startDate, endDate, status, keywordTeacher } = query;
+            const result = await service.getDataPencairan(query, startDate, endDate, status, keywordTeacher);
+            return responseHandler.succes(res, 'Success get data pencairan', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getDataPencairanById(req, res, next) {
+        const service = new SuperAdminDataTransaksi();
+        try {
+            const { id } = req.params;
+            const result = await service.getDataPencairanById(id);
+            return responseHandler.succes(res, 'Success get data pencairan by id', result);
         } catch (error) {
             next(error);
         }

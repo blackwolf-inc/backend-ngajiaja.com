@@ -40,4 +40,7 @@ router.get('/data/course/finished', SuperAdminDashboardController.getCourseFinis
 router.get('/data/course/ongoing/:courseId', SuperAdminDashboardController.getCourseOngoingById);
 router.get('/data/course/finished/:courseId', SuperAdminDashboardController.getCourseFinishedById);
 
+router.get('/data/transaksi/pencairan', SuperAdminDashboardController.getDataPencairan);
+router.get('/data/transaksi/pencairan/:id', SuperAdminDashboardController.getDataPencairanById);
+
 module.exports = router;
