@@ -83,6 +83,7 @@ router.patch(
 );
 
 router.get('/infaq-peserta', AdminDashboardController.getInfaqPeserta);
+router.get('/infaq-peserta/export', AdminDashboardController.exportInfaq);
 router.get('/pencairan-pengajar', AdminDashboardController.getPencairanPengajar);
 router.patch(
   '/pencairan-pengajar/:id',

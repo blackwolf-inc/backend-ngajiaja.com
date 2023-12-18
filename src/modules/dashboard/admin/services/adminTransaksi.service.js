@@ -142,11 +142,64 @@ class AdminTransaksiService extends BaseService {
 
       const result = await Pencairan.findOne({ where: { id: req.params.id } });
       if (result.bukti_pembayaran) {
-        await fs.unlink(path.join(process.cwd(), `../images/${result.bukti_pembayaran}`), () => {});
+        await fs.unlink(path.join(process.cwd(), `../images/${result.bukti_pembayaran}`), () => { });
       }
     } else {
       throw ApiError.badRequest(`Image not found`);
     }
+  }
+
+  async exportInfaqPeserta(startDate = '2023-01-01', endDate = '2023-12-31') {
+    let userWhere = {};
+    let whereClause = {};
+    let bankWhere = {};
+
+    if (startDate && endDate) {
+      whereClause.createdAt = { [Op.between]: [startDate, endDate] };
+    }
+
+    const includeQuery = [
+      {
+        model: Peserta,
+        required: true,
+        as: 'peserta',
+        attributes: ['id'],
+        include: [
+          {
+            model: User,
+            required: true,
+            as: 'user',
+            attributes: ['nama'],
+            where: userWhere,
+          },
+        ],
+      },
+      {
+        model: Bank,
+        as: 'bank',
+        where: bankWhere,
+      },
+    ];
+
+    const result = await this.__findAll({ where: whereClause }, includeQuery);
+
+    const modifiedResult = result.datas.map((item) => {
+      return {
+        id: item.id,
+        nama_peserta: item.peserta.user.nama,
+        status: item.status,
+        metode: item.bank.nama_bank,
+        nominal: item.nominal,
+        waktu_pembayaran: item.waktu_pembayaran,
+        bukti_pembayaran: item.bukti_pembayaran
+          ? `${process.env.BASE_URL}/images/${item.bukti_pembayaran}`
+          : null,
+        createdAt: item.createdAt,
+        editedAt: item.editedAt
+      };
+    });
+
+    return modifiedResult;
   }
 }
 

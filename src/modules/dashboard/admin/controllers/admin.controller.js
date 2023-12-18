@@ -566,6 +566,25 @@ class AdminDashboardController {
     }
   }
 
+  static async exportInfaq(req, res, next) {
+    const service = new AdminTransaksiService(req, Infaq);
+    try {
+      const { startDate, endDate } = req;
+      const result = await service.exportInfaqPeserta(startDate, endDate);
+      const csv = Papa.unparse(result);
+      const date = +new Date();
+
+      const filename = `InfaqPeserta_${date}.csv`;
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+      res.send(csv);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 module.exports = AdminDashboardController;

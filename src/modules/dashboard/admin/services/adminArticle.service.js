@@ -205,8 +205,6 @@ class AdminArticle {
 
         await articleCategory.update({ categories: categories });
 
-        console.log('data:', data);
-        console.log('categories:', categories)
         return articleCategory;
     }
 
