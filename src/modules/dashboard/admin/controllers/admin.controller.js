@@ -585,6 +585,17 @@ class AdminDashboardController {
     }
   }
 
+  static async deleteArticleAdmin(req, res, next) {
+    const service = new AdminArticle();
+    try {
+      const { articleId } = req.params;
+      const result = await service.deleteArticleByIdService(articleId);
+      return responseHandler.succes(res, 'Success delete article', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 module.exports = AdminDashboardController;

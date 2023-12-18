@@ -208,6 +208,21 @@ class AdminArticle {
         return articleCategory;
     }
 
+    async deleteArticleByIdService(articleId) {
+        const article = await Article.findOne({
+            where: { article_id: articleId },
+            attributes: { exclude: ['categories'] }
+        });
+        if (!article) {
+            console.error(`Article not found for id: ${articleId}`);
+            throw new Error('Article not found');
+        }
+
+        await article.destroy();
+
+        return article;
+    }
+
 
 }
 

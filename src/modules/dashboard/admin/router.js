@@ -96,4 +96,6 @@ router.get('/article-list', AdminDashboardController.getArticleList);
 router.get('/article-category', AdminDashboardController.getArticleCategoryList);
 router.patch('/article-category/:categoriesId', AdminDashboardController.updateArticleCategory);
 
+router.delete('/article/:articleId', AdminDashboardController.deleteArticleAdmin);
+
 module.exports = router;
