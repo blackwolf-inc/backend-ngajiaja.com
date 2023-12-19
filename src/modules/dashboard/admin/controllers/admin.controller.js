@@ -185,8 +185,8 @@ class AdminDashboardController {
   static async getAllBimbingan(req, res, next) {
     const service = new AdminDashboard();
     try {
-      const { month } = req.query;
-      const result = await service.getAllBimbingan(month);
+      const { granularity, startDate, endDate } = req.query;
+      const result = await service.getAllBimbingan(granularity, startDate, endDate);
       return responseHandler.succes(res, 'Success get all bimbingan', result);
     } catch (error) {
       next(error);
