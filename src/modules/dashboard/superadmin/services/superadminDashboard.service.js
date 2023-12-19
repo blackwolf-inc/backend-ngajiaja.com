@@ -3,89 +3,48 @@ const db = require('../../../../models/index');
 const { Pengajar, Peserta, User, Infaq, Bank, sequelize } = db;
 
 class SuperAdminDashboard {
-    async getDataMonthSuperAdminDashboard(month, startDate = '2023-01-01', endDate = '2023-12-31') {
+    async getDataSuperAdminDashboard(granularity, startDate = '2023-01-01', endDate = '2024-12-31') {
+        const dateGroupBy = granularity === 'yearly' ? '%Y' : granularity === 'monthly' ? '%Y-%m' : '%Y-%m-%d';
+        const dateSelect = granularity === 'yearly' ? "DATE_FORMAT(tanggal, '%Y') AS year" : granularity === 'monthly' ? "DATE_FORMAT(tanggal, '%Y-%m') AS month" : "DATE_FORMAT(tanggal, '%Y-%m-%d') AS day";
 
-        if (month) {
-            const formattedMonth = month;
-            const bimbinganReguler = await sequelize.query(
-                `
-                SELECT COUNT(*) AS total, DATE(tanggal) AS day
-                FROM BimbinganRegulers
-                JOIN Periods ON BimbinganRegulers.period_id = Periods.id
-                WHERE tanggal BETWEEN :startDate AND :endDate AND DATE_FORMAT(tanggal, '%Y-%m') = :formattedMonth AND Periods.status IN ('ACTIVATED', 'FINISHED')
-                GROUP BY DATE(tanggal)
-                `,
-                {
-                    replacements: { startDate, endDate, formattedMonth },
-                    type: QueryTypes.SELECT
-                }
-            );
-
-            const bimbinganTambahan = await sequelize.query(
-                `
-                SELECT COUNT(*) AS total, DATE(tanggal) AS day
-                FROM BimbinganTambahans
-                JOIN Periods ON BimbinganTambahans.period_id = Periods.id
-                WHERE tanggal BETWEEN :startDate AND :endDate AND DATE_FORMAT(tanggal, '%Y-%m') = :formattedMonth AND Periods.status IN ('ACTIVATED', 'FINISHED')
-                GROUP BY DATE(tanggal)
-                `,
-                {
-                    replacements: { startDate, endDate, formattedMonth },
-                    type: QueryTypes.SELECT
-                }
-            );
-
-            const result = {};
-
-            for (const item of bimbinganReguler) {
-                result[item.day] = (result[item.day] || 0) + item.total;
+        const bimbinganReguler = await sequelize.query(
+            `
+            SELECT COUNT(*) AS total, ${dateSelect}
+            FROM BimbinganRegulers
+            JOIN Periods ON BimbinganRegulers.period_id = Periods.id
+            WHERE tanggal BETWEEN :startDate AND :endDate AND Periods.status IN ('ACTIVATED', 'FINISHED')
+            GROUP BY DATE_FORMAT(tanggal, :dateGroupBy)
+            `,
+            {
+                replacements: { startDate, endDate, dateGroupBy },
+                type: QueryTypes.SELECT
             }
+        );
 
-            for (const item of bimbinganTambahan) {
-                result[item.day] = (result[item.day] || 0) + item.total;
+        const bimbinganTambahan = await sequelize.query(
+            `
+            SELECT COUNT(*) AS total, ${dateSelect}
+            FROM BimbinganTambahans
+            JOIN Periods ON BimbinganTambahans.period_id = Periods.id
+            WHERE tanggal BETWEEN :startDate AND :endDate AND Periods.status IN ('ACTIVATED', 'FINISHED')
+            GROUP BY DATE_FORMAT(tanggal, :dateGroupBy)
+            `,
+            {
+                replacements: { startDate, endDate, dateGroupBy },
+                type: QueryTypes.SELECT
             }
+        );
 
-            return result;
-        } else {
-            const bimbinganReguler = await sequelize.query(
-                `
-                SELECT COUNT(*) AS total, DATE_FORMAT(tanggal, '%Y-%m') AS month
-                FROM BimbinganRegulers
-                JOIN Periods ON BimbinganRegulers.period_id = Periods.id
-                WHERE tanggal BETWEEN :startDate AND :endDate AND Periods.status IN ('ACTIVATED', 'FINISHED')
-                GROUP BY DATE_FORMAT(tanggal, '%Y-%m')
-                `,
-                {
-                    replacements: { startDate, endDate },
-                    type: QueryTypes.SELECT
-                }
-            );
+        const result = {};
 
-            const bimbinganTambahan = await sequelize.query(
-                `
-                SELECT COUNT(*) AS total, DATE_FORMAT(tanggal, '%Y-%m') AS month
-                FROM BimbinganTambahans
-                JOIN Periods ON BimbinganTambahans.period_id = Periods.id
-                WHERE tanggal BETWEEN :startDate AND :endDate AND Periods.status IN ('ACTIVATED', 'FINISHED')
-                GROUP BY DATE_FORMAT(tanggal, '%Y-%m')
-                `,
-                {
-                    replacements: { startDate, endDate },
-                    type: QueryTypes.SELECT
-                }
-            );
+        const allBimbingan = [...bimbinganReguler, ...bimbinganTambahan];
 
-            const result = {};
-
-            const allBimbingan = [...bimbinganReguler, ...bimbinganTambahan];
-
-
-            for (const item of allBimbingan) {
-                result[item.month] = (result[item.month] || 0) + item.total;
-            }
-
-            return result;
+        for (const item of allBimbingan) {
+            const key = granularity === 'yearly' ? item.year : granularity === 'monthly' ? item.month : item.day;
+            result[key] = (result[key] || 0) + item.total;
         }
+
+        return result;
     }
 
     async getDataDashboard(startDate = '2023-01-01', endDate = '2023-12-31') {
