@@ -54,6 +54,29 @@ class PengajarController {
       next(error);
     }
   }
+
+  static async postDataRekening(req, res, next) {
+    const service = new PengajarService(req, Pengajar);
+    try {
+      const pengajar = await service.getPengajarByUserId(req.user.id);
+      const result = await service.postDataRekening(pengajar.id, req.body);
+      return responseHandler.succes(res, `Success post data rekening`, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async postPencairanPengajar(req, res, next) {
+    const pengajarService = new PengajarService(req, Pengajar);
+    try {
+
+      const result = await pengajarService.postPencairanPengajar(req.body);
+
+      return res.status(201).json({ message: 'Success post pencairan', data: result });
+    } catch (error) {
+      return res.status(400).json({ message: error.message });
+    }
+  }
 }
 
 module.exports = PengajarController;

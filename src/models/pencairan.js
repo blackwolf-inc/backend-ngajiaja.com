@@ -15,12 +15,22 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
+
+      Pencairan.belongsTo(models.Pengajar, {
+        foreignKey: 'pengajar_id',
+        as: 'pengajar',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
     }
   }
   Pencairan.init(
     {
       user_id: DataTypes.INTEGER,
+      pengajar_id: DataTypes.INTEGER,
       nama_bank: DataTypes.STRING,
+      no_rekening: DataTypes.STRING,
+      nama_rekening: DataTypes.STRING,
       status: DataTypes.STRING,
       nominal: DataTypes.DOUBLE,
       waktu_pembayaran: DataTypes.DATE,

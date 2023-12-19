@@ -1,7 +1,8 @@
-const { QueryTypes } = require('sequelize');
+const { QueryTypes, Op, Sequelize } = require('sequelize');
 const db = require('../../../../models/index');
 const { Article, ArticleCategories, User, sequelize } = db;
 const jwt = require('jsonwebtoken');
+const { ceil } = Math;
 
 class AdminArticle {
     async createArticleCategoryService(data, token) {
@@ -91,8 +92,14 @@ class AdminArticle {
 
         const article_category = category.categories;
         const article_createby = user.nama;
-        const article = await Article.findByPk(id);
-
+        const article = await Article.findByPk(id, {
+            include: [{
+                model: ArticleCategories,
+                as: 'categories_id',
+                attributes: ['categories_id', 'categories', 'user_id', 'created_by', 'createdAt', 'updatedAt']
+            }],
+            attributes: ['article_id', 'article_title', 'article_body', 'article_category', 'article_category_id', 'article_picture', 'article_thumbnail', 'main_article', 'archived_article', 'article_createby', 'createdAt', 'updatedAt'] // specify the fields you want to select from the 'Articles' table
+        });
         if (!article) {
             throw new Error('Article not found');
         }
@@ -107,8 +114,112 @@ class AdminArticle {
             archived_article,
             article_createby,
             article_thumbnail,
-            categories: category
         });
+        return article;
+    }
+
+    async getArticleListService(page = 1, pageSize = 10) {
+        page = Number(page);
+        pageSize = Number(pageSize);
+        const offset = (page - 1) * pageSize;
+
+        const totalArticles = await Article.count();
+
+        const base_url = process.env.BASE_URL;
+
+        const totalPages = ceil(totalArticles / pageSize);
+
+        const articles = await Article.findAll({
+            offset: offset,
+            limit: pageSize,
+            attributes: [
+                'article_id',
+                'article_title',
+                'article_body',
+                'article_category',
+                'article_category_id',
+                'article_picture',
+                [Sequelize.literal(`CONCAT('${base_url}/images/', article_thumbnail)`), 'article_thumbnail'],
+                'main_article',
+                'archived_article',
+                'article_createby',
+                'createdAt',
+                'updatedAt'
+            ]
+        });
+
+        return {
+            data: articles,
+            page,
+            pageSize,
+            totalPages
+        };
+    }
+
+    async getArticleCategoryListService(page = 1, pageSize = 10) {
+        page = Number(page);
+        pageSize = Number(pageSize);
+        const offset = (page - 1) * pageSize;
+
+        const totalArticleCategories = await ArticleCategories.count();
+
+        const totalPages = Math.ceil(totalArticleCategories / pageSize);
+
+        const articleCategories = await ArticleCategories.findAll({
+            offset: offset,
+            limit: pageSize,
+            attributes: [
+                'categories_id',
+                'categories',
+                'user_id',
+                'created_by',
+                'createdAt',
+                'updatedAt',
+                [
+                    sequelize.literal(`(
+                        SELECT COUNT(*)
+                        FROM Articles AS a
+                        WHERE a.article_category_id = ArticleCategories.categories_id
+                    )`),
+                    'jumlah_article',
+                ],
+            ],
+        });
+
+        return {
+            data: articleCategories,
+            page,
+            pageSize,
+            totalPages,
+        };
+    }
+
+    async updateArticleCategoryService(data, categoriesId) {
+        const categories = data;
+
+        const articleCategory = await ArticleCategories.findByPk(categoriesId);
+        if (!articleCategory) {
+            console.error(`Article category not found for id: ${categoriesId}`);
+            throw new Error('Article category not found');
+        }
+
+        await articleCategory.update({ categories: categories });
+
+        return articleCategory;
+    }
+
+    async deleteArticleByIdService(articleId) {
+        const article = await Article.findOne({
+            where: { article_id: articleId },
+            attributes: { exclude: ['categories'] }
+        });
+        if (!article) {
+            console.error(`Article not found for id: ${articleId}`);
+            throw new Error('Article not found');
+        }
+
+        await article.destroy();
+
         return article;
     }
 

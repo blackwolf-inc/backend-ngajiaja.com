@@ -17,4 +17,7 @@ router.get('/', PengajarDashboardController.getOne);
 router.get('/bimbingan/pending', PengajarDashboardController.getBimbinganPending);
 router.get('/bimbingan/ongoing', PengajarDashboardController.getBimbinganOnGoing);
 
+router.patch('/rekening/:id', PengajarDashboardController.postDataRekening);
+router.post('/pencairan', PengajarDashboardController.postPencairanPengajar);
+
 module.exports = router;

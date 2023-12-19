@@ -3,6 +3,8 @@ const router = Router();
 const { USER_ROLE } = require('../../../helpers/constanta.js');
 const { hasRole } = require('../../../middlewares/roleAuth.js');
 const SuperAdminDashboardController = require('./controllers/superAdmin.controller.js');
+const multer = require('multer');
+const { image } = require('../../../utils/storageImage.js')
 
 router.get('/test', (req, res) => {
     res.status(200).json({
@@ -39,5 +41,11 @@ router.get('/data/course/ongoing', SuperAdminDashboardController.getCourseOngoin
 router.get('/data/course/finished', SuperAdminDashboardController.getCourseFinished);
 router.get('/data/course/ongoing/:courseId', SuperAdminDashboardController.getCourseOngoingById);
 router.get('/data/course/finished/:courseId', SuperAdminDashboardController.getCourseFinishedById);
+
+router.get('/data/transaksi/', SuperAdminDashboardController.getDataTransaksi);
+router.get('/data/transaksi/pencairan', SuperAdminDashboardController.getDataPencairan);
+router.get('/data/transaksi/pencairan/:id', SuperAdminDashboardController.getDataPencairanById);
+router.patch('/data/transaksi/pencairan/:id', image.single('bukti_pembayaran'), SuperAdminDashboardController.updateStatusPencairan);
+router.get('/export/transaksi/pencairan/', SuperAdminDashboardController.exportDataPencairan);
 
 module.exports = router;

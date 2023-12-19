@@ -529,6 +529,73 @@ class AdminDashboardController {
       next(error);
     }
   }
+
+  static async getArticleList(req, res, next) {
+    const service = new AdminArticle();
+    try {
+      const { query } = req;
+      const { page, pageSize } = query;
+      const result = await service.getArticleListService(page, pageSize);
+      return responseHandler.succes(res, 'Success get article list', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getArticleCategoryList(req, res, next) {
+    const service = new AdminArticle();
+    try {
+      const { query } = req;
+      const { page, pageSize } = query;
+      const result = await service.getArticleCategoryListService(page, pageSize);
+      return responseHandler.succes(res, 'Success get article category list', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateArticleCategory(req, res, next) {
+    const service = new AdminArticle();
+    try {
+      const { categoriesId } = req.params;
+      const { categories } = req.body;
+      const result = await service.updateArticleCategoryService(categories, categoriesId);
+      return responseHandler.succes(res, 'Success update article category', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async exportInfaq(req, res, next) {
+    const service = new AdminTransaksiService(req, Infaq);
+    try {
+      const { startDate, endDate } = req;
+      const result = await service.exportInfaqPeserta(startDate, endDate);
+      const csv = Papa.unparse(result);
+      const date = +new Date();
+
+      const filename = `InfaqPeserta_${date}.csv`;
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+      res.send(csv);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async deleteArticleAdmin(req, res, next) {
+    const service = new AdminArticle();
+    try {
+      const { articleId } = req.params;
+      const result = await service.deleteArticleByIdService(articleId);
+      return responseHandler.succes(res, 'Success delete article', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 module.exports = AdminDashboardController;

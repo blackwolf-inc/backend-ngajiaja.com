@@ -2,8 +2,11 @@ const SuperAdminDashboardService = require('../services/superadminDashboard.serv
 const SuperAdminPesertaDashboardService = require('../services/superadminPesertaDashboard.service.js')
 const SuperAdminPengajarDashboardService = require('../services/superadminPengajarDashboard.service.js')
 const SuperAdminManageCourseService = require('../services/superadminKelolaBimbingan.service.js')
+const SuperAdminDataTransaksi = require('../services/superadminDataTransaksi.service.js')
 const responseHandler = require('../../../../helpers/responseHandler');
 const Papa = require('papaparse');
+const fs = require('fs');
+const path = require('path');
 
 class SuperAdminController {
     static async getAllDataSuperAdminDashboard(req, res, next) {
@@ -327,6 +330,90 @@ class SuperAdminController {
             const { courseId } = req.params;
             const result = await service.getCourseFinishedById(courseId);
             return responseHandler.succes(res, 'Success get course finished by id', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getDataPencairan(req, res, next) {
+        const service = new SuperAdminDataTransaksi();
+        try {
+            const { query } = req;
+            const { startDate, endDate, status, keywordTeacher } = query;
+            const result = await service.getDataPencairan(query, startDate, endDate, status, keywordTeacher);
+            return responseHandler.succes(res, 'Success get data pencairan', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getDataPencairanById(req, res, next) {
+        const service = new SuperAdminDataTransaksi();
+        try {
+            const { id } = req.params;
+            const result = await service.getDataPencairanById(id);
+            return responseHandler.succes(res, 'Success get data pencairan by id', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async updateStatusPencairan(req, res, next) {
+        const service = new SuperAdminDataTransaksi();
+        try {
+            const { id } = req.params;
+            const { status, keterangan } = req.body;
+
+            let bukti_pembayaran;
+            let filePath;
+            if (req.file) {
+                const extension = path.extname(req.file.originalname);
+                bukti_pembayaran = `${Date.now()}${extension}`;
+                filePath = `images/${bukti_pembayaran}`;
+
+                if (!req.file.mimetype.startsWith('image/')) {
+                    return res.status(400).json({ message: 'File must be an image' });
+                }
+
+                if (!fs.existsSync('images')) {
+                    fs.mkdirSync('images');
+                }
+
+                fs.renameSync(req.file.path, filePath);
+            }
+
+            const result = await service.updateStatusPencairan(id, status, bukti_pembayaran, keterangan);
+            return responseHandler.succes(res, 'Success update status pencairan', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getDataTransaksi(req, res, next) {
+        const service = new SuperAdminDataTransaksi();
+        try {
+            const { startDate, endDate } = req.query;
+            const result = await service.getDataTransaksi(startDate, endDate);
+            return responseHandler.succes(res, 'Success get data transaksi', result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async exportDataPencairan(req, res, next) {
+        const service = new SuperAdminDataTransaksi();
+        try {
+            const { startDate, endDate } = req.query;
+            const result = await service.exportDataPencairan(startDate, endDate);
+            const csv = Papa.unparse(result);
+            const date = +new Date();
+
+            const filename = `DataPencairan_${date}.csv`;
+
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+            res.send(csv);
         } catch (error) {
             next(error);
         }
