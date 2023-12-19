@@ -40,73 +40,48 @@ class AdminDashboard {
         };
     }
 
-    async getAllBimbingan(month) {
-        const monthMapping = { 'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12 };
-        month = monthMapping[month];
+    async getAllBimbingan(granularity, startDate = '2023-01-01', endDate = '2024-12-31') {
+        const dateGroupBy = granularity === 'yearly' ? '%Y' : granularity === 'monthly' ? '%Y-%m' : '%Y-%m-%d';
+        const dateSelect = granularity === 'yearly' ? "DATE_FORMAT(tanggal, '%Y') AS year" : granularity === 'monthly' ? "DATE_FORMAT(tanggal, '%Y-%m') AS month" : "DATE_FORMAT(tanggal, '%Y-%m-%d') AS day";
 
-        if (month) {
-            const bimbinganReguler = await sequelize.query(
-                `
-                SELECT COUNT(*) AS total, DAY(tanggal) AS day
-                FROM BimbinganRegulers
-                WHERE MONTH(tanggal) = ${month}
-                GROUP BY DAY(tanggal)
-                `,
-                { type: QueryTypes.SELECT }
-            );
-
-            const bimbinganTambahan = await sequelize.query(
-                `
-                SELECT COUNT(*) AS total, DAY(tanggal) AS day
-                FROM BimbinganTambahans
-                WHERE MONTH(tanggal) = ${month}
-                GROUP BY DAY(tanggal)
-                `,
-                { type: QueryTypes.SELECT }
-            );
-
-            const result = {};
-
-            for (const item of bimbinganReguler) {
-                result[item.day] = (result[item.day] || 0) + item.total;
+        const bimbinganReguler = await sequelize.query(
+            `
+            SELECT COUNT(*) AS total, ${dateSelect}
+            FROM BimbinganRegulers
+            JOIN Periods ON BimbinganRegulers.period_id = Periods.id
+            WHERE tanggal BETWEEN :startDate AND :endDate AND Periods.status IN ('ACTIVATED', 'FINISHED')
+            GROUP BY DATE_FORMAT(tanggal, :dateGroupBy)
+            `,
+            {
+                replacements: { startDate, endDate, dateGroupBy },
+                type: QueryTypes.SELECT
             }
+        );
 
-            for (const item of bimbinganTambahan) {
-                result[item.day] = (result[item.day] || 0) + item.total;
+        const bimbinganTambahan = await sequelize.query(
+            `
+            SELECT COUNT(*) AS total, ${dateSelect}
+            FROM BimbinganTambahans
+            JOIN Periods ON BimbinganTambahans.period_id = Periods.id
+            WHERE tanggal BETWEEN :startDate AND :endDate AND Periods.status IN ('ACTIVATED', 'FINISHED')
+            GROUP BY DATE_FORMAT(tanggal, :dateGroupBy)
+            `,
+            {
+                replacements: { startDate, endDate, dateGroupBy },
+                type: QueryTypes.SELECT
             }
+        );
 
-            return result;
-        } else {
-            const bimbinganReguler = await sequelize.query(
-                `
-                SELECT COUNT(*) AS total, MONTH(tanggal) AS month
-                FROM BimbinganRegulers
-                GROUP BY MONTH(tanggal)
-                `,
-                { type: QueryTypes.SELECT }
-            );
+        const result = {};
 
-            const bimbinganTambahan = await sequelize.query(
-                `
-                SELECT COUNT(*) AS total, MONTH(tanggal) AS month
-                FROM BimbinganTambahans
-                GROUP BY MONTH(tanggal)
-                `,
-                { type: QueryTypes.SELECT }
-            );
+        const allBimbingan = [...bimbinganReguler, ...bimbinganTambahan];
 
-            const result = {};
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-            const allBimbingan = [...bimbinganReguler, ...bimbinganTambahan];
-
-            for (const item of allBimbingan) {
-                const month = months[item.month - 1];
-                result[month] = (result[month] || 0) + item.total;
-            }
-
-            return result;
+        for (const item of allBimbingan) {
+            const key = granularity === 'yearly' ? item.year : granularity === 'monthly' ? item.month : item.day;
+            result[key] = (result[key] || 0) + item.total;
         }
+
+        return result;
     }
 
 }

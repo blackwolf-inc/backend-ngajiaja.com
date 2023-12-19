@@ -49,10 +49,13 @@ class PengajarService extends BaseService {
         continue;
       }
 
+      const base_url = process.env.BASE_URL;
+
       const bimbinganPending = {
         period_id: period.id,
         peserta_id: period.peserta.id,
         user_id: period.peserta.user.id,
+        profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
         schedule: {
           day1: null,
           hour1: null,
@@ -108,6 +111,8 @@ class PengajarService extends BaseService {
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
+    const base_url = process.env.BASE_URL;
+
     const data = [];
     for (const period of result.datas) {
       if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
@@ -118,6 +123,7 @@ class PengajarService extends BaseService {
             period_id: period.id,
             peserta_id: period.peserta.id,
             user_id: period.peserta.user.id,
+            profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
             bimbingan_reguler_id: bimbinganReguler.id,
             status: null,
             name: period.peserta.user.nama,
@@ -162,6 +168,7 @@ class PengajarService extends BaseService {
             period_id: period.id,
             peserta_id: period.peserta.id,
             user_id: period.peserta.user.id,
+            profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
             bimbingan_tambahan_id: bimbinganTambahan.id,
             status: null,
             name: period.peserta.user.nama,

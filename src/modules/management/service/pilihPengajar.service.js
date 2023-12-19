@@ -88,9 +88,12 @@ class PilihPengajar extends BaseService {
         ],
       });
 
+      const base_url = process.env.BASE_URL;
+
       const formattedResult = result.map((pengajar) => ({
         id_pengajar: pengajar.id,
         nama: pengajar.user.nama,
+        profile_picture: `${base_url}/images/${pengajar.user.profile_picture}`,
         jenis_kelamin: pengajar.user.jenis_kelamin,
         jadwalActive: pengajar.jadwal_mengajar ? pengajar.jadwal_mengajar.length : 0,
         jadwal_mengajar: pengajar.jadwal_mengajar,
@@ -144,9 +147,12 @@ class PilihPengajar extends BaseService {
         ],
       });
 
+      const base_url = process.env.BASE_URL;
+
       const formattedResult = result.map((pengajar) => ({
         id_pengajar: pengajar.id,
         nama: pengajar.user.nama,
+        profile_picture: `${base_url}/images/${pengajar.user.profile_picture}`,
         jenis_kelamin: pengajar.user.jenis_kelamin,
         jadwalActive: pengajar.jadwal_mengajar ? pengajar.jadwal_mengajar.length : 0,
         jadwal_mengajar: pengajar.jadwal_mengajar,
@@ -170,10 +176,13 @@ class PilihPengajar extends BaseService {
       ],
     });
 
+    const base_url = process.env.BASE_URL;
+
     const result = pengajarList.map((pengajar) => {
       return {
         id_pengajar: pengajar.id,
         nama: pengajar.user.nama,
+        profile_picture: `${base_url}/images/${pengajar.user.profile_picture}`,
         jenis_kelamin: pengajar.user.jenis_kelamin,
         jadwalActive: pengajar.jadwal_mengajar ? pengajar.jadwal_mengajar.length : 0,
         jadwal_mengajar: pengajar.jadwal_mengajar,

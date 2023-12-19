@@ -81,6 +81,7 @@ class AdminPesertaService {
             `
           SELECT 
             u.id AS 'user_id', u.nama, u.role, u.status,
+            CONCAT('${base_url}/images/', u.profile_picture) AS 'profile_picture',
             p.id AS 'peserta_id', p.level,
             b.bank_id, CONCAT('${base_url}/images/', b.bukti_pembayaran) AS bukti_pembayaran, b.createdAt,
             bk.nama_bank
@@ -149,10 +150,13 @@ class AdminPesertaService {
             whereClause += ` AND p.level = '${level}'`;
         }
 
+        const base_url = process.env.BASE_URL;
+
         const result = await sequelize.query(
             `
             SELECT 
                 u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+                CONCAT('${base_url}/images/', u.profile_picture) AS 'profile_picture',
                 p.id AS 'peserta_id', p.level,
                 SUM(CASE WHEN br.absensi_peserta = 0 THEN 1 ELSE 0 END) +
                 SUM(CASE WHEN bt.absensi_peserta = 0 THEN 1 ELSE 0 END) AS notAttend
@@ -220,12 +224,15 @@ class AdminPesertaService {
             whereClause += ` AND DATE(b.createdAt) BETWEEN '${startDateInit}' AND '${endDateInit}'`;
         }
 
+        const base_url = process.env.BASE_URL;
+
         const result = await sequelize.query(
             `
           SELECT 
             u.id AS 'user_id', u.nama, u.role, u.status,
+            CONCAT('${base_url}/images/', u.profile_picture) AS 'profile_picture',
             p.id AS 'peserta_id', p.level,
-            b.bank_id, b.bukti_pembayaran, b.createdAt,
+            b.bank_id, CONCAT('${base_url}/images/', b.bukti_pembayaran) AS bukti_pembayaran, b.createdAt,
             bk.nama_bank
             FROM Pesertas p 
           JOIN Users u ON p.user_id = u.id 
@@ -247,10 +254,13 @@ class AdminPesertaService {
             whereClause += ` AND DATE(pr.createdAt) BETWEEN '${startDateInit}' AND '${endDateInit}'`;
         }
 
+        const base_url = process.env.BASE_URL;
+
         const result = await sequelize.query(
             `
             SELECT 
                 u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+                CONCAT('${base_url}/images/', u.profile_picture) AS 'profile_picture',
                 p.id AS 'peserta_id', p.level,
                 SUM(CASE WHEN br.absensi_peserta = 0 THEN 1 ELSE 0 END) +
                 SUM(CASE WHEN bt.absensi_peserta = 0 THEN 1 ELSE 0 END) AS notAttend

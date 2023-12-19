@@ -25,6 +25,8 @@ class BimbinganService extends BaseService {
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
+    const base_url = process.env.BASE_URL;
+
     const data = [];
     for (const period of result.datas) {
       if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
@@ -38,6 +40,7 @@ class BimbinganService extends BaseService {
           peserta_id: period.peserta.id,
           user_id: period.peserta.user.id,
           name: period.peserta.user.nama,
+          profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
           schedule: {
             day1: period.bimbingan_reguler[0].hari_bimbingan,
             hour1: period.bimbingan_reguler[0].jam_bimbingan,
@@ -63,6 +66,7 @@ class BimbinganService extends BaseService {
           peserta_id: period.peserta.id,
           user_id: period.peserta.user.id,
           name: period.peserta.user.nama,
+          profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
           schedule: {
             day1: period.bimbingan_tambahan[0].hari_bimbingan,
             hour1: period.bimbingan_tambahan[0].jam_bimbingan,
@@ -120,6 +124,8 @@ class BimbinganService extends BaseService {
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
+    const base_url = process.env.BASE_URL;
+
     const data = [];
     for (const period of result.datas) {
       if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
@@ -133,9 +139,9 @@ class BimbinganService extends BaseService {
           peserta_id: period.peserta.id,
           user_id: period.peserta.user.id,
           name: period.peserta.user.nama,
-          period: `${period.bimbingan_reguler[0].tanggal} - ${
-            period.bimbingan_reguler[period.bimbingan_reguler.length - 1].tanggal
-          }`,
+          profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
+          period: `${period.bimbingan_reguler[0].tanggal} - ${period.bimbingan_reguler[period.bimbingan_reguler.length - 1].tanggal
+            }`,
           absent,
           peserta_review: period.catatan_peserta,
         };
@@ -154,9 +160,9 @@ class BimbinganService extends BaseService {
           peserta_id: period.peserta.id,
           user_id: period.peserta.user.id,
           name: period.peserta.user.nama,
-          period: `${period.bimbingan_tambahan[0].tanggal} - ${
-            period.bimbingan_tambahan[period.bimbingan_tambahan.length - 1].tanggal
-          }`,
+          profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
+          period: `${period.bimbingan_tambahan[0].tanggal} - ${period.bimbingan_tambahan[period.bimbingan_tambahan.length - 1].tanggal
+            }`,
           absent,
           peserta_review: period.catatan_peserta,
         };
@@ -212,6 +218,8 @@ class BimbinganService extends BaseService {
     );
     if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
 
+    const base_url = process.env.BASE_URL;
+
     let age = 0;
     if (result.peserta.user.tgl_lahir) {
       const birthdate = moment(result.peserta.user.tgl_lahir, 'YYYY-MM-DD').toDate();
@@ -231,6 +239,7 @@ class BimbinganService extends BaseService {
     return {
       name: result.peserta.user.nama,
       gender: result.peserta.user.jenis_kelamin,
+      profile_picture: `${base_url}/images/${result.peserta.user.profile_picture}`,
       age,
       level: result.peserta.level,
     };
@@ -243,6 +252,8 @@ class BimbinganService extends BaseService {
     );
     if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
 
+    const base_url = process.env.BASE_URL;
+
     const data = [];
     if (result.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
       for (const bimbinganReguler of result.bimbingan_reguler) {
@@ -250,6 +261,7 @@ class BimbinganService extends BaseService {
           period_id: result.id,
           peserta_id: result.peserta.id,
           user_id: result.peserta.user.id,
+          profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
           bimbingan_reguler_id: bimbinganReguler.id,
           status: null,
           date: bimbinganReguler.tanggal,
@@ -297,6 +309,7 @@ class BimbinganService extends BaseService {
           period_id: result.id,
           peserta_id: result.peserta.id,
           user_id: result.peserta.user.id,
+          profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
           bimbingan_tambahan_id: bimbinganTambahan.id,
           status: null,
           date: bimbinganTambahan.tanggal,
