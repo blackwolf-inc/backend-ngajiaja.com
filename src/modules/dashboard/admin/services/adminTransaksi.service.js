@@ -8,6 +8,7 @@ const { Op } = require('sequelize');
 class AdminTransaksiService extends BaseService {
   async getInfaqPeserta(query) {
     let userWhere = {};
+    let userPengajarWhere = {};
     let whereClause = {};
     let bankWhere = {};
 
@@ -15,6 +16,10 @@ class AdminTransaksiService extends BaseService {
 
     if (query.studentName) {
       userWhere.nama = { [Op.like]: `%${query.studentName}%` };
+    }
+
+    if (query.teacherName) {
+      userPengajarWhere.nama = { [Op.like]: `%${query.teacherName}%` };
     }
 
     if (query.status) {
@@ -56,7 +61,7 @@ class AdminTransaksiService extends BaseService {
             required: true,
             as: 'user',
             attributes: ['nama', 'profile_picture'],
-            where: userWhere,
+            where: userPengajarWhere,
           },
         ],
       },
