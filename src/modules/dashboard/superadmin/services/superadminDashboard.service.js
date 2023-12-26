@@ -7,6 +7,15 @@ class SuperAdminDashboard {
         const dateGroupBy = granularity === 'yearly' ? '%Y' : granularity === 'monthly' ? '%Y-%m' : '%Y-%m-%d';
         const dateSelect = granularity === 'yearly' ? "DATE_FORMAT(tanggal, '%Y') AS year" : granularity === 'monthly' ? "DATE_FORMAT(tanggal, '%Y-%m') AS month" : "DATE_FORMAT(tanggal, '%Y-%m-%d') AS day";
 
+        const allDates = [];
+        for (let date = new Date(startDate); date <= new Date(endDate); date.setDate(date.getDate() + 1)) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const key = granularity === 'yearly' ? year : granularity === 'monthly' ? `${year}-${month}` : `${year}-${month}-${day}`;
+            allDates[key] = 0;
+        }
+
         const bimbinganReguler = await sequelize.query(
             `
             SELECT COUNT(*) AS total, ${dateSelect}
@@ -35,7 +44,7 @@ class SuperAdminDashboard {
             }
         );
 
-        const result = {};
+        const result = { ...allDates };
 
         const allBimbingan = [...bimbinganReguler, ...bimbinganTambahan];
 

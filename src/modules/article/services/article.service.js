@@ -10,7 +10,7 @@ class ArticleService {
         const totalArticles = await Article.count({
             attributes: {
                 exclude: ['categories'],
-                include: [[Sequelize.literal(`CONCAT('${base_url}/images', article_thumbnail)`), 'article_thumbnail']]
+                include: [[Sequelize.literal(`CONCAT('${base_url}/images/', article_thumbnail)`), 'article_thumbnail']]
             },
             where: {
                 archived_article: 0
@@ -23,7 +23,7 @@ class ArticleService {
             limit: pageSize,
             attributes: {
                 exclude: ['categories'],
-                include: [[Sequelize.literal(`CONCAT('${base_url}/images', article_thumbnail)`), 'article_thumbnail']]
+                include: [[Sequelize.literal(`CONCAT('${base_url}/images/', article_thumbnail)`), 'article_thumbnail']]
             },
             where: {
                 archived_article: 0
@@ -40,7 +40,7 @@ class ArticleService {
         const totalArticles = await Article.count({
             attributes: {
                 exclude: ['categories'],
-                include: [[Sequelize.literal(`CONCAT('${base_url}/images', article_thumbnail)`), 'article_thumbnail']]
+                include: [[Sequelize.literal(`CONCAT('${base_url}/images/', article_thumbnail)`), 'article_thumbnail']]
             },
             where: {
                 main_article: 1,
@@ -54,7 +54,7 @@ class ArticleService {
             limit: pageSize,
             attributes: {
                 exclude: ['categories'],
-                include: [[Sequelize.literal(`CONCAT('${base_url}/images', article_thumbnail)`), 'article_thumbnail']]
+                include: [[Sequelize.literal(`CONCAT('${base_url}/images/', article_thumbnail)`), 'article_thumbnail']]
             },
             where: {
                 main_article: 1,
@@ -72,7 +72,7 @@ class ArticleService {
         const totalArticles = await Article.count({
             attributes: {
                 exclude: ['categories'],
-                include: [[Sequelize.literal(`CONCAT('${base_url}/images', article_thumbnail)`), 'article_thumbnail']]
+                include: [[Sequelize.literal(`CONCAT('${base_url}/images/', article_thumbnail)`), 'article_thumbnail']]
             },
             where: {
                 archived_article: 1
@@ -85,7 +85,7 @@ class ArticleService {
             limit: pageSize,
             attributes: {
                 exclude: ['categories'],
-                include: [[Sequelize.literal(`CONCAT('${base_url}/images', article_thumbnail)`), 'article_thumbnail']]
+                include: [[Sequelize.literal(`CONCAT('${base_url}/images/', article_thumbnail)`), 'article_thumbnail']]
             }, where: {
                 archived_article: 1
             }
@@ -100,7 +100,7 @@ class ArticleService {
         const article = await Article.findOne({
             attributes: {
                 exclude: ['categories'],
-                include: [[Sequelize.literal(`CONCAT('${base_url}/images', article_thumbnail)`), 'article_thumbnail']]
+                include: [[Sequelize.literal(`CONCAT('${base_url}/images/', article_thumbnail)`), 'article_thumbnail']]
             },
             where: {
                 article_id: article_id

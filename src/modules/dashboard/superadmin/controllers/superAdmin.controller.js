@@ -365,21 +365,10 @@ class SuperAdminController {
             const { status, keterangan } = req.body;
 
             let bukti_pembayaran;
-            let filePath;
+
             if (req.file) {
-                const extension = path.extname(req.file.originalname);
-                bukti_pembayaran = `${Date.now()}${extension}`;
-                filePath = `images/${bukti_pembayaran}`;
-
-                if (!req.file.mimetype.startsWith('image/')) {
-                    return res.status(400).json({ message: 'File must be an image' });
-                }
-
-                if (!fs.existsSync('images')) {
-                    fs.mkdirSync('images');
-                }
-
-                fs.renameSync(req.file.path, filePath);
+                req.body.bukti_pembayaran = req.file.filename;
+                bukti_pembayaran = req.body.bukti_pembayaran;
             }
 
             const result = await service.updateStatusPencairan(id, status, bukti_pembayaran, keterangan);

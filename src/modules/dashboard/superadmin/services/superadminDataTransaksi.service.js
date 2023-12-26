@@ -25,7 +25,7 @@ class SuperAdminDataTransaksi {
 
         const result = await sequelize.query(
             `
-            SELECT Pencairans.id, Pencairans.user_id, Pencairans.status, Pencairans.nominal, Pencairans.waktu_pembayaran, CONCAT('${base_url}/images/', Pencairans.bukti_pembayaran) AS bukti_pembayaran, Pencairans.pengajar_id, Pencairans.createdAt, Pencairans.updatedAt, Users.nama
+            SELECT Pencairans.id, Pencairans.user_id, Pencairans.status, Pencairans.nominal, Pencairans.waktu_pembayaran, CONCAT('${base_url}/images/', Pencairans.bukti_pembayaran) AS bukti_pembayaran, Pencairans.pengajar_id, Pencairans.createdAt, Pencairans.updatedAt, Users.nama, CONCAT('${base_url}/images/', Users.profile_picture) AS profile_picture
             FROM Pencairans
             JOIN Users ON Pencairans.user_id = Users.id
             ${whereClause}
@@ -54,9 +54,11 @@ class SuperAdminDataTransaksi {
     }
 
     async getDataPencairanById(id) {
+        const base_url = process.env.BASE_URL;
+
         const pencairan = await sequelize.query(
             `
-            SELECT Pencairans.id, Pencairans.user_id, Pencairans.status, Pencairans.nominal, Pencairans.waktu_pembayaran, Pencairans.bukti_pembayaran, Pencairans.pengajar_id, Pencairans.nama_bank, Pencairans.no_rekening, Pencairans.nama_rekening, Users.nama
+            SELECT Pencairans.id, Pencairans.user_id, Pencairans.status, Pencairans.nominal, Pencairans.waktu_pembayaran, Pencairans.bukti_pembayaran, Pencairans.pengajar_id, Pencairans.nama_bank, Pencairans.no_rekening, Pencairans.nama_rekening, Users.nama, CONCAT('${base_url}/images/', Users.profile_picture) AS profile_picture
             FROM Pencairans
             JOIN Users ON Pencairans.user_id = Users.id
             WHERE Pencairans.id = :id
