@@ -140,8 +140,9 @@ class BimbinganService extends BaseService {
           user_id: period.peserta.user.id,
           name: period.peserta.user.nama,
           profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
-          period: `${period.bimbingan_reguler[0].tanggal} - ${period.bimbingan_reguler[period.bimbingan_reguler.length - 1].tanggal
-            }`,
+          period: `${period.bimbingan_reguler[0].tanggal} - ${
+            period.bimbingan_reguler[period.bimbingan_reguler.length - 1].tanggal
+          }`,
           absent,
           peserta_review: period.catatan_peserta,
         };
@@ -161,8 +162,9 @@ class BimbinganService extends BaseService {
           user_id: period.peserta.user.id,
           name: period.peserta.user.nama,
           profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
-          period: `${period.bimbingan_tambahan[0].tanggal} - ${period.bimbingan_tambahan[period.bimbingan_tambahan.length - 1].tanggal
-            }`,
+          period: `${period.bimbingan_tambahan[0].tanggal} - ${
+            period.bimbingan_tambahan[period.bimbingan_tambahan.length - 1].tanggal
+          }`,
           absent,
           peserta_review: period.catatan_peserta,
         };
@@ -542,7 +544,7 @@ class BimbinganService extends BaseService {
           attributes: { exclude: ['updatedAt', 'createdAt'] },
         },
       ],
-      attributes: ['id', 'tipe_bimbingan', 'status', 'tanggal_pengingat_infaq'],
+      attributes: ['id', 'pengajar_id', 'tipe_bimbingan', 'status', 'tanggal_pengingat_infaq'],
     });
 
     let arrayPeriodeBimbingan = [];
