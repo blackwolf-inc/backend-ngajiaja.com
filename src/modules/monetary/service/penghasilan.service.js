@@ -14,6 +14,7 @@ class PenghasilanService extends BaseService {
         id: item.id,
         peserta: item.peserta.user.nama,
         peserta_id: item.peserta.id,
+        profile_picture: item.peserta.user.profile_picture,
         user_id: item.peserta.user.id,
         payed: item.pembayaran,
         income: item.penghasilan,

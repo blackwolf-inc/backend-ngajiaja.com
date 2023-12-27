@@ -239,6 +239,7 @@ class BimbinganService extends BaseService {
     }
 
     return {
+      peserta_id: result.peserta.id,
       name: result.peserta.user.nama,
       gender: result.peserta.user.jenis_kelamin,
       profile_picture: `${base_url}/images/${result.peserta.user.profile_picture}`,
