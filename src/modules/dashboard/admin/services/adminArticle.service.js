@@ -72,8 +72,6 @@ class AdminArticle {
     async updateArticleService(data, token, id) {
         const { article_title, article_body, article_category_id, main_article, archived_article, article_thumbnail } = data;
 
-        console.log('article_category_id:', article_category_id);
-
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
         const user_id = decodedToken.id;
 
@@ -82,14 +80,15 @@ class AdminArticle {
             throw new Error('User not found');
         }
 
-        const category = await ArticleCategories.findByPk(article_category_id);
-        console.log('category:', category);
-
-        if (!category) {
-            throw new Error('Category not found');
+        let article_category;
+        if (article_category_id) {
+            const category = await ArticleCategories.findByPk(article_category_id);
+            if (!category) {
+                throw new Error('Category not found');
+            }
+            article_category = category.categories;
         }
 
-        const article_category = category.categories;
         const article_createby = user.nama;
         const article = await Article.findByPk(id, {
             include: [{
