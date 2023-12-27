@@ -107,6 +107,10 @@ class ArticleService {
             }
         });
 
+        if (article) {
+            await Article.increment('article_views', { where: { article_id: article_id } });
+        }
+
         return article;
     }
 }

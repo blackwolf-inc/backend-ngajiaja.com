@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
             main_article: DataTypes.INTEGER,
             archived_article: DataTypes.INTEGER,
             article_createby: DataTypes.STRING,
+            article_views: DataTypes.INTEGER,
             createdAt: DataTypes.DATE,
             updatedAt: DataTypes.DATE,
         },
