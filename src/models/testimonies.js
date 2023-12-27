@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
             testimony_body: DataTypes.STRING,
             testimony_profession: DataTypes.STRING,
             testimony_picture: DataTypes.STRING,
+            testimony_archived: DataTypes.INTEGER,
             createdAt: DataTypes.DATE,
             updatedAt: DataTypes.DATE,
         },

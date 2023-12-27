@@ -98,4 +98,9 @@ router.patch('/article-category/:categoriesId', AdminDashboardController.updateA
 
 router.delete('/article/:articleId', AdminDashboardController.deleteArticleAdmin);
 
+router.post('/testimonies', image.single('testimony_picture'), AdminDashboardController.createTestimonies);
+router.patch('/testimonies/:testimonyId', image.single('testimony_picture'), AdminDashboardController.updateTestimonies);
+router.delete('/testimonies/:testimonyId', AdminDashboardController.deleteTestimonies);
+router.get('/testimonies', AdminDashboardController.getTestimonies);
+
 module.exports = router;

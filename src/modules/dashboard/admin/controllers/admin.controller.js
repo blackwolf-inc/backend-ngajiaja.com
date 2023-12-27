@@ -3,6 +3,7 @@ const AdminPesertaService = require('../services/adminPeserta.service.js');
 const AdminDashboard = require('../services/adminDashboard.service.js');
 const AdminManageCourseService = require('../services/adminKelolaBimbingan.js');
 const AdminTransaksiService = require('../services/adminTransaksi.service.js');
+const AdminTestimoniesService = require('../services/adminTestimonies.service.js');
 const { Infaq, Pencairan } = require('../../../../models');
 const responseHandler = require('../../../../helpers/responseHandler');
 const fs = require('fs');
@@ -571,6 +572,62 @@ class AdminDashboardController {
       const { articleId } = req.params;
       const result = await service.deleteArticleByIdService(articleId);
       return responseHandler.succes(res, 'Success delete article', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async createTestimonies(req, res, next) {
+    const service = new AdminTestimoniesService();
+    try {
+      let { testimony_name, testimony_body, testimony_profession, testimony_archived } = req.body;
+      let testimony_picture
+      if (req.file) {
+        req.body.testimony_picture = req.file.filename;
+        testimony_picture = req.file.filename;
+      }
+      const result = await service.createTestimonyService({ testimony_name, testimony_body, testimony_profession, testimony_picture, testimony_archived });
+      return responseHandler.succes(res, 'Success create testimonies', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateTestimonies(req, res, next) {
+    const service = new AdminTestimoniesService();
+    try {
+      const { testimonyId } = req.params;
+      let { testimony_name, testimony_body, testimony_profession, testimony_archived } = req.body;
+      let testimony_picture
+      if (req.file) {
+        req.body.testimony_picture = req.file.filename;
+        testimony_picture = req.file.filename;
+      }
+      const result = await service.updateTestimonyService(testimonyId, { testimony_name, testimony_body, testimony_profession, testimony_picture, testimony_archived });
+      return responseHandler.succes(res, 'Success update testimonies', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async deleteTestimonies(req, res, next) {
+    const service = new AdminTestimoniesService();
+    try {
+      const { testimonyId } = req.params;
+      const result = await service.deleteTestimonyService(testimonyId);
+      return responseHandler.succes(res, 'Success delete testimonies', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getTestimonies(req, res, next) {
+    const service = new AdminTestimoniesService();
+    try {
+      const { query } = req;
+      const { page, pageSize, testimony_name } = query;
+      const result = await service.getTestimonyService(page, pageSize, testimony_name);
+      return responseHandler.succes(res, 'Success get testimonies', result);
     } catch (error) {
       next(error);
     }
