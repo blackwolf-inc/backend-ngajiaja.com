@@ -52,6 +52,7 @@ class AdminManageCourseService {
         const { pageSize = 10 } = query;
         let page = query.page ? parseInt(query.page) : 1;
         const offset = (page - 1) * pageSize;
+        const base_url = process.env.BASE_URL;
 
         let whereClause = "WHERE p.status = 'ACTIVATED'";
         if (keywordStudent) {
@@ -65,6 +66,8 @@ class AdminManageCourseService {
             `
             SELECT 
                 p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', p.hari_1, p.jam_1, p.hari_2, p.jam_2,
+                CONCAT('${base_url}/images/', u1.profile_picture) AS 'profile_picture_peserta',
+                CONCAT('${base_url}/images/', u2.profile_picture) AS 'profile_picture_pengajar',
                 CASE 
                     WHEN p.tipe_bimbingan = 'REGULER' THEN (SELECT COUNT(*) FROM BimbinganRegulers br WHERE br.period_id = p.id AND br.absensi_peserta = 1)
                     WHEN p.tipe_bimbingan = 'TAMBAHAN' THEN (SELECT COUNT(*) FROM BimbinganTambahans bt WHERE bt.period_id = p.id AND bt.absensi_peserta = 1)
@@ -107,6 +110,7 @@ class AdminManageCourseService {
         const { pageSize = 10 } = query;
         let page = query.page ? parseInt(query.page) : 1;
         const offset = (page - 1) * pageSize;
+        const base_url = process.env.BASE_URL;
 
         let whereClause = "WHERE p.status = 'FINISHED'";
         if (keywordStudent) {
@@ -138,6 +142,8 @@ class AdminManageCourseService {
             `
             SELECT 
                 p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name',
+                CONCAT('${base_url}/images/', u1.profile_picture) AS 'profile_picture_peserta',
+                CONCAT('${base_url}/images/', u2.profile_picture) AS 'profile_picture_pengajar',
                 CASE 
                     WHEN p.tipe_bimbingan = 'REGULER' THEN (SELECT COUNT(*) FROM BimbinganRegulers br WHERE br.period_id = p.id AND br.absensi_peserta = 1)
                     WHEN p.tipe_bimbingan = 'TAMBAHAN' THEN (SELECT COUNT(*) FROM BimbinganTambahans bt WHERE bt.period_id = p.id AND bt.absensi_peserta = 1)
@@ -187,10 +193,13 @@ class AdminManageCourseService {
     }
 
     async getCourseOngoingById(periodId) {
+        const base_url = process.env.BASE_URL;
         const result = await sequelize.query(
             `
             SELECT 
                 p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', p.hari_1, p.jam_1, p.hari_2, p.jam_2,
+                CONCAT('${base_url}/images/', u1.profile_picture) AS 'profile_picture_peserta',
+                CONCAT('${base_url}/images/', u2.profile_picture) AS 'profile_picture_pengajar',
                 CASE 
                     WHEN p.tipe_bimbingan = 'REGULER' THEN (SELECT COUNT(*) FROM BimbinganRegulers br WHERE br.period_id = p.id AND br.absensi_peserta = 1)
                     WHEN p.tipe_bimbingan = 'TAMBAHAN' THEN (SELECT COUNT(*) FROM BimbinganTambahans bt WHERE bt.period_id = p.id AND bt.absensi_peserta = 1)
@@ -215,10 +224,13 @@ class AdminManageCourseService {
     }
 
     async getCourseFinishedById(periodId) {
+        const base_url = process.env.BASE_URL;
         const result = await sequelize.query(
             `
             SELECT 
                 p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name',
+                CONCAT('${base_url}/images/', u1.profile_picture) AS 'profile_picture_peserta',
+                CONCAT('${base_url}/images/', u2.profile_picture) AS 'profile_picture_pengajar',
                 CASE 
                     WHEN p.tipe_bimbingan = 'REGULER' THEN (SELECT COUNT(*) FROM BimbinganRegulers br WHERE br.period_id = p.id AND br.absensi_peserta = 1)
                     WHEN p.tipe_bimbingan = 'TAMBAHAN' THEN (SELECT COUNT(*) FROM BimbinganTambahans bt WHERE bt.period_id = p.id AND bt.absensi_peserta = 1)
@@ -262,10 +274,14 @@ class AdminManageCourseService {
             whereClause += ` AND p.createdAt <= '${endDateInit}'`;
         }
 
+        const base_url = process.env.BASE_URL;
+
         const result = await sequelize.query(
             `
             SELECT 
                 p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', p.hari_1, p.jam_1, p.hari_2, p.jam_2, p.createdAt,
+                CONCAT('${base_url}/images/', u1.profile_picture) AS 'profile_picture_peserta',
+                CONCAT('${base_url}/images/', u2.profile_picture) AS 'profile_picture_pengajar',
                 CASE 
                     WHEN p.tipe_bimbingan = 'REGULER' THEN (SELECT COUNT(*) FROM BimbinganRegulers br WHERE br.period_id = p.id AND br.absensi_peserta = 1)
                     WHEN p.tipe_bimbingan = 'TAMBAHAN' THEN (SELECT COUNT(*) FROM BimbinganTambahans bt WHERE bt.period_id = p.id AND bt.absensi_peserta = 1)
@@ -300,10 +316,14 @@ class AdminManageCourseService {
             whereClause += ` AND p.createdAt <= '${endDateInit}'`;
         }
 
+        const base_url = process.env.BASE_URL;
+
         const result = await sequelize.query(
             `
             SELECT 
                 p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', p.createdAt,
+                CONCAT('${base_url}/images/', u1.profile_picture) AS 'profile_picture_peserta',
+                CONCAT('${base_url}/images/', u2.profile_picture) AS 'profile_picture_pengajar',
                 CASE 
                     WHEN p.tipe_bimbingan = 'REGULER' THEN (SELECT COUNT(*) FROM BimbinganRegulers br WHERE br.period_id = p.id AND br.absensi_peserta = 1)
                     WHEN p.tipe_bimbingan = 'TAMBAHAN' THEN (SELECT COUNT(*) FROM BimbinganTambahans bt WHERE bt.period_id = p.id AND bt.absensi_peserta = 1)

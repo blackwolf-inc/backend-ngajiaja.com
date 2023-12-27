@@ -5,7 +5,15 @@ const {
   STATUS_BIMBINGAN,
   STATUS_BIMBINGAN_ACTIVE,
 } = require('../../../../helpers/constanta');
-const { BimbinganReguler, BimbinganTambahan, Peserta, User } = require('../../../../models');
+const {
+  BimbinganReguler,
+  BimbinganTambahan,
+  Peserta,
+  Pengajar,
+  User,
+  Pencairan,
+  PenghasilanPengajar,
+} = require('../../../../models');
 const moment = require('moment');
 
 class PengajarService extends BaseService {
@@ -49,10 +57,13 @@ class PengajarService extends BaseService {
         continue;
       }
 
+      const base_url = process.env.BASE_URL;
+
       const bimbinganPending = {
         period_id: period.id,
         peserta_id: period.peserta.id,
         user_id: period.peserta.user.id,
+        profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
         schedule: {
           day1: null,
           hour1: null,
@@ -108,6 +119,8 @@ class PengajarService extends BaseService {
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
+    const base_url = process.env.BASE_URL;
+
     const data = [];
     for (const period of result.datas) {
       if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
@@ -118,8 +131,10 @@ class PengajarService extends BaseService {
             period_id: period.id,
             peserta_id: period.peserta.id,
             user_id: period.peserta.user.id,
+            profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
             bimbingan_reguler_id: bimbinganReguler.id,
             status: null,
+            link_meet: bimbinganReguler.link_meet,
             name: period.peserta.user.nama,
             date: bimbinganReguler.tanggal,
             time: bimbinganReguler.jam_bimbingan,
@@ -162,8 +177,10 @@ class PengajarService extends BaseService {
             period_id: period.id,
             peserta_id: period.peserta.id,
             user_id: period.peserta.user.id,
+            profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
             bimbingan_tambahan_id: bimbinganTambahan.id,
             status: null,
+            link_meet: bimbinganTambahan.link_meet,
             name: period.peserta.user.nama,
             date: bimbinganTambahan.tanggal,
             time: bimbinganTambahan.jam_bimbingan,
@@ -349,6 +366,53 @@ class PengajarService extends BaseService {
       as: 'bimbingan_tambahan',
     },
   ];
+
+  async postDataRekening(id, data) {
+    const result = await this.updateData(data, { id });
+    if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
+
+    return result;
+  }
+
+  async postPencairanPengajar(data) {
+    const pengajar = await Pengajar.findOne({ where: { id: data.pengajar_id } });
+
+    if (!pengajar) {
+      throw new Error('Pengajar not found');
+    }
+
+    if (!pengajar.nama_bank || !pengajar.no_rekening || !pengajar.nama_rekening) {
+      throw new Error('Bank details are incomplete');
+    }
+
+    const totalPenghasilan = await PenghasilanPengajar.sum('penghasilan', {
+      where: { pengajar_id: data.pengajar_id },
+    });
+    const totalPencairan = await Pencairan.sum('nominal', {
+      where: {
+        pengajar_id: data.pengajar_id,
+        status: 'ACCEPTED',
+      },
+    });
+
+    if (totalPenghasilan - totalPencairan - data.nominal < 0) {
+      throw new Error('Insufficient funds');
+    }
+
+    const pencairanData = {
+      pengajar_id: data.pengajar_id,
+      nominal: data.nominal,
+      status: 'WAITING',
+      nama_bank: pengajar.nama_bank,
+      no_rekening: pengajar.no_rekening,
+      nama_rekening: pengajar.nama_rekening,
+      user_id: pengajar.user_id,
+    };
+
+    const result = await Pencairan.create(pencairanData);
+
+    return result;
+  }
 }
 
 module.exports = PengajarService;

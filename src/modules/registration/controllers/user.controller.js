@@ -8,6 +8,7 @@ const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
 const jwt = require('jsonwebtoken');
+const fsp = require('fs/promises');
 
 class UserController {
   static async getOne(req, res, next) {
@@ -105,21 +106,11 @@ class UserController {
     }
 
     let profile_picture;
-    let filePath;
+
     if (req.file) {
-      const extension = path.extname(req.file.originalname);
-      profile_picture = `${Date.now()}${extension}`;
-      filePath = `images/${profile_picture}`;
-
-      if (!req.file.mimetype.startsWith('image/')) {
-        return res.status(400).json({ message: 'File must be an image' });
-      }
-
-      if (!fs.existsSync('images')) {
-        fs.mkdirSync('images');
-      }
-
-      fs.renameSync(req.file.path, filePath);
+      req.body.profile_picture = req.file.filename;
+      await fs.promises.unlink(path.join(process.cwd(), '../images', user.profile_picture));
+      profile_picture = req.body.profile_picture;
     }
     if (req.body.password) {
       req.body.password = getHash(req.body.password);

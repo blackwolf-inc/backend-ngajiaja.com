@@ -2,6 +2,7 @@ const InfaqService = require('../service/infaq.service');
 const PesertaService = require('../../registration/services/student.service');
 const responseHandler = require('../../../helpers/responseHandler');
 const db = require('../../../models/index');
+const { use } = require('chai');
 const { Infaq, PenghasilanPengajar } = db;
 
 class InfaqController {
@@ -36,9 +37,11 @@ class InfaqController {
 
   static async create(req, res, next) {
     const service = new InfaqService(req, Infaq);
+    const user = req.user;
     try {
+      console.log(user.id);
       await Promise.all([
-        service.checkPesertaById(req.body),
+        service.checkPesertaById(user.id),
         service.checkPengajarById(req.body),
         service.checkPeriodById(req.body),
         service.checkBankById(req.body),

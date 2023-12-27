@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             Article.belongsTo(models.ArticleCategories, {
                 foreignKey: 'article_category_id',
-                as: 'categories',
+                as: 'categories_id',
                 onDelete: 'CASCADE',
                 onUpdate: 'CASCADE',
             });
@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
             main_article: DataTypes.INTEGER,
             archived_article: DataTypes.INTEGER,
             article_createby: DataTypes.STRING,
+            article_views: DataTypes.INTEGER,
             createdAt: DataTypes.DATE,
             updatedAt: DataTypes.DATE,
         },

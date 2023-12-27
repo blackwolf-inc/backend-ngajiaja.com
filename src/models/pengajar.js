@@ -43,6 +43,13 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       });
+
+      Pengajar.hasMany(models.Pencairan, {
+        foreignKey: 'pengajar_id',
+        as: 'pencairan',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      });
     }
   }
   Pengajar.init(

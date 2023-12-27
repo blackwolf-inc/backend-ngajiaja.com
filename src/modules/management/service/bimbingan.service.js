@@ -25,6 +25,8 @@ class BimbinganService extends BaseService {
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
+    const base_url = process.env.BASE_URL;
+
     const data = [];
     for (const period of result.datas) {
       if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
@@ -38,6 +40,7 @@ class BimbinganService extends BaseService {
           peserta_id: period.peserta.id,
           user_id: period.peserta.user.id,
           name: period.peserta.user.nama,
+          profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
           schedule: {
             day1: period.bimbingan_reguler[0].hari_bimbingan,
             hour1: period.bimbingan_reguler[0].jam_bimbingan,
@@ -63,6 +66,7 @@ class BimbinganService extends BaseService {
           peserta_id: period.peserta.id,
           user_id: period.peserta.user.id,
           name: period.peserta.user.nama,
+          profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
           schedule: {
             day1: period.bimbingan_tambahan[0].hari_bimbingan,
             hour1: period.bimbingan_tambahan[0].jam_bimbingan,
@@ -120,6 +124,8 @@ class BimbinganService extends BaseService {
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
 
+    const base_url = process.env.BASE_URL;
+
     const data = [];
     for (const period of result.datas) {
       if (period.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
@@ -133,6 +139,7 @@ class BimbinganService extends BaseService {
           peserta_id: period.peserta.id,
           user_id: period.peserta.user.id,
           name: period.peserta.user.nama,
+          profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
           period: `${period.bimbingan_reguler[0].tanggal} - ${
             period.bimbingan_reguler[period.bimbingan_reguler.length - 1].tanggal
           }`,
@@ -154,6 +161,7 @@ class BimbinganService extends BaseService {
           peserta_id: period.peserta.id,
           user_id: period.peserta.user.id,
           name: period.peserta.user.nama,
+          profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
           period: `${period.bimbingan_tambahan[0].tanggal} - ${
             period.bimbingan_tambahan[period.bimbingan_tambahan.length - 1].tanggal
           }`,
@@ -212,6 +220,8 @@ class BimbinganService extends BaseService {
     );
     if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
 
+    const base_url = process.env.BASE_URL;
+
     let age = 0;
     if (result.peserta.user.tgl_lahir) {
       const birthdate = moment(result.peserta.user.tgl_lahir, 'YYYY-MM-DD').toDate();
@@ -229,8 +239,10 @@ class BimbinganService extends BaseService {
     }
 
     return {
+      peserta_id: result.peserta.id,
       name: result.peserta.user.nama,
       gender: result.peserta.user.jenis_kelamin,
+      profile_picture: `${base_url}/images/${result.peserta.user.profile_picture}`,
       age,
       level: result.peserta.level,
     };
@@ -243,6 +255,8 @@ class BimbinganService extends BaseService {
     );
     if (!result) throw ApiError.notFound(`Period with id ${id} not found`);
 
+    const base_url = process.env.BASE_URL;
+
     const data = [];
     if (result.tipe_bimbingan === TYPE_BIMBINGAN.REGULER) {
       for (const bimbinganReguler of result.bimbingan_reguler) {
@@ -250,6 +264,7 @@ class BimbinganService extends BaseService {
           period_id: result.id,
           peserta_id: result.peserta.id,
           user_id: result.peserta.user.id,
+          profile_picture: `${base_url}/images/${result.peserta.user.profile_picture}`,
           bimbingan_reguler_id: bimbinganReguler.id,
           status: null,
           date: bimbinganReguler.tanggal,
@@ -297,6 +312,7 @@ class BimbinganService extends BaseService {
           period_id: result.id,
           peserta_id: result.peserta.id,
           user_id: result.peserta.user.id,
+          profile_picture: `${base_url}/images/${result.peserta.user.profile_picture}`,
           bimbingan_tambahan_id: bimbinganTambahan.id,
           status: null,
           date: bimbinganTambahan.tanggal,
@@ -449,58 +465,29 @@ class BimbinganService extends BaseService {
         {
           model: BimbinganReguler,
           as: 'bimbingan_reguler',
-          where: {
-            absensi_peserta: 1,
-            absensi_pengajar: 1,
-          },
-          required: false,
+          attributes: ['tanggal', 'status'],
         },
         {
           model: BimbinganTambahan,
           as: 'bimbingan_tambahan',
-          required: false,
+          attributes: ['tanggal', 'status'],
         },
       ],
       order: [['createdAt', 'DESC']],
     });
-
-    const periodeBimbingan = await Period.findAll({
-      where: { peserta_id: pesertaId[0].id, status: req.status },
-      include: [
-        {
-          model: BimbinganReguler,
-          as: 'bimbingan_reguler',
-        },
-        {
-          model: BimbinganTambahan,
-          as: 'bimbingan_tambahan',
-        },
-      ],
-      order: [['createdAt', 'DESC']],
-    });
-
-    let arrayPeriodeBimbingan = [];
-
-    if (periodeBimbingan.status == TYPE_BIMBINGAN.REGULER) {
-      periodeBimbingan.map((data) => {
-        data.bimbingan_reguler.map((dataTanggal) => {
-          arrayPeriodeBimbingan.push(dataTanggal.tanggal);
-        });
-      });
-    }
-
-    if (periodeBimbingan.status == TYPE_BIMBINGAN.TAMBAHAN) {
-      periodeBimbingan.map((data) => {
-        data.bimbingan_tambahan.map((dataTanggal) => {
-          arrayPeriodeBimbingan.push(dataTanggal.tanggal);
-        });
-      });
-    }
 
     const result = period.map((data) => {
+      const totalBimbinganRegulerFinished = data.bimbingan_reguler.filter(
+        (bimbingan) => bimbingan.status === STATUS_BIMBINGAN_ACTIVE.FINISHED
+      ).length;
+
       const totalBimbinganReguler = data.bimbingan_reguler.length;
+      let start_date = data.bimbingan_reguler[0];
+      let end_date = data.bimbingan_reguler[totalBimbinganReguler - 1];
+
       return {
         id: data.id,
+        profile_picture: data.pengajar.user.profile_picture,
         pengajar_id: data.pengajar_id,
         nama: data.pengajar.user.nama,
         jenis_kelamin: data.pengajar.user.jenis_kelamin,
@@ -508,11 +495,10 @@ class BimbinganService extends BaseService {
         jam_1: data.jam_1,
         hari_2: data.hari_2,
         jam_2: data.jam_2,
-        tanggal_mulai: arrayPeriodeBimbingan ? arrayPeriodeBimbingan[0] : null,
-        tanggal_selesai: arrayPeriodeBimbingan
-          ? arrayPeriodeBimbingan[arrayPeriodeBimbingan.length - 1]
-          : null,
-        jumlah_attedance_bimbingan_regular: totalBimbinganReguler ? totalBimbinganReguler : 0,
+        tanggal_mulai_reguler: start_date ? start_date : null,
+        tanggal_selesai_reguler: end_date ? end_date : null,
+        total_attendance_reguler: totalBimbinganRegulerFinished,
+        total_bimbingan_reguler: totalBimbinganReguler,
         tipe_bimbingan: data.tipe_bimbingan,
         status: data.status,
         infaq_bimbingan_tambahan_sebelum:
@@ -560,7 +546,7 @@ class BimbinganService extends BaseService {
           attributes: { exclude: ['updatedAt', 'createdAt'] },
         },
       ],
-      attributes: ['id', 'tipe_bimbingan', 'status', 'tanggal_pengingat_infaq'],
+      attributes: ['id', 'pengajar_id', 'tipe_bimbingan', 'status', 'tanggal_pengingat_infaq'],
     });
 
     let arrayPeriodeBimbingan = [];
@@ -588,6 +574,7 @@ class BimbinganService extends BaseService {
     const totalBimbinganReguler = period.bimbingan_reguler.length;
     return {
       id: period.id,
+      profile_picture: period.pengajar.user.profile_picture,
       id_pengajar: period.pengajar_id,
       nama: period.pengajar.user.nama,
       jenis_kelamin: period.pengajar.user.jenis_kelamin,

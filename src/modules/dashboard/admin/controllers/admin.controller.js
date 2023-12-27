@@ -185,8 +185,8 @@ class AdminDashboardController {
   static async getAllBimbingan(req, res, next) {
     const service = new AdminDashboard();
     try {
-      const { month } = req.query;
-      const result = await service.getAllBimbingan(month);
+      const { granularity, startDate, endDate } = req.query;
+      const result = await service.getAllBimbingan(granularity, startDate, endDate);
       return responseHandler.succes(res, 'Success get all bimbingan', result);
     } catch (error) {
       next(error);
@@ -410,22 +410,12 @@ class AdminDashboardController {
         archived_article,
       } = req.body;
       const token = req.headers.authorization.split(' ')[1];
+
       let article_thumbnail;
-      let filePath;
+
       if (req.file) {
-        const extension = path.extname(req.file.originalname);
-        article_thumbnail = `${Date.now()}${extension}`;
-        filePath = `images/${article_thumbnail}`;
-
-        if (!req.file.mimetype.startsWith('image/')) {
-          return res.status(400).json({ message: 'File must be an image' });
-        }
-
-        if (!fs.existsSync('images')) {
-          fs.mkdirSync('images');
-        }
-
-        fs.renameSync(req.file.path, filePath);
+        req.body.article_thumbnail = req.file.filename;
+        article_thumbnail = req.body.article_thumbnail;
       }
       const result = await service.createArticleService(
         {
@@ -458,22 +448,12 @@ class AdminDashboardController {
         archived_article,
       } = req.body;
       const token = req.headers.authorization.split(' ')[1];
+
       let article_thumbnail;
-      let filePath;
+
       if (req.file) {
-        const extension = path.extname(req.file.originalname);
-        article_thumbnail = `${Date.now()}${extension}`;
-        filePath = `images/${article_thumbnail}`;
-
-        if (!req.file.mimetype.startsWith('image/')) {
-          return res.status(400).json({ message: 'File must be an image' });
-        }
-
-        if (!fs.existsSync('images')) {
-          fs.mkdirSync('images');
-        }
-
-        fs.renameSync(req.file.path, filePath);
+        req.body.article_thumbnail = req.file.filename;
+        article_thumbnail = req.body.article_thumbnail;
       }
       const result = await service.updateArticleService(
         {
@@ -529,6 +509,73 @@ class AdminDashboardController {
       next(error);
     }
   }
+
+  static async getArticleList(req, res, next) {
+    const service = new AdminArticle();
+    try {
+      const { query } = req;
+      const { page, pageSize } = query;
+      const result = await service.getArticleListService(page, pageSize);
+      return responseHandler.succes(res, 'Success get article list', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getArticleCategoryList(req, res, next) {
+    const service = new AdminArticle();
+    try {
+      const { query } = req;
+      const { page, pageSize } = query;
+      const result = await service.getArticleCategoryListService(page, pageSize);
+      return responseHandler.succes(res, 'Success get article category list', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateArticleCategory(req, res, next) {
+    const service = new AdminArticle();
+    try {
+      const { categoriesId } = req.params;
+      const { categories } = req.body;
+      const result = await service.updateArticleCategoryService(categories, categoriesId);
+      return responseHandler.succes(res, 'Success update article category', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async exportInfaq(req, res, next) {
+    const service = new AdminTransaksiService(req, Infaq);
+    try {
+      const { startDate, endDate } = req;
+      const result = await service.exportInfaqPeserta(startDate, endDate);
+      const csv = Papa.unparse(result);
+      const date = +new Date();
+
+      const filename = `InfaqPeserta_${date}.csv`;
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+      res.send(csv);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async deleteArticleAdmin(req, res, next) {
+    const service = new AdminArticle();
+    try {
+      const { articleId } = req.params;
+      const result = await service.deleteArticleByIdService(articleId);
+      return responseHandler.succes(res, 'Success delete article', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 module.exports = AdminDashboardController;

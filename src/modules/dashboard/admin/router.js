@@ -83,6 +83,7 @@ router.patch(
 );
 
 router.get('/infaq-peserta', AdminDashboardController.getInfaqPeserta);
+router.get('/infaq-peserta/export', AdminDashboardController.exportInfaq);
 router.get('/pencairan-pengajar', AdminDashboardController.getPencairanPengajar);
 router.patch(
   '/pencairan-pengajar/:id',
@@ -90,5 +91,11 @@ router.patch(
   storage.image.single('media'),
   AdminDashboardController.updatePencairanPengajar
 );
+
+router.get('/article-list', AdminDashboardController.getArticleList);
+router.get('/article-category', AdminDashboardController.getArticleCategoryList);
+router.patch('/article-category/:categoriesId', AdminDashboardController.updateArticleCategory);
+
+router.delete('/article/:articleId', AdminDashboardController.deleteArticleAdmin);
 
 module.exports = router;

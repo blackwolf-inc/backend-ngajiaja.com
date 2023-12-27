@@ -19,9 +19,8 @@ class InfaqService extends BaseService {
     if (!result) throw ApiError.notFound(`User with id ${id} not found`);
     return result;
   }
-  async checkPesertaById(payload) {
-    let id = payload.peserta_id;
-    const result = await Peserta.findOne({ where: { id } });
+  async checkPesertaById(userId) {
+    const result = await Peserta.findOne({ where: { user_id: userId } });
     if (!result) throw ApiError.notFound(`Peserta with id ${id} not found`);
     return result;
   }
@@ -83,7 +82,7 @@ class InfaqService extends BaseService {
             model: User,
             required: true,
             as: 'user',
-            attributes: ['nama'],
+            attributes: ['nama', 'profile_picture'],
             where: userWhere,
           },
         ],
@@ -217,7 +216,7 @@ class InfaqService extends BaseService {
           model: User,
           required: true,
           as: 'user',
-          attributes: ['nama'],
+          attributes: ['nama', 'profile_picture'],
         },
       ],
     },
