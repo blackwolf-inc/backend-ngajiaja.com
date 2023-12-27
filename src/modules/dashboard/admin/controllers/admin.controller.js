@@ -598,11 +598,20 @@ class AdminDashboardController {
     try {
       const { testimonyId } = req.params;
       let { testimony_name, testimony_body, testimony_profession, testimony_archived } = req.body;
-      let testimony_picture
+      let testimony_picture;
+
+      const currentTestimony = await service.getTestimonyByIdService(testimonyId);
+
       if (req.file) {
         req.body.testimony_picture = req.file.filename;
+
+        if (currentTestimony.testimony_picture) {
+          await fs.promises.unlink(path.join(process.cwd(), '../images', currentTestimony.testimony_picture));
+        }
+
         testimony_picture = req.file.filename;
       }
+
       const result = await service.updateTestimonyService(testimonyId, { testimony_name, testimony_body, testimony_profession, testimony_picture, testimony_archived });
       return responseHandler.succes(res, 'Success update testimonies', result);
     } catch (error) {

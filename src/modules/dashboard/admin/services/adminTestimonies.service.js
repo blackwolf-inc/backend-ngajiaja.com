@@ -76,6 +76,18 @@ class AdminTestimonies {
 
         return { testimonies, page, pageSize, totalPages };
     }
+
+    async getTestimonyByIdService(id) {
+        const base_url = process.env.BASE_URL;
+
+        const testimony = await Testimonies.findByPk(id);
+
+        if (!testimony) {
+            throw new Error('Testimony not found');
+        }
+
+        return testimony;
+    }
 }
 
 module.exports = AdminTestimonies;
