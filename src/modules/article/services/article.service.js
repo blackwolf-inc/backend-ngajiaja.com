@@ -33,7 +33,9 @@ class ArticleService {
         return { articles, page, pageSize, totalPages };
     }
 
-    async getArticleMainService(page = 1, pageSize = 10) {
+    async getArticleMainService(page = 1, pageSize = 10, article_title = '', article_category = '') {
+        page = Number(page);
+        pageSize = Number(pageSize);
         const offset = (page - 1) * pageSize;
         const base_url = process.env.BASE_URL;
 
@@ -44,7 +46,13 @@ class ArticleService {
             },
             where: {
                 main_article: 1,
-                archived_article: 0
+                archived_article: 0,
+                article_title: {
+                    [Op.like]: `%${article_title}%`
+                },
+                article_category: {
+                    [Op.like]: `%${article_category}%`
+                }
             }
         });
         const totalPages = Math.ceil(totalArticles / pageSize);
@@ -58,14 +66,22 @@ class ArticleService {
             },
             where: {
                 main_article: 1,
-                archived_article: 0
+                archived_article: 0,
+                article_title: {
+                    [Op.like]: `%${article_title}%`
+                },
+                article_category: {
+                    [Op.like]: `%${article_category}%`
+                }
             }
         });
 
         return { articles, page, pageSize, totalPages };
     }
 
-    async getArticleArcivedService(page = 1, pageSize = 10) {
+    async getArticleArcivedService(page = 1, pageSize = 10, article_title = '', article_category = '') {
+        page = Number(page);
+        pageSize = Number(pageSize);
         const offset = (page - 1) * pageSize;
         const base_url = process.env.BASE_URL;
 
@@ -75,7 +91,13 @@ class ArticleService {
                 include: [[Sequelize.literal(`CONCAT('${base_url}/images/', article_thumbnail)`), 'article_thumbnail']]
             },
             where: {
-                archived_article: 1
+                archived_article: 1,
+                article_title: {
+                    [Op.like]: `%${article_title}%`
+                },
+                article_category: {
+                    [Op.like]: `%${article_category}%`
+                }
             }
         });
         const totalPages = Math.ceil(totalArticles / pageSize);
@@ -87,7 +109,13 @@ class ArticleService {
                 exclude: ['categories'],
                 include: [[Sequelize.literal(`CONCAT('${base_url}/images/', article_thumbnail)`), 'article_thumbnail']]
             }, where: {
-                archived_article: 1
+                archived_article: 1,
+                article_title: {
+                    [Op.like]: `%${article_title}%`
+                },
+                article_category: {
+                    [Op.like]: `%${article_category}%`
+                }
             }
         });
 
@@ -106,6 +134,10 @@ class ArticleService {
                 article_id: article_id
             }
         });
+
+        if (article) {
+            await Article.increment('article_views', { where: { article_id: article_id } });
+        }
 
         return article;
     }

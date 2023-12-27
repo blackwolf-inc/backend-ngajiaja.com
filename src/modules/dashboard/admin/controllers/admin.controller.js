@@ -410,22 +410,12 @@ class AdminDashboardController {
         archived_article,
       } = req.body;
       const token = req.headers.authorization.split(' ')[1];
+
       let article_thumbnail;
-      let filePath;
+
       if (req.file) {
-        const extension = path.extname(req.file.originalname);
-        article_thumbnail = `${Date.now()}${extension}`;
-        filePath = `images/${article_thumbnail}`;
-
-        if (!req.file.mimetype.startsWith('image/')) {
-          return res.status(400).json({ message: 'File must be an image' });
-        }
-
-        if (!fs.existsSync('images')) {
-          fs.mkdirSync('images');
-        }
-
-        fs.renameSync(req.file.path, filePath);
+        req.body.article_thumbnail = req.file.filename;
+        article_thumbnail = req.body.article_thumbnail;
       }
       const result = await service.createArticleService(
         {
@@ -458,22 +448,12 @@ class AdminDashboardController {
         archived_article,
       } = req.body;
       const token = req.headers.authorization.split(' ')[1];
+
       let article_thumbnail;
-      let filePath;
+
       if (req.file) {
-        const extension = path.extname(req.file.originalname);
-        article_thumbnail = `${Date.now()}${extension}`;
-        filePath = `images/${article_thumbnail}`;
-
-        if (!req.file.mimetype.startsWith('image/')) {
-          return res.status(400).json({ message: 'File must be an image' });
-        }
-
-        if (!fs.existsSync('images')) {
-          fs.mkdirSync('images');
-        }
-
-        fs.renameSync(req.file.path, filePath);
+        req.body.article_thumbnail = req.file.filename;
+        article_thumbnail = req.body.article_thumbnail;
       }
       const result = await service.updateArticleService(
         {

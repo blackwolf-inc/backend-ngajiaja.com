@@ -38,7 +38,7 @@ class AdminArticle {
     }
 
     async createArticleService(data, token) {
-        const { article_title, article_body, article_category_id, article_picture, main_article, archived_article, article_thumbnail } = data;
+        const { article_title, article_body, article_category_id, main_article, archived_article, article_thumbnail } = data;
 
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
         const user_id = decodedToken.id;
@@ -60,7 +60,6 @@ class AdminArticle {
             article_body,
             article_category,
             article_category_id,
-            article_picture,
             main_article,
             archived_article,
             article_createby,
@@ -71,7 +70,7 @@ class AdminArticle {
     }
 
     async updateArticleService(data, token, id) {
-        const { article_title, article_body, article_category_id, article_picture, main_article, archived_article, article_thumbnail } = data;
+        const { article_title, article_body, article_category_id, main_article, archived_article, article_thumbnail } = data;
 
         console.log('article_category_id:', article_category_id);
 
@@ -98,7 +97,7 @@ class AdminArticle {
                 as: 'categories_id',
                 attributes: ['categories_id', 'categories', 'user_id', 'created_by', 'createdAt', 'updatedAt']
             }],
-            attributes: ['article_id', 'article_title', 'article_body', 'article_category', 'article_category_id', 'article_picture', 'article_thumbnail', 'main_article', 'archived_article', 'article_createby', 'createdAt', 'updatedAt'] // specify the fields you want to select from the 'Articles' table
+            attributes: ['article_id', 'article_title', 'article_body', 'article_category', 'article_category_id', 'article_thumbnail', 'main_article', 'archived_article', 'article_createby', 'createdAt', 'updatedAt'] // specify the fields you want to select from the 'Articles' table
         });
         if (!article) {
             throw new Error('Article not found');
@@ -109,7 +108,6 @@ class AdminArticle {
             article_body,
             article_category,
             article_category_id,
-            article_picture,
             main_article,
             archived_article,
             article_createby,
@@ -138,11 +136,11 @@ class AdminArticle {
                 'article_body',
                 'article_category',
                 'article_category_id',
-                'article_picture',
                 [Sequelize.literal(`CONCAT('${base_url}/images/', article_thumbnail)`), 'article_thumbnail'],
                 'main_article',
                 'archived_article',
                 'article_createby',
+                'article_views',
                 'createdAt',
                 'updatedAt'
             ]
