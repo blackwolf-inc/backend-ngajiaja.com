@@ -15,7 +15,8 @@ class ArticlePost {
     static async getArticleMain(req, res, next) {
         const service = new ArticleService()
         try {
-            const articleMain = await service.getArticleMainService()
+            const { page, pageSize, article_title, article_category } = req.query
+            const articleMain = await service.getArticleMainService(page, pageSize, article_title, article_category)
             return responseHandler.succes(res, 'Article Main', articleMain);
         } catch (error) {
             next(error);
@@ -25,7 +26,8 @@ class ArticlePost {
     static async getArticleArchived(req, res, next) {
         const service = new ArticleService()
         try {
-            const articleArchived = await service.getArticleArcivedService()
+            const { page, pageSize, article_title, article_category } = req.query
+            const articleArchived = await service.getArticleArcivedService(page, pageSize, article_title, article_category)
             return responseHandler.succes(res, 'Article Archived', articleArchived);
         } catch (error) {
             next(error);
