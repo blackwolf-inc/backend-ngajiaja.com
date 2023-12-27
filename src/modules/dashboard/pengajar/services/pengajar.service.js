@@ -5,7 +5,15 @@ const {
   STATUS_BIMBINGAN,
   STATUS_BIMBINGAN_ACTIVE,
 } = require('../../../../helpers/constanta');
-const { BimbinganReguler, BimbinganTambahan, Peserta, Pengajar, User, Pencairan, PenghasilanPengajar } = require('../../../../models');
+const {
+  BimbinganReguler,
+  BimbinganTambahan,
+  Peserta,
+  Pengajar,
+  User,
+  Pencairan,
+  PenghasilanPengajar,
+} = require('../../../../models');
 const moment = require('moment');
 
 class PengajarService extends BaseService {
@@ -126,6 +134,7 @@ class PengajarService extends BaseService {
             profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
             bimbingan_reguler_id: bimbinganReguler.id,
             status: null,
+            link_meet: bimbinganReguler.link_meet,
             name: period.peserta.user.nama,
             date: bimbinganReguler.tanggal,
             time: bimbinganReguler.jam_bimbingan,
@@ -171,6 +180,7 @@ class PengajarService extends BaseService {
             profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
             bimbingan_tambahan_id: bimbinganTambahan.id,
             status: null,
+            link_meet: bimbinganTambahan.link_meet,
             name: period.peserta.user.nama,
             date: bimbinganTambahan.tanggal,
             time: bimbinganTambahan.jam_bimbingan,
@@ -375,12 +385,14 @@ class PengajarService extends BaseService {
       throw new Error('Bank details are incomplete');
     }
 
-    const totalPenghasilan = await PenghasilanPengajar.sum('penghasilan', { where: { pengajar_id: data.pengajar_id } });
+    const totalPenghasilan = await PenghasilanPengajar.sum('penghasilan', {
+      where: { pengajar_id: data.pengajar_id },
+    });
     const totalPencairan = await Pencairan.sum('nominal', {
       where: {
         pengajar_id: data.pengajar_id,
-        status: 'ACCEPTED'
-      }
+        status: 'ACCEPTED',
+      },
     });
 
     if (totalPenghasilan - totalPencairan - data.nominal < 0) {
@@ -401,7 +413,6 @@ class PengajarService extends BaseService {
 
     return result;
   }
-
 }
 
 module.exports = PengajarService;

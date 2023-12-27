@@ -26,6 +26,14 @@ class PencairanService extends BaseService {
     };
     const result = await this.getAll(query);
 
+    for (const data of result.datas) {
+      const payment_uri = data.bukti_pembayaran
+        ? `${process.env.BASE_URL}/images/${data.bukti_pembayaran}`
+        : null;
+
+      data.bukti_pembayaran = payment_uri;
+    }
+
     let filteredData;
     if (startDate && endDate) {
       if (status) {
