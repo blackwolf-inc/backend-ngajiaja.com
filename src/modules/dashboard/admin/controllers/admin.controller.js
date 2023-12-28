@@ -11,6 +11,7 @@ const Papa = require('papaparse');
 const AdminArticle = require('../services/adminArticle.service.js');
 const storageImage = require('../../../../utils/storageImage.js');
 const path = require('path');
+const { getHash } = require('../../../../helpers/passwordHash.js');
 
 class AdminDashboardController {
   static async dataPengajar(req, res, next) {
@@ -647,6 +648,9 @@ class AdminDashboardController {
     try {
       const { userId } = req.params;
       const { password, retypePassword } = req.body;
+      if (req.body.password) {
+        req.body.password = getHash(req.body.password);
+      }
       const result = await service.changeUserPasswordService(userId, password, retypePassword);
       return responseHandler.succes(res, 'Success change user password', result);
     } catch (error) {
