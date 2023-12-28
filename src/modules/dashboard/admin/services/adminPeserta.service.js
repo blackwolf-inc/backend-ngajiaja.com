@@ -63,7 +63,7 @@ class AdminPesertaService {
         const offset = (page - 1) * pageSize;
         const base_url = process.env.BASE_URL;
 
-        let whereClause = "WHERE u.role = 'PESERTA' AND u.status IN ('REGISTERED', 'REJECTED', 'ADMINISTRATION')";
+        let whereClause = "WHERE u.role = 'PESERTA' AND u.status IN ('REGISTERED', 'REJECTED', 'ADMINISTRATION', 'ARCHIVED')";
         if (status) {
             whereClause += ` AND u.status = '${status}'`;
         }
@@ -217,7 +217,7 @@ class AdminPesertaService {
     }
 
     async getPesertaRegisteredExport(startDate, endDate) {
-        let whereClause = "WHERE u.role = 'PESERTA' AND u.status IN ('REGISTERED', 'REJECTED', 'ADMINISTRATION')";
+        let whereClause = "WHERE u.role = 'PESERTA' AND u.status IN ('REGISTERED', 'REJECTED', 'ADMINISTRATION', 'ARCHIVED')";
         if (startDate && endDate) {
             const startDateInit = moment(startDate).startOf('day').format('YYYY-MM-DD');
             const endDateInit = moment(endDate).endOf('day').format('YYYY-MM-DD');
