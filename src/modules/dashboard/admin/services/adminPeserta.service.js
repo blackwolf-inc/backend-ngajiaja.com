@@ -80,7 +80,7 @@ class AdminPesertaService {
         const result = await sequelize.query(
             `
           SELECT 
-            u.id AS 'user_id', u.nama, u.role, u.status,
+            u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
             CONCAT('${base_url}/images/', u.profile_picture) AS 'profile_picture',
             p.id AS 'peserta_id', p.level,
             b.bank_id, CONCAT('${base_url}/images/', b.bukti_pembayaran) AS bukti_pembayaran, b.createdAt,
