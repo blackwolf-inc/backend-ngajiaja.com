@@ -103,4 +103,6 @@ router.patch('/testimonies/:testimonyId', image.single('testimony_picture'), Adm
 router.delete('/testimonies/:testimonyId', AdminDashboardController.deleteTestimonies);
 router.get('/testimonies', AdminDashboardController.getTestimonies);
 
+router.patch('/change-user-password/:userId', AdminDashboardController.changeUserPassword);
+
 module.exports = router;

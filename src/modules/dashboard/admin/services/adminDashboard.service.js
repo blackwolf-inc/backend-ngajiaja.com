@@ -93,5 +93,16 @@ class AdminDashboard {
         return result;
     }
 
+    async changeUserPasswordService(userId, password, retypePassword) {
+        const user = await User.findOne({ where: { id: userId } });
+        if (!user) throw new Error('User not found');
+
+        if (password !== retypePassword) {
+            throw new Error('Password and retype password do not match');
+        }
+
+        await user.update({ password });
+    }
+
 }
 module.exports = AdminDashboard;

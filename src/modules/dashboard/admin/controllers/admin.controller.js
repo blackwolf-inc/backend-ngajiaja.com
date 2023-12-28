@@ -642,6 +642,19 @@ class AdminDashboardController {
     }
   }
 
+  static async changeUserPassword(req, res, next) {
+    const service = new AdminDashboard();
+    try {
+      const { userId } = req.params;
+      const { password, retypePassword } = req.body;
+      const result = await service.changeUserPasswordService(userId, password, retypePassword);
+      return responseHandler.succes(res, 'Success change user password', result);
+    } catch (error) {
+      responseHandler.error(res, error.message);
+      next(error);
+    }
+  }
+
 }
 
 module.exports = AdminDashboardController;
