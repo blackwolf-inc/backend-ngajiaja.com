@@ -1,6 +1,7 @@
 const { QueryTypes } = require('sequelize');
 const db = require('../../../../models/index');
 const { Pengajar, User, sequelize } = db;
+const { getHash } = require('../../../../helpers/passwordHash');
 
 class AdminDashboard {
     async getDataAdminDashboard() {
@@ -99,6 +100,18 @@ class AdminDashboard {
 
         if (password !== retypePassword) {
             throw new Error('Password and retype password do not match');
+        }
+
+        if (password.length < 6) {
+            throw new Error('Password must be at least 6 characters');
+        }
+
+        if (password === user.password) {
+            throw new Error('Password must be different from the previous one');
+        }
+
+        if (password) {
+            password = getHash(password);
         }
 
         await user.update({ password });
