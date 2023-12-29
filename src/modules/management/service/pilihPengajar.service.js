@@ -15,28 +15,19 @@ const { STATUS_JADWAL_PENGAJAR, STATUS_BIMBINGAN_ACTIVE } = require('../../../he
 class PilihPengajar extends BaseService {
   async checkDays(hari_1, hari_2) {
     const arrayDays = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'];
-    let indexDay1 = 0;
-    let indexDay2 = 0;
+    let indexDay1 = -1;
+    let indexDay2 = -1;
 
-    let days = '';
+    for (let i = 0; i < arrayDays.length; i++) {
+      if (arrayDays[i] === hari_1) {
+        indexDay1 = i;
+      } else if (arrayDays[i] === hari_2) {
+        indexDay2 = i;
+      }
+    }
 
-    for (let i = 0; i < 2; i++) {
-      if (i == 0) {
-        days = hari_1;
-      } else {
-        days = hari_2;
-      }
-
-      for (let i = 0; i < arrayDays.length; i++) {
-        if (arrayDays[i] == hari_1) {
-          indexDay1 = i;
-        } else if (arrayDays[i] == hari_2) {
-          indexDay2 = i;
-        }
-      }
-      if (indexDay1 > indexDay2) {
-        throw ApiError.badRequest(`Invalid date first day: ${hari_1} > last day: ${hari_2}`);
-      }
+    if (indexDay1 !== -1 && indexDay2 !== -1 && indexDay1 > indexDay2) {
+      throw ApiError.badRequest(`Invalid date first day: ${hari_1} > last day: ${hari_2}`);
     }
   }
 
@@ -230,6 +221,37 @@ class PilihPengajar extends BaseService {
     const dateDiff = 30;
 
     let dateThisMonth = dateVerifikasi;
+
+    // If hari_1 = hari_2
+    if (hari_1 == hari_2) {
+      for (let i = 0; i <= 3; i++) {
+        const queryHari1 = {
+          period_id: id,
+          tanggal_pengingat_infaq: dateRemember,
+          tanggal: moment(dateThisMonth).format('YYYY-MM-DD'),
+          hari_bimbingan: hari_1,
+          jam_bimbingan: jam_1,
+          status: STATUS_BIMBINGAN_ACTIVE.NOT_SET,
+        };
+        const resultHari1 = await BimbinganReguler.create(queryHari1);
+        records.push(resultHari1);
+        dateThisMonth = moment(dateThisMonth).add('days', 1).format('YYYY-MM-DD');
+
+        const queryHari2 = {
+          period_id: id,
+          tanggal_pengingat_infaq: dateRemember,
+          tanggal: moment(dateThisMonth).format('YYYY-MM-DD'),
+          hari_bimbingan: hari_2,
+          jam_bimbingan: jam_2,
+          status: STATUS_BIMBINGAN_ACTIVE.NOT_SET,
+        };
+        const resultHari2 = await BimbinganReguler.create(queryHari2);
+        records.push(resultHari2);
+      }
+
+      return records;
+    }
+
     for (let i = 1; i <= dateDiff; i++) {
       if (hari_1 == moment(dateThisMonth).format('dddd')?.toUpperCase()) {
         const query = {
