@@ -115,18 +115,38 @@ class AdminArticle {
         return article;
     }
 
-    async getArticleListService(page = 1, pageSize = 10) {
+    async getArticleListService(page = 1, pageSize = 10, articleTitle = '', articleCategory = '', mainArticle = '', statusArticle = '') {
         page = Number(page);
         pageSize = Number(pageSize);
         const offset = (page - 1) * pageSize;
 
-        const totalArticles = await Article.count();
+        let whereClause = {
+            article_title: {
+                [Op.like]: `%${articleTitle}%`
+            },
+            article_category: {
+                [Op.like]: `%${articleCategory}%`
+            }
+        };
+
+        if (mainArticle !== '') {
+            whereClause.main_article = mainArticle;
+        }
+
+        if (statusArticle !== '') {
+            whereClause.archived_article = statusArticle;
+        }
+
+        const totalArticles = await Article.count({
+            where: whereClause
+        });
 
         const base_url = process.env.BASE_URL;
 
-        const totalPages = ceil(totalArticles / pageSize);
+        const totalPages = Math.ceil(totalArticles / pageSize);
 
         const articles = await Article.findAll({
+            where: whereClause,
             offset: offset,
             limit: pageSize,
             attributes: [
@@ -153,16 +173,27 @@ class AdminArticle {
         };
     }
 
-    async getArticleCategoryListService(page = 1, pageSize = 10) {
+    async getArticleCategoryListService(page = 1, pageSize = 10, categoryName = '') {
         page = Number(page);
         pageSize = Number(pageSize);
         const offset = (page - 1) * pageSize;
 
-        const totalArticleCategories = await ArticleCategories.count();
+        const totalArticleCategories = await ArticleCategories.count({
+            where: {
+                categories: {
+                    [Op.like]: `%${categoryName}%`
+                }
+            }
+        });
 
         const totalPages = Math.ceil(totalArticleCategories / pageSize);
 
         const articleCategories = await ArticleCategories.findAll({
+            where: {
+                categories: {
+                    [Op.like]: `%${categoryName}%`
+                }
+            },
             offset: offset,
             limit: pageSize,
             attributes: [
