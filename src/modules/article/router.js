@@ -10,5 +10,6 @@ router.get('/index', ArticleController.getArticlePost)
 router.get('/main', ArticleController.getArticleMain)
 router.get('/archived', ArticleController.getArticleArchived)
 router.get('/detail/:id', ArticleController.getArticleDetail)
+router.get('/category', ArticleController.getArticleCategory)
 
 module.exports = router
