@@ -516,8 +516,8 @@ class AdminDashboardController {
     const service = new AdminArticle();
     try {
       const { query } = req;
-      const { page, pageSize } = query;
-      const result = await service.getArticleListService(page, pageSize);
+      const { page, pageSize, articleTitle, articleCategory, mainArticle, statusArticle } = query;
+      const result = await service.getArticleListService(page, pageSize, articleTitle, articleCategory, mainArticle, statusArticle);
       return responseHandler.succes(res, 'Success get article list', result);
     } catch (error) {
       next(error);
@@ -528,8 +528,8 @@ class AdminDashboardController {
     const service = new AdminArticle();
     try {
       const { query } = req;
-      const { page, pageSize } = query;
-      const result = await service.getArticleCategoryListService(page, pageSize);
+      const { page, pageSize, categoryName } = query;
+      const result = await service.getArticleCategoryListService(page, pageSize, categoryName);
       return responseHandler.succes(res, 'Success get article category list', result);
     } catch (error) {
       next(error);
