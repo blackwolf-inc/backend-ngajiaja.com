@@ -8,6 +8,8 @@ const ApiError = require('../../../helpers/errorHandler');
 const { STATUS_BIMBINGAN_ACTIVE } = require('../../../helpers/constanta');
 const { Period, BimbinganReguler, User, BimbinganTambahan } = db;
 
+const base_url = process.env.BASE_URL;
+
 class BimbinganPeserta {
   static async getDataBimbingan(req, res, next) {
     const service = new PengajarService(req, Period);
