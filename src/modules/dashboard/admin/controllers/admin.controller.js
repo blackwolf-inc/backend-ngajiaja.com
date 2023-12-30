@@ -11,6 +11,7 @@ const Papa = require('papaparse');
 const AdminArticle = require('../services/adminArticle.service.js');
 const storageImage = require('../../../../utils/storageImage.js');
 const path = require('path');
+const { getHash } = require('../../../../helpers/passwordHash.js');
 
 class AdminDashboardController {
   static async dataPengajar(req, res, next) {
@@ -515,8 +516,8 @@ class AdminDashboardController {
     const service = new AdminArticle();
     try {
       const { query } = req;
-      const { page, pageSize } = query;
-      const result = await service.getArticleListService(page, pageSize);
+      const { page, pageSize, articleTitle, articleCategory, mainArticle, statusArticle } = query;
+      const result = await service.getArticleListService(page, pageSize, articleTitle, articleCategory, mainArticle, statusArticle);
       return responseHandler.succes(res, 'Success get article list', result);
     } catch (error) {
       next(error);
@@ -527,8 +528,8 @@ class AdminDashboardController {
     const service = new AdminArticle();
     try {
       const { query } = req;
-      const { page, pageSize } = query;
-      const result = await service.getArticleCategoryListService(page, pageSize);
+      const { page, pageSize, categoryName } = query;
+      const result = await service.getArticleCategoryListService(page, pageSize, categoryName);
       return responseHandler.succes(res, 'Success get article category list', result);
     } catch (error) {
       next(error);
@@ -638,6 +639,22 @@ class AdminDashboardController {
       const result = await service.getTestimonyService(page, pageSize, testimony_name);
       return responseHandler.succes(res, 'Success get testimonies', result);
     } catch (error) {
+      next(error);
+    }
+  }
+
+  static async changeUserPassword(req, res, next) {
+    const service = new AdminDashboard();
+    try {
+      const { userId } = req.params;
+      const { password, retypePassword } = req.body;
+      if (req.body.password) {
+        req.body.password = getHash(req.body.password);
+      }
+      const result = await service.changeUserPasswordService(userId, password, retypePassword);
+      return responseHandler.succes(res, 'Success change user password', result);
+    } catch (error) {
+      responseHandler.error(res, error.message);
       next(error);
     }
   }

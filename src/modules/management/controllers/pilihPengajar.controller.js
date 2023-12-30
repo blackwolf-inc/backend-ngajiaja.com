@@ -13,7 +13,7 @@ class PilihPengajar {
         req.query.hari_1,
         req.query.jam_1,
         req.query.hari_2,
-        req.query.jam_2,
+        req.query.jam_2
       );
       return responseHandler.succes(res, `Success get all ${service.db.name}s`, result);
     } catch (error) {
@@ -41,9 +41,9 @@ class PilihPengajar {
         req.body.hari_1,
         req.body.jam_1,
         req.body.hari_2,
-        req.body.jam_2,
+        req.body.jam_2
       );
-      return responseHandler.succes(res, `Success get all ${service.db.name}s`, result);
+      return responseHandler.succes(res, `Success crete data ${service.db.name}s`, result);
     } catch (error) {
       next(error);
     }
@@ -111,7 +111,7 @@ class PilihPengajar {
         req.body.hari_1,
         req.body.jam_1,
         req.body.hari_2,
-        req.body.jam_2,
+        req.body.jam_2
       );
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {

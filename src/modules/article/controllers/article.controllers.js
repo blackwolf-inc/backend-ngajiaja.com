@@ -5,7 +5,8 @@ class ArticlePost {
     static async getArticlePost(req, res, next) {
         const service = new ArticleService()
         try {
-            const articleIndex = await service.getArticlePostService()
+            const { page, pageSize } = req.query
+            const articleIndex = await service.getArticlePostService(page, pageSize)
             return responseHandler.succes(res, 'Article Index', articleIndex);
         } catch (error) {
             next(error);
@@ -39,6 +40,17 @@ class ArticlePost {
         try {
             const articleDetail = await service.getArticleByIdService(req.params.id)
             return responseHandler.succes(res, 'Article Detail', articleDetail);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getArticleCategory(req, res, next) {
+        const service = new ArticleService()
+        try {
+            const { page, pageSize, categories } = req.query
+            const articleCategory = await service.getArticleCategoryService(page, pageSize, categories)
+            return responseHandler.succes(res, 'Article Category', articleCategory);
         } catch (error) {
             next(error);
         }

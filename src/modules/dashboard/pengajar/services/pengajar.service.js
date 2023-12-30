@@ -63,6 +63,7 @@ class PengajarService extends BaseService {
         period_id: period.id,
         peserta_id: period.peserta.id,
         user_id: period.peserta.user.id,
+        no_telp: period.peserta.user.telp_wa,
         profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
         schedule: {
           day1: null,
@@ -131,6 +132,7 @@ class PengajarService extends BaseService {
             period_id: period.id,
             peserta_id: period.peserta.id,
             user_id: period.peserta.user.id,
+            no_telp: period.peserta.user.telp_wa,
             profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
             bimbingan_reguler_id: bimbinganReguler.id,
             status: null,
@@ -177,6 +179,7 @@ class PengajarService extends BaseService {
             period_id: period.id,
             peserta_id: period.peserta.id,
             user_id: period.peserta.user.id,
+            no_telp: period.peserta.user.telp_wa,
             profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
             bimbingan_tambahan_id: bimbinganTambahan.id,
             status: null,

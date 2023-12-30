@@ -1,9 +1,11 @@
 const db = require('../../.../../../models/index');
-const { Article, sequelize } = db;
+const { Article, ArticleCategories, sequelize } = db;
 const { QueryTypes, Op, Sequelize } = require('sequelize');
 
 class ArticleService {
     async getArticlePostService(page = 1, pageSize = 10) {
+        page = Number(page);
+        pageSize = Number(pageSize);
         const offset = (page - 1) * pageSize;
         const base_url = process.env.BASE_URL;
 
@@ -140,6 +142,34 @@ class ArticleService {
         }
 
         return article;
+    }
+
+    async getArticleCategoryService(page = 1, pageSize = 10, categories = '') {
+        page = Number(page);
+        pageSize = Number(pageSize);
+        const offset = (page - 1) * pageSize;
+
+        const totalArticleCategories = await ArticleCategories.count({
+            where: {
+                categories: {
+                    [Op.like]: `%${categories}%`
+                }
+            }
+        });
+
+        const totalPages = Math.ceil(totalArticleCategories / pageSize);
+
+        const articleCategories = await ArticleCategories.findAll({
+            where: {
+                categories: {
+                    [Op.like]: `%${categories}%`
+                }
+            },
+            offset: offset,
+            limit: pageSize
+        });
+
+        return { articleCategories, page, pageSize, totalPages };
     }
 }
 

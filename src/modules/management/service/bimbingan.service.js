@@ -17,6 +17,8 @@ const {
 const { QueryTypes } = require('sequelize');
 const moment = require('moment');
 
+const base_url = process.env.BASE_URL;
+
 class BimbinganService extends BaseService {
   async bimbinganOnGoing(id, pesertaName, level) {
     const result = await this.__findAll(
@@ -24,8 +26,6 @@ class BimbinganService extends BaseService {
       this.#includeQuery
     );
     if (!result) throw ApiError.notFound(`Pengajar with user id ${id} not found`);
-
-    const base_url = process.env.BASE_URL;
 
     const data = [];
     for (const period of result.datas) {
@@ -40,6 +40,7 @@ class BimbinganService extends BaseService {
           peserta_id: period.peserta.id,
           user_id: period.peserta.user.id,
           name: period.peserta.user.nama,
+          no_telp: period.peserta.user.telp_wa,
           profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
           schedule: {
             day1: period.bimbingan_reguler[0].hari_bimbingan,
@@ -66,6 +67,7 @@ class BimbinganService extends BaseService {
           peserta_id: period.peserta.id,
           user_id: period.peserta.user.id,
           name: period.peserta.user.nama,
+          no_telp: period.peserta.user.telp_wa,
           profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
           schedule: {
             day1: period.bimbingan_tambahan[0].hari_bimbingan,
@@ -239,6 +241,7 @@ class BimbinganService extends BaseService {
     }
 
     return {
+      user_id: result.peserta.user.id,
       peserta_id: result.peserta.id,
       name: result.peserta.user.nama,
       gender: result.peserta.user.jenis_kelamin,
@@ -487,7 +490,7 @@ class BimbinganService extends BaseService {
 
       return {
         id: data.id,
-        profile_picture: data.pengajar.user.profile_picture,
+        profile_picture: `${base_url}/images/${data.pengajar.user.profile_picture}`,
         pengajar_id: data.pengajar_id,
         nama: data.pengajar.user.nama,
         jenis_kelamin: data.pengajar.user.jenis_kelamin,
@@ -550,6 +553,7 @@ class BimbinganService extends BaseService {
     });
 
     let arrayPeriodeBimbingan = [];
+    let arrayTotalAttendance = [];
 
     let tipeBimbingan = '';
 
@@ -560,7 +564,12 @@ class BimbinganService extends BaseService {
     if (period.tipe_bimbingan == TYPE_BIMBINGAN.REGULER) {
       period.bimbingan_reguler.map((data) => {
         arrayPeriodeBimbingan.push(data.tanggal);
+
+        if (data.status === STATUS_BIMBINGAN_ACTIVE.FINISHED) {
+          arrayTotalAttendance.push(data.status);
+        }
       });
+
       tipeBimbingan = TYPE_BIMBINGAN.REGULER;
     }
 
@@ -574,7 +583,7 @@ class BimbinganService extends BaseService {
     const totalBimbinganReguler = period.bimbingan_reguler.length;
     return {
       id: period.id,
-      profile_picture: period.pengajar.user.profile_picture,
+      profile_picture: `${base_url}/images/${period.pengajar.user.profile_picture}`,
       id_pengajar: period.pengajar_id,
       nama: period.pengajar.user.nama,
       jenis_kelamin: period.pengajar.user.jenis_kelamin,
@@ -586,7 +595,7 @@ class BimbinganService extends BaseService {
       tanggal_selesai: arrayPeriodeBimbingan
         ? arrayPeriodeBimbingan[arrayPeriodeBimbingan.length - 1]
         : null,
-      jumlah_attedance_bimbingan_reguler: totalBimbinganReguler ? totalBimbinganReguler : 0,
+      jumlah_attedance_bimbingan_reguler: arrayTotalAttendance.length,
       total_bimbingan_reguler: totalBimbinganReguler,
       tipe_bimbingan: period.tipe_bimbingan,
       status: period.status,

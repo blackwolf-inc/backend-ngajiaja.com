@@ -48,4 +48,6 @@ router.get('/data/transaksi/pencairan/:id', SuperAdminDashboardController.getDat
 router.patch('/data/transaksi/pencairan/:id', image.single('bukti_pembayaran'), SuperAdminDashboardController.updateStatusPencairan);
 router.get('/export/transaksi/pencairan/', SuperAdminDashboardController.exportDataPencairan);
 
+router.post('/add-infaq-sadmin', image.single('bukti_pembayaran'), SuperAdminDashboardController.addInfaqSAdmin);
+
 module.exports = router;

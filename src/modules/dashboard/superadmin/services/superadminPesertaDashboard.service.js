@@ -78,7 +78,7 @@ class SuperAdminDashboardPeserta {
         const result = await sequelize.query(
             `
           SELECT 
-            u.id AS 'user_id', u.nama, u.role, u.status,
+            u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
             p.id AS 'peserta_id', p.level,
             b.bank_id, CONCAT('${base_url}/images/', b.bukti_pembayaran) AS bukti_pembayaran, b.createdAt,
             bk.nama_bank
@@ -221,7 +221,7 @@ class SuperAdminDashboardPeserta {
         const result = await sequelize.query(
             `
           SELECT 
-            u.id AS 'user_id', u.nama, u.role, u.status,
+            u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
             p.id AS 'peserta_id', p.level,
             b.bank_id, b.bukti_pembayaran, b.createdAt,
             bk.nama_bank

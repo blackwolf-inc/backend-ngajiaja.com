@@ -3,6 +3,7 @@ const SuperAdminPesertaDashboardService = require('../services/superadminPeserta
 const SuperAdminPengajarDashboardService = require('../services/superadminPengajarDashboard.service.js')
 const SuperAdminManageCourseService = require('../services/superadminKelolaBimbingan.service.js')
 const SuperAdminDataTransaksi = require('../services/superadminDataTransaksi.service.js')
+const SuperAdminInfaq = require('../services/superadminInfaq.service.js')
 const responseHandler = require('../../../../helpers/responseHandler');
 const Papa = require('papaparse');
 const fs = require('fs');
@@ -403,6 +404,27 @@ class SuperAdminController {
             res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
 
             res.send(csv);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async addInfaqSAdmin(req, res, next) {
+        const service = new SuperAdminInfaq();
+        try {
+            const data = req.body;
+            if (!data) {
+                throw new Error('Request body is empty');
+            }
+
+            let { peserta_id, pengajar_id, bank_id, periode_id, status, nominal, waktu_pembayaran, bukti_pembayaran, keterangan } = data;
+            if (req.file) {
+                data.bukti_pembayaran = req.file.filename;
+                data.waktu_pembayaran = new Date();
+            }
+
+            const result = await service.addInfaqSAdminService(data, peserta_id, pengajar_id, bank_id, periode_id, status, nominal, waktu_pembayaran, bukti_pembayaran, keterangan);
+            return responseHandler.succes(res, 'Success add infaq', result);
         } catch (error) {
             next(error);
         }
