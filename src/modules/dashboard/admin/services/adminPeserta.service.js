@@ -80,16 +80,17 @@ class AdminPesertaService {
         const result = await sequelize.query(
             `
           SELECT 
-            u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+            u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa, u.createdAt AS 'user_createdAt',
             CONCAT('${base_url}/images/', u.profile_picture) AS 'profile_picture',
             p.id AS 'peserta_id', p.level,
-            b.bank_id, CONCAT('${base_url}/images/', b.bukti_pembayaran) AS bukti_pembayaran, b.createdAt,
+            b.bank_id, CONCAT('${base_url}/images/', b.bukti_pembayaran) AS bukti_pembayaran, b.createdAt as 'biaya_createdAt',
             bk.nama_bank
             FROM Pesertas p 
           JOIN Users u ON p.user_id = u.id 
           LEFT JOIN BiayaAdministrasis b ON p.user_id = b.user_id
           LEFT JOIN Banks bk ON b.bank_id = bk.id
           ${whereClause}
+          ORDER BY u.createdAt DESC
           LIMIT ${pageSize} OFFSET ${offset}
           `,
             { type: QueryTypes.SELECT }
@@ -155,7 +156,7 @@ class AdminPesertaService {
         const result = await sequelize.query(
             `
             SELECT 
-                u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+                u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa, u.createdAt AS 'user_createdAt',
                 CONCAT('${base_url}/images/', u.profile_picture) AS 'profile_picture',
                 p.id AS 'peserta_id', p.level,
                 SUM(CASE WHEN br.absensi_peserta = 0 THEN 1 ELSE 0 END) +
@@ -167,6 +168,7 @@ class AdminPesertaService {
             LEFT JOIN BimbinganTambahans bt ON pr.id = bt.period_id
             ${whereClause}
             GROUP BY u.id, p.id
+            ORDER BY u.createdAt DESC
             LIMIT ${pageSize} OFFSET ${offset}
             `,
             { type: QueryTypes.SELECT }
@@ -229,16 +231,17 @@ class AdminPesertaService {
         const result = await sequelize.query(
             `
           SELECT 
-            u.id AS 'user_id', u.nama, u.role, u.status,
+            u.id AS 'user_id', u.nama, u.role, u.status, u.createdAt AS 'user_createdAt', u.telp_wa,
             CONCAT('${base_url}/images/', u.profile_picture) AS 'profile_picture',
             p.id AS 'peserta_id', p.level,
-            b.bank_id, CONCAT('${base_url}/images/', b.bukti_pembayaran) AS bukti_pembayaran, b.createdAt,
+            b.bank_id, CONCAT('${base_url}/images/', b.bukti_pembayaran) AS bukti_pembayaran, b.createdAt AS 'biaya_createdAt',
             bk.nama_bank
             FROM Pesertas p 
           JOIN Users u ON p.user_id = u.id 
           LEFT JOIN BiayaAdministrasis b ON p.user_id = b.user_id
           LEFT JOIN Banks bk ON b.bank_id = bk.id
           ${whereClause}
+          ORDER BY u.createdAt DESC
           `,
             { type: QueryTypes.SELECT }
         );
@@ -259,7 +262,7 @@ class AdminPesertaService {
         const result = await sequelize.query(
             `
             SELECT 
-                u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+                u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa, u.createdAt AS 'user_createdAt',
                 CONCAT('${base_url}/images/', u.profile_picture) AS 'profile_picture',
                 p.id AS 'peserta_id', p.level,
                 SUM(CASE WHEN br.absensi_peserta = 0 THEN 1 ELSE 0 END) +
@@ -271,6 +274,7 @@ class AdminPesertaService {
             LEFT JOIN BimbinganTambahans bt ON pr.id = bt.period_id
             ${whereClause}
             GROUP BY u.id, p.id
+            ORDER BY u.createdAt DESC
           `,
             { type: QueryTypes.SELECT }
         );

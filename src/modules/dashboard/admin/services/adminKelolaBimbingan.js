@@ -65,7 +65,7 @@ class AdminManageCourseService {
         const result = await sequelize.query(
             `
             SELECT 
-                p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', p.hari_1, p.jam_1, p.hari_2, p.jam_2, u1.telp_wa AS 'telp_wa_peserta', u2.telp_wa AS 'telp_wa_pengajar',
+                p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', p.hari_1, p.jam_1, p.hari_2, p.jam_2, u1.telp_wa AS 'telp_wa_peserta', u2.telp_wa AS 'telp_wa_pengajar', p.createdAt,
                 CONCAT('${base_url}/images/', u1.profile_picture) AS 'profile_picture_peserta',
                 CONCAT('${base_url}/images/', u2.profile_picture) AS 'profile_picture_pengajar',
                 CASE 
@@ -84,6 +84,7 @@ class AdminManageCourseService {
             JOIN Pengajars pg ON p.pengajar_id = pg.id
             JOIN Users u2 ON pg.user_id = u2.id
             ${whereClause}
+            ORDER BY p.createdAt DESC
             LIMIT ${pageSize} OFFSET ${offset}
             `,
             { type: sequelize.QueryTypes.SELECT }
@@ -141,7 +142,7 @@ class AdminManageCourseService {
         const result = await sequelize.query(
             `
             SELECT 
-                p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', u1.telp_wa AS 'telp_wa_peserta', u2.telp_wa AS 'telp_wa_pengajar',
+                p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', u1.telp_wa AS 'telp_wa_peserta', u2.telp_wa AS 'telp_wa_pengajar', p.createdAt,
                 CONCAT('${base_url}/images/', u1.profile_picture) AS 'profile_picture_peserta',
                 CONCAT('${base_url}/images/', u2.profile_picture) AS 'profile_picture_pengajar',
                 CASE 
@@ -170,6 +171,7 @@ class AdminManageCourseService {
             JOIN Pengajars pg ON p.pengajar_id = pg.id
             JOIN Users u2 ON pg.user_id = u2.id
             ${whereClause}
+            ORDER BY p.createdAt DESC
             LIMIT ${pageSize} OFFSET ${offset}
             `,
             { type: sequelize.QueryTypes.SELECT }
@@ -279,7 +281,7 @@ class AdminManageCourseService {
         const result = await sequelize.query(
             `
             SELECT 
-                p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', p.hari_1, p.jam_1, p.hari_2, p.jam_2, p.createdAt, u1.telp_wa AS 'telp_wa_peserta', u2.telp_wa AS 'telp_wa_pengajar',
+                p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', p.hari_1, p.jam_1, p.hari_2, p.jam_2, p.createdAt, u1.telp_wa AS 'telp_wa_peserta', u2.telp_wa AS 'telp_wa_pengajar', p.createdAt,
                 CONCAT('${base_url}/images/', u1.profile_picture) AS 'profile_picture_peserta',
                 CONCAT('${base_url}/images/', u2.profile_picture) AS 'profile_picture_pengajar',
                 CASE 
@@ -299,6 +301,7 @@ class AdminManageCourseService {
             JOIN Pengajars pg ON p.pengajar_id = pg.id
             JOIN Users u2 ON pg.user_id = u2.id
             ${whereClause}
+            ORDER BY p.createdAt DESC
             `,
             { type: sequelize.QueryTypes.SELECT }
         );
@@ -321,7 +324,7 @@ class AdminManageCourseService {
         const result = await sequelize.query(
             `
             SELECT 
-                p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', p.createdAt, u1.telp_wa AS 'telp_wa_peserta', u2.telp_wa AS 'telp_wa_pengajar',
+                p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', p.createdAt, u1.telp_wa AS 'telp_wa_peserta', u2.telp_wa AS 'telp_wa_pengajar', p.createdAt,
                 CONCAT('${base_url}/images/', u1.profile_picture) AS 'profile_picture_peserta',
                 CONCAT('${base_url}/images/', u2.profile_picture) AS 'profile_picture_pengajar',
                 CASE 
@@ -351,6 +354,7 @@ class AdminManageCourseService {
             JOIN Pengajars pg ON p.pengajar_id = pg.id
             JOIN Users u2 ON pg.user_id = u2.id
             ${whereClause}
+            ORDER BY p.createdAt DESC
             `,
             { type: sequelize.QueryTypes.SELECT }
         );

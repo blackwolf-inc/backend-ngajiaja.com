@@ -79,11 +79,12 @@ class SuperAdminDashboardPengajar {
         const result = await sequelize.query(
             `
           SELECT 
-            u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+            u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa, u.createdAt,
             p.id AS 'pengajar_id', p.tanggal_wawancara, p.jam_wawancara, p.link_wawancara, p.link_video_membaca_quran, p.link_video_simulasi_mengajar
           FROM Pengajars p 
           JOIN Users u ON p.user_id = u.id 
           ${whereClause}
+          ORDER BY p.createdAt DESC
           LIMIT ${pageSize} OFFSET ${offset}
           `,
             { type: QueryTypes.SELECT }
@@ -156,11 +157,12 @@ class SuperAdminDashboardPengajar {
         const result = await sequelize.query(
             `
       SELECT 
-        u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+        u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa, u.createdAt,
         p.id AS 'pengajar_id', p.level, p.persentase_bagi_hasil
       FROM Pengajars p 
       JOIN Users u ON p.user_id = u.id 
       ${whereClause}
+        ORDER BY u.createdAt DESC
       LIMIT ${pageSize} OFFSET ${offset}
       `,
             { type: QueryTypes.SELECT }
@@ -219,11 +221,12 @@ class SuperAdminDashboardPengajar {
         const result = await sequelize.query(
             `
         SELECT 
-          u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+          u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa, u.createdAt,
           p.id AS 'pengajar_id', p.tanggal_wawancara, p.jam_wawancara, p.link_wawancara, p.link_video_membaca_quran, p.link_video_simulasi_mengajar, p.createdAt
         FROM Pengajars p 
         JOIN Users u ON p.user_id = u.id 
         ${whereClause}
+        ORDER BY u.createdAt DESC
         `,
             { type: QueryTypes.SELECT }
         );
@@ -243,11 +246,12 @@ class SuperAdminDashboardPengajar {
         const result = await sequelize.query(
             `
           SELECT 
-               u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa,
+               u.id AS 'user_id', u.nama, u.role, u.status, u.telp_wa, u.createdAt,
                p.id AS 'pengajar_id', p.level, p.createdAt
           FROM Pengajars p 
           JOIN Users u ON p.user_id = u.id 
           ${whereClause}
+            ORDER BY u.createdAt DESC
           `,
             { type: QueryTypes.SELECT }
         );

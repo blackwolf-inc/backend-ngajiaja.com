@@ -149,6 +149,7 @@ class AdminArticle {
             where: whereClause,
             offset: offset,
             limit: pageSize,
+            order: [['createdAt', 'DESC']],
             attributes: [
                 'article_id',
                 'article_title',
@@ -196,6 +197,7 @@ class AdminArticle {
             },
             offset: offset,
             limit: pageSize,
+            order: [['createdAt', 'DESC']],
             attributes: [
                 'categories_id',
                 'categories',
