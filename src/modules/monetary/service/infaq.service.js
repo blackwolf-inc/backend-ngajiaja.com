@@ -9,7 +9,7 @@ const {
   Pengajar,
   PenghasilanPengajar,
 } = require('../../../models');
-const { Op, where } = require('sequelize');
+const { Op } = require('sequelize');
 const fs = require('fs/promises');
 const path = require('path');
 
@@ -100,6 +100,10 @@ class InfaqService extends BaseService {
     let modifiedResult;
 
     modifiedResult = result.datas.map((item) => {
+      item.pengajar.user.profile_picture = item.pengajar.user.profile_picture
+        ? `${process.env.BASE_URL}/images/${item.pengajar.user.profile_picture}`
+        : null;
+
       return {
         ...item, // Jika `dataValues` tidak ada, sesuaikan dengan struktur aktual
         bukti_pembayaran: item.bukti_pembayaran
@@ -119,6 +123,10 @@ class InfaqService extends BaseService {
 
   async getOneInfaqById(id) {
     const result = await this.__findOne({ where: { id } }, this.#includeQuery);
+
+    result.pengajar.user.profile_picture = result.pengajar.user.profile_picture
+      ? `${process.env.BASE_URL}/images/${result.pengajar.user.profile_picture}`
+      : null;
 
     let modifiedResult;
 
