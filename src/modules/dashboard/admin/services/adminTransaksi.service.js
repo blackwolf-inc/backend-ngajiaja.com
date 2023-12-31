@@ -45,7 +45,7 @@ class AdminTransaksiService extends BaseService {
             model: User,
             required: true,
             as: 'user',
-            attributes: ['nama', 'profile_picture'],
+            attributes: ['nama', 'profile_picture', 'telp_wa'],
             where: userWhere,
           },
         ],
@@ -60,7 +60,7 @@ class AdminTransaksiService extends BaseService {
             model: User,
             required: true,
             as: 'user',
-            attributes: ['nama', 'profile_picture'],
+            attributes: ['nama', 'profile_picture', 'telp_wa'],
             where: userPengajarWhere,
           },
         ],
@@ -72,7 +72,7 @@ class AdminTransaksiService extends BaseService {
       },
     ];
 
-    const result = await this.__findAll({ where: whereClause }, includeQuery);
+    const result = await this.__findAll({ where: whereClause, order: [['createdAt', 'DESC']] }, includeQuery);
 
     const totalPage = Math.ceil(result.total / parseInt(query.paginate, 10) || 1);
 
@@ -81,13 +81,16 @@ class AdminTransaksiService extends BaseService {
         id: item.id,
         id_peserta: item.peserta.id,
         nama_peserta: item.peserta.user.nama,
+        telp_wa_peserta: item.peserta.user.telp_wa,
         profile_picture_peserta: item.peserta.user.profile_picture ? `${base_url}/images/${item.peserta.user.profile_picture}` : null,
         id_pengajar: item.pengajar.id,
         nama_pengajar: item.pengajar.user.nama,
+        telp_wa_pengajar: item.pengajar.user.telp_wa,
         profile_picture_pengajar: item.pengajar.user.profile_picture ? `${base_url}/images/${item.pengajar.user.profile_picture}` : null,
         status: item.status,
         metode: item.bank.nama_bank,
         nominal: item.nominal,
+        createdAt: item.createdAt,
         waktu_pembayaran: item.waktu_pembayaran,
         bukti_pembayaran: item.bukti_pembayaran
           ? `${process.env.BASE_URL}/images/${item.bukti_pembayaran}`

@@ -25,10 +25,11 @@ class SuperAdminDataTransaksi {
 
         const result = await sequelize.query(
             `
-            SELECT Pencairans.id, Pencairans.user_id, Pencairans.status, Pencairans.nominal, Pencairans.waktu_pembayaran, CONCAT('${base_url}/images/', Pencairans.bukti_pembayaran) AS bukti_pembayaran, Pencairans.pengajar_id, Pencairans.createdAt, Pencairans.updatedAt, Users.nama, CONCAT('${base_url}/images/', Users.profile_picture) AS profile_picture
+            SELECT Pencairans.id, Pencairans.user_id, Pencairans.status, Pencairans.nominal, Pencairans.waktu_pembayaran, CONCAT('${base_url}/images/', Pencairans.bukti_pembayaran) AS bukti_pembayaran, Pencairans.pengajar_id, Pencairans.createdAt, Pencairans.updatedAt, Users.nama, CONCAT('${base_url}/images/', Users.profile_picture) AS profile_picture, Pencairans.createdAt, Users.telp_wa
             FROM Pencairans
             JOIN Users ON Pencairans.user_id = Users.id
             ${whereClause}
+            ORDER BY Pencairans.createdAt DESC
             LIMIT ${pageSize} OFFSET ${offset}
             `,
             {
@@ -153,10 +154,11 @@ class SuperAdminDataTransaksi {
     async exportDataPencairan(startDate = '2023-01-01', endDate = '2023-12-31') {
         const pencairan = await sequelize.query(
             `
-            SELECT Pencairans.id, Pencairans.user_id, Pencairans.status, Pencairans.nominal, Pencairans.waktu_pembayaran, Pencairans.bukti_pembayaran, Pencairans.pengajar_id, Pencairans.nama_bank, Pencairans.no_rekening, Pencairans.nama_rekening, Users.nama
+            SELECT Pencairans.id, Pencairans.user_id, Pencairans.status, Pencairans.nominal, Pencairans.waktu_pembayaran, Pencairans.bukti_pembayaran, Pencairans.pengajar_id, Pencairans.nama_bank, Pencairans.no_rekening, Pencairans.nama_rekening, Users.nama, Pencairans.createdAt, Users.telp_wa
             FROM Pencairans
             JOIN Users ON Pencairans.user_id = Users.id
             WHERE Pencairans.createdAt BETWEEN '${startDate}' AND '${endDate}'
+            ORDER BY Pencairans.createdAt DESC
             `,
             {
                 type: QueryTypes.SELECT
