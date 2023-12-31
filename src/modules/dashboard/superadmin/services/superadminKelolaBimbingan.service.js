@@ -60,7 +60,7 @@ class SuperAdminManageCourse {
         const result = await sequelize.query(
             `
             SELECT 
-                p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', p.hari_1, p.jam_1, p.hari_2, p.jam_2, u1.telp_wa AS 'telp_wa_peserta', u2.telp_wa AS 'telp_wa_pengajar',
+                p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', p.hari_1, p.jam_1, p.hari_2, p.jam_2, u1.telp_wa AS 'telp_wa_peserta', u2.telp_wa AS 'telp_wa_pengajar', p.createdAt,
                 CASE 
                     WHEN p.tipe_bimbingan = 'REGULER' THEN (SELECT COUNT(*) FROM BimbinganRegulers br WHERE br.period_id = p.id AND br.absensi_peserta = 1)
                     WHEN p.tipe_bimbingan = 'TAMBAHAN' THEN (SELECT COUNT(*) FROM BimbinganTambahans bt WHERE bt.period_id = p.id AND bt.absensi_peserta = 1)
@@ -77,6 +77,7 @@ class SuperAdminManageCourse {
             JOIN Pengajars pg ON p.pengajar_id = pg.id
             JOIN Users u2 ON pg.user_id = u2.id
             ${whereClause}
+            ORDER BY p.createdAt DESC
             LIMIT ${pageSize} OFFSET ${offset}
             `,
             { type: sequelize.QueryTypes.SELECT }
@@ -133,7 +134,7 @@ class SuperAdminManageCourse {
         const result = await sequelize.query(
             `
             SELECT 
-                p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', u1.telp_wa AS 'telp_wa_peserta', u2.telp_wa AS 'telp_wa_pengajar',
+                p.id AS 'period_id', p.status, p.tipe_bimbingan, p.peserta_id, u1.nama AS 'peserta_name', p.pengajar_id, u2.nama AS 'pengajar_name', u1.telp_wa AS 'telp_wa_peserta', u2.telp_wa AS 'telp_wa_pengajar', p.createdAt,
                 CASE 
                     WHEN p.tipe_bimbingan = 'REGULER' THEN (SELECT COUNT(*) FROM BimbinganRegulers br WHERE br.period_id = p.id AND br.absensi_peserta = 1)
                     WHEN p.tipe_bimbingan = 'TAMBAHAN' THEN (SELECT COUNT(*) FROM BimbinganTambahans bt WHERE bt.period_id = p.id AND bt.absensi_peserta = 1)
@@ -160,6 +161,7 @@ class SuperAdminManageCourse {
             JOIN Pengajars pg ON p.pengajar_id = pg.id
             JOIN Users u2 ON pg.user_id = u2.id
             ${whereClause}
+            ORDER BY p.createdAt DESC
             LIMIT ${pageSize} OFFSET ${offset}
             `,
             { type: sequelize.QueryTypes.SELECT }

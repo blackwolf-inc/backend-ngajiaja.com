@@ -5,8 +5,8 @@ class ArticlePost {
     static async getArticlePost(req, res, next) {
         const service = new ArticleService()
         try {
-            const { page, pageSize } = req.query
-            const articleIndex = await service.getArticlePostService(page, pageSize)
+            const { page, pageSize, article_title, article_category } = req.query
+            const articleIndex = await service.getArticlePostService(page, pageSize, article_title, article_category)
             return responseHandler.succes(res, 'Article Index', articleIndex);
         } catch (error) {
             next(error);

@@ -69,6 +69,7 @@ class AdminTestimonies {
             where: filter,
             offset: offset,
             limit: pageSize,
+            order: [['createdAt', 'DESC']],
             attributes: {
                 include: [[sequelize.literal(`CONCAT('${base_url}/images/', testimony_picture)`), 'testimony_picture']]
             }
