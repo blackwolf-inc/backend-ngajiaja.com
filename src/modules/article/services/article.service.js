@@ -3,7 +3,7 @@ const { Article, ArticleCategories, sequelize } = db;
 const { QueryTypes, Op, Sequelize } = require('sequelize');
 
 class ArticleService {
-    async getArticlePostService(page = 1, pageSize = 10) {
+    async getArticlePostService(page = 1, pageSize = 10, article_title = '', article_category = '') {
         page = Number(page);
         pageSize = Number(pageSize);
         const offset = (page - 1) * pageSize;
@@ -15,7 +15,13 @@ class ArticleService {
                 include: [[Sequelize.literal(`CONCAT('${base_url}/images/', article_thumbnail)`), 'article_thumbnail']]
             },
             where: {
-                archived_article: 0
+                archived_article: 0,
+                article_title: {
+                    [Op.like]: `%${article_title}%`
+                },
+                article_category: {
+                    [Op.like]: `%${article_category}%`
+                }
             }
         });
         const totalPages = Math.ceil(totalArticles / pageSize);
@@ -28,7 +34,13 @@ class ArticleService {
                 include: [[Sequelize.literal(`CONCAT('${base_url}/images/', article_thumbnail)`), 'article_thumbnail']]
             },
             where: {
-                archived_article: 0
+                archived_article: 0,
+                article_title: {
+                    [Op.like]: `%${article_title}%`
+                },
+                article_category: {
+                    [Op.like]: `%${article_category}%`
+                }
             }
         });
 
