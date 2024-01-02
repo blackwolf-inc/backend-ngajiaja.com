@@ -32,7 +32,7 @@ class SuperAdminManageCourse {
                 FROM Periods p
                 JOIN Pengajars pj ON p.pengajar_id = pj.id
                 JOIN Users u ON pj.user_id = u.id
-                WHERE p.status = 'CANCELED'
+                WHERE p.status != 'CANCELED'
                 `,
         { type: QueryTypes.SELECT }
       ),
