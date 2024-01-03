@@ -506,6 +506,7 @@ class BimbinganService extends BaseService {
         status: data.status,
         infaq_bimbingan_tambahan_sebelum:
           data.bimbingan_tambahan.length > 0 ? data.bimbingan_tambahan[0].tanggal : null,
+        telp_wa: data.pengajar.user.telp_wa,
       };
     });
 
