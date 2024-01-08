@@ -1,10 +1,12 @@
 const { QueryTypes } = require('sequelize');
 const db = require('../../../../models/index');
-const { Pengajar, User, sequelize } = db;
+const { Pengajar, User, sequelize, Peserta } = db;
 const BaseService = require('../../../../base/base.service');
 const UserService = require('../../../registration/services/user.service');
 const PengajarService = require('../../../registration/services/teacher.service');
 const moment = require('moment');
+const ApiError = require('../../../../helpers/errorHandler');
+const SendEmailNotification = require('../../../../utils/nodemailer');
 
 class AdminPengajarService {
   /**
@@ -135,7 +137,7 @@ class AdminPengajarService {
     const afterUpdatePengajar = await servicePengajar.updateData(
       {
         level: payload.level_pengajar,
-        persentase_bagi_hasil: payload.persentase_bagi_hasil
+        persentase_bagi_hasil: payload.persentase_bagi_hasil,
       },
       { id: user.pengajar.id }
     );
@@ -143,7 +145,7 @@ class AdminPengajarService {
     return {
       status: afterUpdateUser.status,
       level: afterUpdatePengajar.level,
-      persentase_bagi_hasil: afterUpdatePengajar.persentase_bagi_hasil
+      persentase_bagi_hasil: afterUpdatePengajar.persentase_bagi_hasil,
     };
   }
 
@@ -305,6 +307,40 @@ class AdminPengajarService {
 
     return result;
   }
+
+  async getOneUser(paramId) {
+    const data = User.findOne({ where: { id: paramId } });
+    if (!data) {
+      throw ApiError.badRequest(`${this.db.name} not found`);
+    }
+
+    return data;
+  }
+
+  async sendNotificationEmail(email, name) {
+    const getHtml = await SendEmailNotification.getHtml('notifikasiPengajar.ejs', {
+      email,
+      name,
+    });
+    return SendEmailNotification.sendMail(email, 'Register Pengajar Notification', getHtml);
+  }
+
+  #includeQuery = [
+    {
+      model: Pengajar,
+      attributes: {
+        exclude: ['user_id'],
+      },
+      as: 'pengajar',
+    },
+    {
+      model: Peserta,
+      attributes: {
+        exclude: ['user_id'],
+      },
+      as: 'peserta',
+    },
+  ];
 }
 
 module.exports = AdminPengajarService;

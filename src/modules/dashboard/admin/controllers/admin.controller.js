@@ -26,6 +26,7 @@ class AdminDashboardController {
 
   static async updateWawancara(req, res, next) {
     const service = new AdminPengajarService();
+
     try {
       const { userId } = req.params;
       const {
@@ -36,6 +37,9 @@ class AdminDashboardController {
         isVerifiedByAdmin,
         level_pengajar,
       } = req.body;
+      // console.log('masuk1');
+      const user = await service.getOneUser(userId);
+
       const result = await service.updateJadwalWawancara(
         req,
         {
@@ -48,6 +52,12 @@ class AdminDashboardController {
         },
         userId
       );
+
+      if (result && status_pengajar === 'ACTIVE') {
+        console.log('masuk GO SEND EMAIL', user.dataValues);
+        service.sendNotificationEmail(user.dataValues.email, user.dataValues.nama);
+      }
+
       return responseHandler.succes(res, 'Success update pengajar registered', result);
     } catch (error) {
       next(error);
@@ -517,7 +527,14 @@ class AdminDashboardController {
     try {
       const { query } = req;
       const { page, pageSize, articleTitle, articleCategory, mainArticle, statusArticle } = query;
-      const result = await service.getArticleListService(page, pageSize, articleTitle, articleCategory, mainArticle, statusArticle);
+      const result = await service.getArticleListService(
+        page,
+        pageSize,
+        articleTitle,
+        articleCategory,
+        mainArticle,
+        statusArticle
+      );
       return responseHandler.succes(res, 'Success get article list', result);
     } catch (error) {
       next(error);
@@ -582,12 +599,18 @@ class AdminDashboardController {
     const service = new AdminTestimoniesService();
     try {
       let { testimony_name, testimony_body, testimony_profession, testimony_archived } = req.body;
-      let testimony_picture
+      let testimony_picture;
       if (req.file) {
         req.body.testimony_picture = req.file.filename;
         testimony_picture = req.file.filename;
       }
-      const result = await service.createTestimonyService({ testimony_name, testimony_body, testimony_profession, testimony_picture, testimony_archived });
+      const result = await service.createTestimonyService({
+        testimony_name,
+        testimony_body,
+        testimony_profession,
+        testimony_picture,
+        testimony_archived,
+      });
       return responseHandler.succes(res, 'Success create testimonies', result);
     } catch (error) {
       next(error);
@@ -607,13 +630,21 @@ class AdminDashboardController {
         req.body.testimony_picture = req.file.filename;
 
         if (currentTestimony.testimony_picture) {
-          await fs.promises.unlink(path.join(process.cwd(), '../images', currentTestimony.testimony_picture));
+          await fs.promises.unlink(
+            path.join(process.cwd(), '../images', currentTestimony.testimony_picture)
+          );
         }
 
         testimony_picture = req.file.filename;
       }
 
-      const result = await service.updateTestimonyService(testimonyId, { testimony_name, testimony_body, testimony_profession, testimony_picture, testimony_archived });
+      const result = await service.updateTestimonyService(testimonyId, {
+        testimony_name,
+        testimony_body,
+        testimony_profession,
+        testimony_picture,
+        testimony_archived,
+      });
       return responseHandler.succes(res, 'Success update testimonies', result);
     } catch (error) {
       next(error);
@@ -658,7 +689,6 @@ class AdminDashboardController {
       next(error);
     }
   }
-
 }
 
 module.exports = AdminDashboardController;
