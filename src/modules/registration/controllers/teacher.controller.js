@@ -40,7 +40,7 @@ class TeacherController {
       }
 
       const result = await service.createTeacher(req.body);
-      service.sendNotificationEmail(userExist.email, userExist.nama);
+      // service.sendNotificationEmail(userExist.email, userExist.nama);
       return responseHandler.succes(res, `Success create ${service.db.name}`, result);
     } catch (error) {
       next(error);
