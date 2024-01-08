@@ -54,6 +54,7 @@ class AdminDashboardController {
       );
       console.log('masuk3', result);
       if (result && status_pengajar === 'ACTIVE') {
+        console.log('masuk GOSEND', user.dataValues);
         service.sendNotificationEmail(user.dataValues.email, user.dataValues.nama);
       }
 
