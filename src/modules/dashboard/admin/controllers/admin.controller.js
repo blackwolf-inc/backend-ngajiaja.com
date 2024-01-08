@@ -39,7 +39,7 @@ class AdminDashboardController {
       } = req.body;
       // console.log('masuk1');
       const user = await service.getOneUser(userId);
-      console.log('masuk2', user.dataValues);
+
       const result = await service.updateJadwalWawancara(
         req,
         {
@@ -52,9 +52,9 @@ class AdminDashboardController {
         },
         userId
       );
-      console.log('masuk3', result);
+
       if (result && status_pengajar === 'ACTIVE') {
-        console.log('masuk GOSEND', user.dataValues);
+        console.log('masuk GO SEND EMAIL', user.dataValues);
         service.sendNotificationEmail(user.dataValues.email, user.dataValues.nama);
       }
 
