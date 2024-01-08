@@ -6,6 +6,7 @@ const UserService = require('../../../registration/services/user.service');
 const PengajarService = require('../../../registration/services/teacher.service');
 const moment = require('moment');
 const ApiError = require('../../../../helpers/errorHandler');
+const SendEmailNotification = require('../../../../utils/nodemailer');
 
 class AdminPengajarService {
   /**
@@ -314,6 +315,14 @@ class AdminPengajarService {
     }
 
     return data;
+  }
+
+  async sendNotificationEmail(email, name) {
+    const getHtml = await SendEmailNotification.getHtml('notifikasiPengajar.ejs', {
+      email,
+      name,
+    });
+    return SendEmailNotification.sendMail(email, 'Register Pengajar Notification', getHtml);
   }
 
   #includeQuery = [
