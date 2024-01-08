@@ -142,9 +142,8 @@ class BimbinganService extends BaseService {
           user_id: period.peserta.user.id,
           name: period.peserta.user.nama,
           profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
-          period: `${period.bimbingan_reguler[0].tanggal} - ${
-            period.bimbingan_reguler[period.bimbingan_reguler.length - 1].tanggal
-          }`,
+          period: `${period.bimbingan_reguler[0].tanggal} - ${period.bimbingan_reguler[period.bimbingan_reguler.length - 1].tanggal
+            }`,
           absent,
           peserta_review: period.catatan_peserta,
         };
@@ -164,9 +163,8 @@ class BimbinganService extends BaseService {
           user_id: period.peserta.user.id,
           name: period.peserta.user.nama,
           profile_picture: `${base_url}/images/${period.peserta.user.profile_picture}`,
-          period: `${period.bimbingan_tambahan[0].tanggal} - ${
-            period.bimbingan_tambahan[period.bimbingan_tambahan.length - 1].tanggal
-          }`,
+          period: `${period.bimbingan_tambahan[0].tanggal} - ${period.bimbingan_tambahan[period.bimbingan_tambahan.length - 1].tanggal
+            }`,
           absent,
           peserta_review: period.catatan_peserta,
         };
@@ -269,7 +267,7 @@ class BimbinganService extends BaseService {
           user_id: result.peserta.user.id,
           profile_picture: `${base_url}/images/${result.peserta.user.profile_picture}`,
           bimbingan_reguler_id: bimbinganReguler.id,
-          status: null,
+          status: bimbinganReguler.status,
           date: bimbinganReguler.tanggal,
           time: bimbinganReguler.jam_bimbingan,
           attendance: bimbinganReguler.absensi_peserta,
@@ -277,33 +275,33 @@ class BimbinganService extends BaseService {
           link_meet: bimbinganReguler.link_meet,
         };
 
-        if (!bimbinganReguler.link_meet) {
-          dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.NOT_SET;
-        }
+        // if (!bimbinganReguler.link_meet) {
+        //   dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.NOT_SET;
+        // }
 
-        if (bimbinganReguler.link_meet && moment().isBefore(dataBimbinganReguler.date)) {
-          dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.WAITING;
-        }
+        // if (bimbinganReguler.link_meet && moment().isBefore(dataBimbinganReguler.date)) {
+        //   dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.WAITING;
+        // }
 
-        if (
-          bimbinganReguler.link_meet &&
-          !bimbinganReguler.catatan_pengajar &&
-          moment().isAfter(moment(dataBimbinganReguler.date).add(1, 'hours'))
-        ) {
-          dataBimbinganReguler.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
-        }
+        // if (
+        //   bimbinganReguler.link_meet &&
+        //   !bimbinganReguler.catatan_pengajar &&
+        //   moment().isAfter(moment(dataBimbinganReguler.date).add(1, 'hours'))
+        // ) {
+        //   dataBimbinganReguler.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
+        // }
 
-        if (bimbinganReguler.tanggal_baru && bimbinganReguler.jam_baru) {
-          dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
-        }
+        // if (bimbinganReguler.tanggal_baru && bimbinganReguler.jam_baru) {
+        //   dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
+        // }
 
-        if (bimbinganReguler.persetujuan_peserta === 0) {
-          dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.CANCELED;
-        }
+        // if (bimbinganReguler.persetujuan_peserta === 0) {
+        //   dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.CANCELED;
+        // }
 
-        if (bimbinganReguler.absensi_peserta === 1 || bimbinganReguler.absensi_pengajar === 1) {
-          dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.FINISHED;
-        }
+        // if (bimbinganReguler.absensi_peserta === 1 || bimbinganReguler.absensi_pengajar === 1) {
+        //   dataBimbinganReguler.status = STATUS_BIMBINGAN_ACTIVE.FINISHED;
+        // }
 
         data.push(dataBimbinganReguler);
       }
@@ -317,7 +315,7 @@ class BimbinganService extends BaseService {
           user_id: result.peserta.user.id,
           profile_picture: `${base_url}/images/${result.peserta.user.profile_picture}`,
           bimbingan_tambahan_id: bimbinganTambahan.id,
-          status: null,
+          status: bimbinganTambahan.status,
           date: bimbinganTambahan.tanggal,
           time: bimbinganTambahan.jam_bimbingan,
           attendance: bimbinganTambahan.absensi_peserta,
@@ -325,33 +323,33 @@ class BimbinganService extends BaseService {
           link_meet: bimbinganTambahan.link_meet,
         };
 
-        if (!bimbinganTambahan.link_meet) {
-          dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.NOT_SET;
-        }
+        // if (!bimbinganTambahan.link_meet) {
+        //   dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.NOT_SET;
+        // }
 
-        if (bimbinganTambahan.link_meet && moment().isBefore(dataBimbinganTambahan.date)) {
-          dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.WAITING;
-        }
+        // if (bimbinganTambahan.link_meet && moment().isBefore(dataBimbinganTambahan.date)) {
+        //   dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.WAITING;
+        // }
 
-        if (
-          bimbinganTambahan.link_meet &&
-          !bimbinganTambahan.catatan_pengajar &&
-          moment().isAfter(moment(dataBimbinganTambahan.date).add(1, 'hours'))
-        ) {
-          dataBimbinganTambahan.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
-        }
+        // if (
+        //   bimbinganTambahan.link_meet &&
+        //   !bimbinganTambahan.catatan_pengajar &&
+        //   moment().isAfter(moment(dataBimbinganTambahan.date).add(1, 'hours'))
+        // ) {
+        //   dataBimbinganTambahan.status = `${STATUS_BIMBINGAN_ACTIVE.WAITING} (LATE)`;
+        // }
 
-        if (bimbinganTambahan.tanggal_baru && bimbinganTambahan.jam_baru) {
-          dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
-        }
+        // if (bimbinganTambahan.tanggal_baru && bimbinganTambahan.jam_baru) {
+        //   dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.RESCHEDULE;
+        // }
 
-        if (bimbinganTambahan.persetujuan_peserta === 0) {
-          dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.CANCELED;
-        }
+        // if (bimbinganTambahan.persetujuan_peserta === 0) {
+        //   dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.CANCELED;
+        // }
 
-        if (bimbinganTambahan.absensi_peserta === 1 || bimbinganTambahan.absensi_pengajar === 1) {
-          dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.FINISHED;
-        }
+        // if (bimbinganTambahan.absensi_peserta === 1 || bimbinganTambahan.absensi_pengajar === 1) {
+        //   dataBimbinganTambahan.status = STATUS_BIMBINGAN_ACTIVE.FINISHED;
+        // }
 
         data.push(dataBimbinganTambahan);
       }
